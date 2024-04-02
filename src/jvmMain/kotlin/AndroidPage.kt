@@ -14,6 +14,11 @@ import androidx.compose.ui.unit.sp
 import widget.Section
 import widget.TwoPage
 import widget.UpdateDescView
+import javax.swing.JButton
+import javax.swing.JFileChooser
+import javax.swing.JFrame
+import javax.swing.JTextField
+
 
 class AndroidPage : Page("安卓页面") {
 
@@ -44,7 +49,7 @@ class AndroidPage : Page("安卓页面") {
         val dividerHeight = 30.dp
         Section("操作") {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = {}) {
+                OutlinedButton(onClick = { selectFile() }) {
                     Text("选择Apk文件夹", color = AppColors.fontGray)
                 }
                 Spacer(Modifier.width(10.dp))
@@ -61,6 +66,21 @@ class AndroidPage : Page("安卓页面") {
         }
     }
 
+    private fun selectFile() {
+//        val frame = JFrame()
+//        val fileDialog = FileDialog(frame, "选择Apk文件夹", FileDialog.LOAD)
+//        fileDialog.isVisible = true
+//        val dir = fileDialog.directory
+//        selectedApkDir.value = dir ?: ""
+        // 创建 JFrame 实例
+
+        val chooser = JFileChooser()
+        chooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY;
+        chooser.showOpenDialog(null)
+        val selectedFile = chooser.selectedFile
+        selectedApkDir.value = selectedFile?.absolutePath ?: ""
+
+    }
 
     @Composable
     private fun VersionCodeBox() {

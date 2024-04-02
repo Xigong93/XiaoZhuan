@@ -53,7 +53,11 @@ class ChannelGroupPage(
 
                     }
                 ) {
-                    Text("发布更新", color = Color.White)
+                    Text(
+                        "发布更新",
+                        color = Color.White,
+                        modifier = Modifier.padding(horizontal = 40.dp)
+                    )
                 }
             }
         }
@@ -87,7 +91,7 @@ private fun ChannelView(channel: Channel, onCheckChange: (Boolean) -> Unit) {
         modifier = Modifier
             .clip(RoundedCornerShape(10.dp))
             .background(Color.White)
-            .padding(20.dp)
+            .padding(16.dp)
     ) {
         Checkbox(
             channel.selected,

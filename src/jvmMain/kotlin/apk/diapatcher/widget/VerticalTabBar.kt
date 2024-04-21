@@ -1,3 +1,5 @@
+package apk.diapatcher.widget
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,10 +13,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.diapatcher.style.AppColors
 
 @Composable
-fun TabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (index: Int) -> Unit) {
-    Row {
+fun VerticalTabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (index: Int) -> Unit) {
+    Column {
         tabs.withIndex().forEach { (index, label) ->
             TabItem(
                 title = label,
@@ -34,22 +37,23 @@ private fun TabItem(
     selectedColor: Color = AppColors.primary,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
+        Divider(
+            color = if (selected) selectedColor else Color.Transparent,
+            modifier = Modifier
+                .size(width = 4.dp, height = 20.dp)
+                .clip(RoundedCornerShape(2.dp))
+        )
+        Spacer(Modifier.width(6.dp))
         Text(
             title,
             color = if (selected) selectedColor else AppColors.fontGray,
             fontSize = 16.sp
         )
-        Spacer(Modifier.height(4.dp))
-        Divider(
-            color = if (selected) selectedColor else Color.Transparent,
-            modifier = Modifier
-                .size(width = 20.dp, height = 4.dp)
-                .clip(RoundedCornerShape(2.dp))
-        )
+
     }
 }
 

@@ -1,3 +1,5 @@
+package apk.diapatcher.ui
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,22 +13,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import widget.Section
-import widget.TwoPage
-import widget.UpdateDescView
-import widget.UpdateTypeView
+import apk.diapatcher.ApkConfig
+import apk.diapatcher.style.AppColors
+import apk.diapatcher.widget.*
+import javax.swing.JFileChooser
 
-class OfficialWebsitePage : Page("官网页面") {
+
+class ApkPage(val apkConfig: ApkConfig) : Page(apkConfig.name) {
 
     private val updateDescView = UpdateDescView()
 
     private val selectedApkDir = mutableStateOf("/user/xigong/download/星题库/v5.30.0")
 
-    private val updateTypeView = UpdateTypeView()
-
     private val channelGroupPage = ChannelGroupPage(
         listOf(
-            Channel("应用内和官网", "", state = ChannelState.Waiting, true),
+            Channel("华为", "", state = ChannelState.Waiting, true),
+            Channel("小米", "", state = ChannelState.Waiting, true),
+            Channel("OPPO", "", state = ChannelState.Waiting, true),
+            Channel("VIVO", "", state = ChannelState.Waiting, true),
+            Channel("荣耀", "", state = ChannelState.Waiting, true),
         )
     )
 
@@ -43,16 +48,12 @@ class OfficialWebsitePage : Page("官网页面") {
         val dividerHeight = 30.dp
         Section("操作") {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = {}) {
-                    Text("选择Apk", color = AppColors.fontGray)
+                OutlinedButton(onClick = { selectFile() }) {
+                    Text("选择Apk文件夹", color = AppColors.fontGray)
                 }
                 Spacer(Modifier.width(10.dp))
                 Text(selectedApkDir.value, color = AppColors.fontGray, fontSize = 12.sp)
             }
-        }
-        Spacer(Modifier.height(dividerHeight))
-        Section("更新类型") {
-            updateTypeView.render()
         }
         Spacer(Modifier.height(dividerHeight))
         Section("版本信息") {
@@ -64,6 +65,21 @@ class OfficialWebsitePage : Page("官网页面") {
         }
     }
 
+    private fun selectFile() {
+//        val frame = JFrame()
+//        val fileDialog = FileDialog(frame, "选择Apk文件夹", FileDialog.LOAD)
+//        fileDialog.isVisible = true
+//        val dir = fileDialog.directory
+//        selectedApkDir.value = dir ?: ""
+        // 创建 JFrame 实例
+
+        val chooser = JFileChooser()
+        chooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY;
+        chooser.showOpenDialog(null)
+        val selectedFile = chooser.selectedFile
+        selectedApkDir.value = selectedFile?.absolutePath ?: ""
+
+    }
 
     @Composable
     private fun VersionCodeBox() {
@@ -109,4 +125,8 @@ class OfficialWebsitePage : Page("官网页面") {
         channelGroupPage.render()
     }
 
+
 }
+
+
+

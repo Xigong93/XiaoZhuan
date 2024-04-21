@@ -1,6 +1,7 @@
 // Copyright 2000-2022 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license.
 pluginManagement {
     repositories {
+        maven("https://maven.aliyun.com/repository/gradle-plugin")
         google()
         gradlePluginPortal()
         mavenCentral()
@@ -13,5 +14,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "AppUpdateTool"
+rootProject.name = "ApkDispatcher"
 

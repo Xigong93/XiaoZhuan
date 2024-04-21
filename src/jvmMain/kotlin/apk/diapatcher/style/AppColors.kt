@@ -1,3 +1,5 @@
+package apk.diapatcher.style
+
 import androidx.compose.ui.graphics.Color
 
 object AppColors {

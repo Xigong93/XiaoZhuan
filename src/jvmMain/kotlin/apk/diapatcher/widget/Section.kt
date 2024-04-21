@@ -1,4 +1,4 @@
-package widget
+package apk.diapatcher.widget
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -18,14 +18,16 @@ fun Section(
     title: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Text(
-        title,
-        color = Color.Black,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(Modifier.height(12.dp))
-    Column {
-        content()
-    }
+   Column {
+       Text(
+           title,
+           color = Color.Black,
+           fontSize = 16.sp,
+           fontWeight = FontWeight.Bold
+       )
+       Spacer(Modifier.height(12.dp))
+       Column {
+           content()
+       }
+   }
 }

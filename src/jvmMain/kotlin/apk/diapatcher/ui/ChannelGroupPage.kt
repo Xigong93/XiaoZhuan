@@ -1,3 +1,5 @@
+package apk.diapatcher.ui
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,7 +12,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import widget.Section
+import apk.diapatcher.style.AppColors
+import apk.diapatcher.widget.Section
 
 /**
  * 渠道页面

@@ -1,4 +1,4 @@
-package widget
+package apk.diapatcher.widget
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable

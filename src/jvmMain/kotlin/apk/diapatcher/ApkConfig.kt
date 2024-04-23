@@ -8,6 +8,9 @@ import com.squareup.moshi.JsonClass
 data class ApkConfig(
     @Json(name = "name")
     val name: String,
+    /** 创建时间，unix时间戳，毫秒 */
+    @Json(name = "createTime")
+    val createTime: Long,
     @Json(name = "channels")
     val channels: List<Channel>,
     @Json(name = "extension")

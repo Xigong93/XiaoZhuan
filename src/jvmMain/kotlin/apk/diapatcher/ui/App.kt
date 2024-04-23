@@ -1,7 +1,12 @@
 package apk.diapatcher.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
@@ -11,10 +16,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import apk.diapatcher.ApkConfig
 import apk.diapatcher.ApkConfigDao
 import apk.diapatcher.style.AppColors
@@ -34,6 +48,8 @@ private class AppWindow {
 
     val apkConfigDao = ApkConfigDao()
 
+    val editMenu = EditMenu()
+
     val apkConfigs = mutableStateOf<List<ApkConfig>>(emptyList())
 
     /**
@@ -41,23 +57,77 @@ private class AppWindow {
      */
     val configPage = mutableStateOf<ConfigPage?>(null)
 
+    /**
+     * 是否显示菜单
+     */
+    val showMenu = mutableStateOf(false)
+
+    /**
+     * 菜单的绝对位置
+     */
+    var menuCoo: LayoutCoordinates? = null
+
+    var pages = apkConfigs.value.map { ApkPage(it) }
+
+    var titles = pages.map { it.title }
+
     init {
-        apkConfigs.value = apkConfigDao.getApkConfigList()
+        reload()
     }
 
-    val pages = apkConfigs.value.map { ApkPage(it) }
+    fun reload() {
+        apkConfigs.value = apkConfigDao.getApkConfigList()
 
-    val titles = pages.map { it.title }
+        pages = apkConfigs.value.map { ApkPage(it) }
+
+        titles = pages.map { it.title }
+    }
 
     @Composable
     fun render() {
-        val configPage = configPage.value
-        if (configPage != null) {
-            configPage.render()
-        } else if (pages.isEmpty()) {
-            empty()
-        } else {
-            content()
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            showPopupWindow()
+            val configPage = configPage.value
+            if (configPage != null) {
+                configPage.render()
+            } else if (pages.isEmpty()) {
+                empty()
+            } else {
+                content()
+            }
+        }
+
+    }
+
+    @Composable
+    fun showPopupWindow() {
+        if (showMenu.value) {
+            val coordinates = menuCoo ?: return
+            val position = coordinates.positionInWindow()
+            val x = with(LocalDensity.current) {
+                position.x.toDp()
+            }
+            val y = with(LocalDensity.current) {
+                position.y.toDp()
+            }
+            Box(modifier = Modifier
+                .zIndex(100f)
+                .fillMaxSize()
+                .background(Color(0f, 0f, 0f, 0.4f))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    showMenu.value = false
+                }
+            ) {
+                Box(
+                    modifier = Modifier.offset(x - 150.dp, y + 46.dp)
+                ) {
+                    editMenu.render()
+                }
+            }
         }
     }
 
@@ -70,6 +140,7 @@ private class AppWindow {
                 onClick = {
                     configPage.value = ConfigPage {
                         configPage.value = null
+                        reload()
                     }
                 }
             ) {
@@ -88,6 +159,7 @@ private class AppWindow {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(20.dp)
             ) {
                 Title()
@@ -95,6 +167,21 @@ private class AppWindow {
                 HorizontalTabBar(titles, selectedTab.value) {
                     selectedTab.value = it
                 }
+                Spacer(modifier = Modifier.weight(1.0f))
+                Image(
+                    painterResource("menu.png"),
+                    contentDescription = "菜单",
+                    modifier = Modifier.size(32.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            showMenu.value = true
+                        }
+                        .onGloballyPositioned {
+                            menuCoo = it
+                        }
+
+
+                )
             }
             Divider()
             pages[selectedTab.value].render()

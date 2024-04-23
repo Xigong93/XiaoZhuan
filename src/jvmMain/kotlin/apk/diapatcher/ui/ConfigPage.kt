@@ -52,7 +52,7 @@ class ConfigPage(
                 configList()
 
             }
-            saveButton()
+            bottomButtons()
         }
     }
 
@@ -119,18 +119,35 @@ class ConfigPage(
 
 
     @Composable
-    fun saveButton() {
-        Button(
-            colors = ButtonDefaults.buttonColors(AppColors.primary),
-            onClick = {
-                saveApkConfig()
+    fun bottomButtons() {
+        Row {
+            Button(
+                colors = ButtonDefaults.buttonColors(AppColors.primary),
+                onClick = {
+                    saveApkConfig()
+                }
+            ) {
+                Text(
+                    "保存",
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 40.dp)
+                )
             }
-        ) {
-            Text(
-                "保存",
-                color = Color.White,
-                modifier = Modifier.padding(horizontal = 40.dp)
-            )
+
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Button(
+                colors = ButtonDefaults.buttonColors(AppColors.fontGray),
+                onClick = {
+                    onCloseClick()
+                }
+            ) {
+                Text(
+                    "关闭",
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 40.dp)
+                )
+            }
         }
     }
 
@@ -138,7 +155,17 @@ class ConfigPage(
         val apkConfigDao = ApkConfigDao()
         val appName = inputAppName.value
         val extension = ApkConfig.ExtensionConfig(enableMultiChannel.value, enableCombinedApk.value)
-        val apkConfig = ApkConfig(appName, channels = emptyList(), extension = extension)
+        val apkConfig = ApkConfig(
+            name = appName,
+            createTime = System.currentTimeMillis(),
+            channels = emptyList(),
+            extension = extension
+        )
+        val oldApkConfig = this.apkConfig
+        if (oldApkConfig != null) {
+            apkConfigDao.removeApkConfig(oldApkConfig)
+        }
         apkConfigDao.saveApkConfig(apkConfig)
+        onCloseClick()
     }
 }

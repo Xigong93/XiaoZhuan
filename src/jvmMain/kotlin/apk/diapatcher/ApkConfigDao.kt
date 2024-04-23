@@ -24,7 +24,7 @@ private class ApkConfigDaoImpl : ApkConfigDao {
 
     override fun getApkConfigList(): List<ApkConfig> {
         val files = getApkDir().listFiles() ?: emptyArray()
-        return files.mapNotNull(::readApkConfig)
+        return files.mapNotNull(::readApkConfig).sortedBy { it.createTime }
     }
 
     override fun saveApkConfig(apkConfig: ApkConfig) {
@@ -47,13 +47,10 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     }
 
     private fun writeApkConfig(file: File, apkConfig: ApkConfig) {
-        try {
-            val json = jsonAdapter.toJson(apkConfig)
-            file.parentFile?.mkdirs()
-            file.writeText(json, charset = Charsets.UTF_8)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        require(!file.exists()) { "文件不能重名" }
+        val json = jsonAdapter.toJson(apkConfig)
+        file.parentFile?.mkdirs()
+        file.writeText(json, charset = Charsets.UTF_8)
     }
 
     private fun getApkDispatcherDir(): File {

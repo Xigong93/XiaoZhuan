@@ -1,5 +1,6 @@
 package apk.diapatcher.ui
 
+import androidx.compose.animation.*
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -122,25 +124,34 @@ private class AppWindow {
 
     @Composable
     fun showPopupWindow() {
-        if (showMenu.value) {
-            val coordinates = menuCoo ?: return
-            val position = coordinates.positionInWindow()
-            val x = with(LocalDensity.current) {
-                position.x.toDp()
+        val position = menuCoo?.positionInWindow() ?: Offset.Zero
+        val density = LocalDensity.current
+        val x = with(density) { position.x.toDp() }
+        val y = with(density) { position.y.toDp() }
+        Box(modifier = Modifier.zIndex(100f).fillMaxSize()) {
+            AnimatedVisibility(
+                visible = showMenu.value,
+                modifier = Modifier.fillMaxSize(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0f, 0f, 0f, 0.4f))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            showMenu.value = false
+                        }
+                )
             }
-            val y = with(LocalDensity.current) {
-                position.y.toDp()
-            }
-            Box(modifier = Modifier
-                .zIndex(100f)
-                .fillMaxSize()
-                .background(Color(0f, 0f, 0f, 0.4f))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    showMenu.value = false
-                }
+
+            AnimatedVisibility(
+                visible = showMenu.value,
+                enter = slideInHorizontally(initialOffsetX = { it * 2 }),
+                exit = slideOutHorizontally(targetOffsetX = { it * 2 })
             ) {
                 Box(
                     modifier = Modifier.offset(x - 150.dp, y + 46.dp)
@@ -149,6 +160,7 @@ private class AppWindow {
                 }
             }
         }
+
     }
 
     @Composable

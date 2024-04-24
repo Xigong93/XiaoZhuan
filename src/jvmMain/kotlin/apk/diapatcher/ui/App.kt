@@ -48,7 +48,27 @@ private class AppWindow {
 
     val apkConfigDao = ApkConfigDao()
 
-    val editMenu = EditMenu()
+    val editMenu = EditMenu().apply {
+        eventListener = object : EditMenu.EventListener {
+            override fun onAddClick() {
+                hideMenu()
+            }
+
+            override fun onEditClick() {
+                hideMenu()
+
+            }
+
+            override fun onDeleteClick() {
+                hideMenu()
+            }
+
+            private fun hideMenu() {
+                showMenu.value = false
+            }
+
+        }
+    }
 
     val apkConfigs = mutableStateOf<List<ApkConfig>>(emptyList())
 

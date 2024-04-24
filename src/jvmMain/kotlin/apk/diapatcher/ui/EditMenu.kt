@@ -35,11 +35,17 @@ class EditMenu() {
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            item("新增") {}
+            item("新增") {
+                eventListener?.onAddClick()
+            }
             Divider()
-            item("编辑") {}
+            item("编辑") {
+                eventListener?.onEditClick()
+            }
             Divider()
-            item("删除", color = Color.Red) {}
+            item("删除", color = Color.Red) {
+                eventListener?.onDeleteClick()
+            }
         }
 
     }

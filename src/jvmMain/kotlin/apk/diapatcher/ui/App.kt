@@ -20,10 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -39,13 +37,12 @@ import apk.diapatcher.widget.HorizontalTabBar
 @Composable
 @Preview
 fun App() {
-//    val selectedTab by remember { mutableStateOf(0) }
     val appWindow = remember { AppWindow() }
-    appWindow.render()
-
+    appWindow.Render()
 }
 
 private class AppWindow {
+
     val selectedTab = mutableStateOf(0)
 
     val apkConfigDao = ApkConfigDao()
@@ -54,15 +51,24 @@ private class AppWindow {
         eventListener = object : EditMenu.EventListener {
             override fun onAddClick() {
                 hideMenu()
+                showConfigPage(null)
             }
 
             override fun onEditClick() {
                 hideMenu()
-
+                val current = currentApkConfig()
+                showConfigPage(current)
             }
 
             override fun onDeleteClick() {
                 hideMenu()
+                val current = currentApkConfig() ?: return
+                apkConfigDao.removeApkConfig(current)
+                reload()
+            }
+
+            private fun currentApkConfig(): ApkConfig? {
+                return apkConfigs.value.getOrNull(selectedTab.value)
             }
 
             private fun hideMenu() {
@@ -91,7 +97,6 @@ private class AppWindow {
 
     var pages = apkConfigs.value.map { ApkPage(it) }
 
-    var titles = pages.map { it.title }
 
     init {
         reload()
@@ -102,29 +107,28 @@ private class AppWindow {
 
         pages = apkConfigs.value.map { ApkPage(it) }
 
-        titles = pages.map { it.title }
+        selectedTab.value = selectedTab.value.coerceIn(0, (apkConfigs.value.size - 1).coerceAtLeast(0))
     }
 
     @Composable
-    fun render() {
-
+    fun Render() {
         Box(modifier = Modifier.fillMaxWidth()) {
-            showPopupWindow()
+            PopupMenu()
             val configPage = configPage.value
             if (configPage != null) {
                 configPage.render()
             } else if (pages.isEmpty()) {
-                empty()
+                Empty()
             } else {
-                content()
+                Content()
             }
         }
 
     }
 
     @Composable
-    fun showPopupWindow() {
-        val position = menuCoo?.positionInWindow() ?: Offset.Zero
+    fun PopupMenu() {
+        val position = menuCoo?.takeIf { it.isAttached }?.positionInWindow() ?: Offset.Zero
         val density = LocalDensity.current
         val x = with(density) { position.x.toDp() }
         val y = with(density) { position.y.toDp() }
@@ -164,16 +168,13 @@ private class AppWindow {
     }
 
     @Composable
-    fun empty() {
+    fun Empty() {
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
             Button(
                 colors = ButtonDefaults.buttonColors(AppColors.primary),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = {
-                    configPage.value = ConfigPage {
-                        configPage.value = null
-                        reload()
-                    }
+                    showConfigPage(null)
                 }
             ) {
                 Text(
@@ -185,8 +186,15 @@ private class AppWindow {
         }
     }
 
+    private fun showConfigPage(apkConfig: ApkConfig?) {
+        configPage.value = ConfigPage(apkConfig) {
+            configPage.value = null
+            reload()
+        }
+    }
+
     @Composable
-    fun content() {
+    fun Content() {
         Column(Modifier.fillMaxSize()) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -196,6 +204,7 @@ private class AppWindow {
             ) {
                 Title()
                 Spacer(Modifier.width(100.dp))
+                val titles = remember(apkConfigs.value) { apkConfigs.value.map { it.name } }
                 HorizontalTabBar(titles, selectedTab.value) {
                     selectedTab.value = it
                 }
@@ -216,6 +225,7 @@ private class AppWindow {
                 )
             }
             Divider()
+
             pages[selectedTab.value].render()
         }
     }

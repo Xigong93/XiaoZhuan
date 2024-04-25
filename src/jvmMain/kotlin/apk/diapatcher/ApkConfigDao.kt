@@ -11,6 +11,7 @@ fun ApkConfigDao(): ApkConfigDao {
 interface ApkConfigDao {
     fun getApkConfigList(): List<ApkConfig>
 
+    @Throws
     fun saveApkConfig(apkConfig: ApkConfig)
 
     fun removeApkConfig(apkConfig: ApkConfig)
@@ -23,10 +24,14 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     private val jsonAdapter by lazy { moshi.adapter(ApkConfig::class.java) }
 
     override fun getApkConfigList(): List<ApkConfig> {
-        val files = getApkDir().listFiles() ?: emptyArray()
-        return files.mapNotNull(::readApkConfig).sortedBy { it.createTime }
+        val files = getApkDispatcherDir().listFiles() ?: emptyArray()
+        return files
+            .filter { it.name.endsWith(FILE_SUFFIX) }
+            .mapNotNull(::readApkConfig)
+            .sortedBy { it.createTime }
     }
 
+    @Throws
     override fun saveApkConfig(apkConfig: ApkConfig) {
         writeApkConfig(getApkConfigFile(apkConfig), apkConfig)
     }
@@ -58,12 +63,12 @@ private class ApkConfigDaoImpl : ApkConfigDao {
         return File(homeDir, ".apkDispatcher")
     }
 
-    private fun getApkDir(): File {
-        return File(getApkDispatcherDir(), "apk")
+    private fun getApkConfigFile(apkConfig: ApkConfig): File {
+        return File(getApkDispatcherDir(), "${apkConfig.name}${FILE_SUFFIX}")
     }
 
-    private fun getApkConfigFile(apkConfig: ApkConfig): File {
-        return File(getApkDir(), "${apkConfig.name}.json")
+    companion object {
+        private const val FILE_SUFFIX = ".apk.json"
     }
 
 

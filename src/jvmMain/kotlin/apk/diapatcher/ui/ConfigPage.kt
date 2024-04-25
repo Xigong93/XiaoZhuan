@@ -30,7 +30,7 @@ class ConfigPage(
 
     private val titles = listOf("基本信息") + channels.map { it.channelName }
 
-    private val inputAppName = mutableStateOf("")
+    private val inputAppName = mutableStateOf<String>(apkConfig?.name ?: "")
 
     /**
      * 开启渠道包
@@ -47,28 +47,28 @@ class ConfigPage(
         Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
                 Row(modifier = Modifier.width(200.dp)) {
-                    channels()
+                    Channels()
                 }
-                configList()
+                ConfigList()
 
             }
-            bottomButtons()
+            BottomButtons()
         }
     }
 
 
     @Composable
-    fun channels() {
+    fun Channels() {
         VerticalTabBar(titles, currentIndex.value) {
             currentIndex.value = it
         }
     }
 
     @Composable
-    fun configList() {
+    fun ConfigList() {
         val index = currentIndex.value
         if (index == 0) {
-            basicInfo()
+            BasicInfo()
         } else {
             val params = channels[index - 1].getParams()
             Column {
@@ -81,7 +81,7 @@ class ConfigPage(
 
 
     @Composable
-    fun basicInfo() {
+    fun BasicInfo() {
         Column {
             Section("App名称") {
                 OutlinedTextField(
@@ -119,7 +119,7 @@ class ConfigPage(
 
 
     @Composable
-    fun bottomButtons() {
+    fun BottomButtons() {
         Row {
             Button(
                 colors = ButtonDefaults.buttonColors(AppColors.primary),
@@ -165,7 +165,11 @@ class ConfigPage(
         if (oldApkConfig != null) {
             apkConfigDao.removeApkConfig(oldApkConfig)
         }
-        apkConfigDao.saveApkConfig(apkConfig)
+        try {
+            apkConfigDao.saveApkConfig(apkConfig)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         onCloseClick()
     }
 }

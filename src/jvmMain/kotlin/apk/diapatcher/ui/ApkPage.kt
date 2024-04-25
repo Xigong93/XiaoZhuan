@@ -19,7 +19,7 @@ import apk.diapatcher.widget.*
 import javax.swing.JFileChooser
 
 
-class ApkPage(val apkConfig: ApkConfig) : Page(apkConfig.name) {
+class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
 
     private val updateDescView = UpdateDescView()
 

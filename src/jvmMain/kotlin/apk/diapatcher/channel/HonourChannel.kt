@@ -7,7 +7,7 @@ class HonourChannel : ApkChannel() {
 
     override val channelName: String = "荣耀"
 
-    override val fileNameIdentify: String = "honour"
+    override val fileNameIdentify: String = "HONOUR"
 
     override val paramDefine: List<Param> = listOf(
         Param("AppId"),

@@ -7,7 +7,7 @@ class HuaweiChannel : ApkChannel() {
 
     override val channelName: String = "华为"
 
-    override val fileNameIdentify: String = "huawei"
+    override val fileNameIdentify: String = "HUAWEI"
 
     override val paramDefine: List<Param> = listOf(
         Param("AppId"),

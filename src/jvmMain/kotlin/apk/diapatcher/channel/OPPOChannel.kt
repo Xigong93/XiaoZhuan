@@ -7,7 +7,7 @@ class OPPOChannel : ApkChannel() {
 
     override val channelName: String = "OPPO"
 
-    override val fileNameIdentify: String = "oppo"
+    override val fileNameIdentify: String = "OPPO"
 
     override val paramDefine: List<Param> = listOf(
         Param("AppId"),

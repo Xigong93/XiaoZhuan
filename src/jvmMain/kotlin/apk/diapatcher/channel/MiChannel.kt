@@ -7,7 +7,7 @@ class MiChannel : ApkChannel() {
 
     override val channelName: String = "小米"
 
-    override val fileNameIdentify: String = "mi"
+    override val fileNameIdentify: String = "MI"
 
     override val paramDefine: List<Param> = listOf(
         Param("AppId"),

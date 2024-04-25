@@ -1,9 +1,12 @@
 package apk.diapatcher.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,23 +27,32 @@ class ConfigPage(
     private val apkConfig: ApkConfig? = null,
     private val onCloseClick: () -> Unit
 ) {
+
     private val currentIndex = mutableStateOf(0)
 
     private val channels = ApkChannelRegistry.channels
 
     private val titles = listOf("基本信息") + channels.map { it.channelName }
 
-    private val inputAppName = mutableStateOf<String>(apkConfig?.name ?: "")
+    /**
+     * App名称
+     */
+    private val inputAppName = mutableStateOf(apkConfig?.name ?: "")
+
+    /**
+     * 渠道的配置参数
+     */
+    private val inputParams = mutableMapOf<String, MutableMap<String, String>>()
 
     /**
      * 开启渠道包
      */
-    private val enableMultiChannel = mutableStateOf(true)
+    private val enableChannels = mutableStateOf(true)
 
     /**
      * 32位和64位兼容包
      */
-    private val enableCombinedApk = mutableStateOf(true)
+    private val enableCombinedAbi = mutableStateOf(true)
 
     @Composable
     fun render() {
@@ -64,19 +76,34 @@ class ConfigPage(
         }
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun ConfigList() {
         val index = currentIndex.value
-        if (index == 0) {
-            BasicInfo()
-        } else {
-            val params = channels[index - 1].getParams()
-            Column {
-                for (param in params) {
-                    ParamInput(param, null).render()
+        AnimatedContent(index) {
+            if (index == 0) {
+                BasicInfo()
+            } else {
+                val channel = channels[index - 1]
+                val params = channel.getParams()
+                val cName = channel.channelName
+                val saveChannel = apkConfig?.channels?.firstOrNull { it.name == cName }
+                Column {
+                    for (param in params) {
+                        val pName = param.name
+                        val saveParams = saveChannel?.params?.firstOrNull { it.name == pName }
+                        val paramInput = remember(cName, pName) {
+                            ParamInput(param, saveParams?.value) { value ->
+                                inputParams.getOrPut(cName, ::mutableMapOf)[pName] = value
+                            }
+                        }
+                        paramInput.render()
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
+
     }
 
 
@@ -98,8 +125,8 @@ class ConfigPage(
             Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    enableMultiChannel.value,
-                    onCheckedChange = { enable -> enableMultiChannel.value = enable },
+                    enableChannels.value,
+                    onCheckedChange = { enable -> enableChannels.value = enable },
                     colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
                 )
                 Text("开启渠道包")
@@ -107,8 +134,8 @@ class ConfigPage(
             Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    enableCombinedApk.value,
-                    onCheckedChange = { enable -> enableCombinedApk.value = enable },
+                    enableCombinedAbi.value,
+                    onCheckedChange = { enable -> enableCombinedAbi.value = enable },
                     colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
                 )
                 Text("32位和64位兼容包")
@@ -151,21 +178,42 @@ class ConfigPage(
         }
     }
 
+    private fun createChannels(): List<ApkConfig.Channel> {
+        return inputParams.entries
+            .sortedBy { it.key }
+            .map { ApkConfig.Channel(it.key, createParams(it.value)) }
+
+    }
+
+    private fun getMergedChannels(): List<ApkConfig.Channel> {
+        val newChannels = createChannels().associateBy(ApkConfig.Channel::name)
+        val oldChannels = apkConfig?.channels ?: emptyList()
+        val channels = oldChannels.associateBy(ApkConfig.Channel::name).toMutableMap()
+        channels.putAll(newChannels)
+        return channels.values.sortedBy(ApkConfig.Channel::name)
+    }
+
+    private fun createParams(params: Map<String, String>): List<ApkConfig.Param> {
+        return params.entries
+            .sortedBy { it.key }
+            .map { ApkConfig.Param(it.key, it.value) }
+    }
+
     private fun saveApkConfig() {
         val apkConfigDao = ApkConfigDao()
         val appName = inputAppName.value
-        val extension = ApkConfig.ExtensionConfig(enableMultiChannel.value, enableCombinedApk.value)
+        val extension = ApkConfig.ExtensionConfig(enableChannels.value, enableCombinedAbi.value)
         val apkConfig = ApkConfig(
             name = appName,
-            createTime = System.currentTimeMillis(),
-            channels = emptyList(),
+            createTime = apkConfig?.createTime ?: System.currentTimeMillis(),
+            channels = getMergedChannels(),
             extension = extension
         )
-        val oldApkConfig = this.apkConfig
-        if (oldApkConfig != null) {
-            apkConfigDao.removeApkConfig(oldApkConfig)
-        }
         try {
+            val oldApkConfig = this.apkConfig
+            if (oldApkConfig != null) {
+                apkConfigDao.removeApkConfig(oldApkConfig)
+            }
             apkConfigDao.saveApkConfig(apkConfig)
         } catch (e: Exception) {
             e.printStackTrace()

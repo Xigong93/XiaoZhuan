@@ -18,8 +18,15 @@ import apk.diapatcher.ApkChannel
 import apk.diapatcher.style.AppColors
 import apk.diapatcher.widget.Section
 
-class ParamInput(private val param: ApkChannel.Param, value: String?) {
+/**
+ * 参数输入框
+ */
+class ParamInput(private val param: ApkChannel.Param, value: String?, private val onValueChange: (String) -> Unit) {
     private val input = mutableStateOf(value ?: param.defaultValue ?: "")
+
+    init {
+        onValueChange(input.value)
+    }
 
     @Composable
     fun render() {
@@ -32,7 +39,10 @@ class ParamInput(private val param: ApkChannel.Param, value: String?) {
             }
             OutlinedTextField(
                 value = input.value,
-                onValueChange = { input.value = it },
+                onValueChange = {
+                    input.value = it
+                    onValueChange(it)
+                },
                 textStyle = TextStyle(fontSize = textSize),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = AppColors.primary,
@@ -47,5 +57,5 @@ class ParamInput(private val param: ApkChannel.Param, value: String?) {
 @Preview
 @Composable
 fun ParamInputPreview() {
-    ParamInput(param = ApkChannel.Param("ApiKey", null, "ApiKey"), null).render()
+    ParamInput(param = ApkChannel.Param("ApiKey", null, "ApiKey"), null) {}.render()
 }

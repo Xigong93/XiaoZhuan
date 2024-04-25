@@ -7,7 +7,7 @@ class VIVOChannel : ApkChannel() {
 
     override val channelName: String = "VIVO"
 
-    override val fileNameIdentify: String = "vivo"
+    override val fileNameIdentify: String = "VIVO"
 
     override val paramDefine: List<Param> = listOf(
         Param("AppId"),

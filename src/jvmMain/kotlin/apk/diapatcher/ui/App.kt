@@ -193,6 +193,7 @@ private class AppWindow {
         }
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun Content() {
         Column(Modifier.fillMaxSize()) {
@@ -225,8 +226,10 @@ private class AppWindow {
                 )
             }
             Divider()
-
-            pages[selectedTab.value].render()
+            val apkPage = pages[selectedTab.value]
+            AnimatedContent(apkPage) {
+                apkPage.render()
+            }
         }
     }
 }

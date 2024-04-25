@@ -4,8 +4,9 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 
+private val instance by lazy { ApkConfigDaoImpl() }
 fun ApkConfigDao(): ApkConfigDao {
-    return ApkConfigDaoImpl()
+    return instance
 }
 
 interface ApkConfigDao {

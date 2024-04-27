@@ -21,7 +21,7 @@ abstract class ApkChannel {
     /**
      * 初始化参数
      */
-    abstract fun init(params: Map<Param, String>)
+    abstract fun init(params: Map<Param, String?>)
 
     /**
      * 添加监听器

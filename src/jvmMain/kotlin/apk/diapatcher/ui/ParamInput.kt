@@ -24,10 +24,6 @@ import apk.diapatcher.widget.Section
 class ParamInput(private val param: ApkChannel.Param, value: String?, private val onValueChange: (String) -> Unit) {
     private val input = mutableStateOf(value ?: param.defaultValue ?: "")
 
-    init {
-        onValueChange(input.value)
-    }
-
     @Composable
     fun render() {
         val textSize = 14.sp

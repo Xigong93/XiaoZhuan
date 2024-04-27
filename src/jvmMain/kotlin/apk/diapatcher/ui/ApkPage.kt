@@ -25,16 +25,15 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
 
     private val selectedApkDir = mutableStateOf("/user/xigong/download/星题库/v5.30.0")
 
-    private val channelGroupPage = ChannelGroupPage(
-        listOf(
-            Channel("华为", "", state = ChannelState.Waiting, true),
-            Channel("小米", "", state = ChannelState.Waiting, true),
-            Channel("OPPO", "", state = ChannelState.Waiting, true),
-            Channel("VIVO", "", state = ChannelState.Waiting, true),
-            Channel("荣耀", "", state = ChannelState.Waiting, true),
-        )
-    )
+    private val channelGroupPage = ChannelGroupPage(apkConfig)
 
+    //    listOf(
+//    Channel("华为", "", state = ChannelState.Waiting, true),
+//    Channel("小米", "", state = ChannelState.Waiting, true),
+//    Channel("OPPO", "", state = ChannelState.Waiting, true),
+//    Channel("VIVO", "", state = ChannelState.Waiting, true),
+//    Channel("荣耀", "", state = ChannelState.Waiting, true),
+//    )
     @Composable
     override fun render() {
         TwoPage(

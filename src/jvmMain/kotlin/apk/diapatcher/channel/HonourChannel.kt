@@ -14,7 +14,7 @@ class HonourChannel : ApkChannel() {
         Param("AppKey"),
     )
 
-    override fun init(params: Map<Param, String>) {
+    override fun init(params: Map<Param, String?>) {
 
     }
 

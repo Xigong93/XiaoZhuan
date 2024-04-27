@@ -12,17 +12,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.diapatcher.ApkChannelRegistry
+import apk.diapatcher.ApkConfig
 import apk.diapatcher.style.AppColors
 import apk.diapatcher.widget.Section
 
 /**
  * 渠道页面
  */
-class ChannelGroupPage(
-    channels: List<Channel>
-) {
+class ChannelGroupPage(private val apkConfig: ApkConfig) {
 
-    private val showChannels = channels.toMutableList()
+    private val channels = ApkChannelRegistry.channels
+
+    private val showChannels = channels
+        .map { Channel(it.channelName, "", ChannelState.Waiting, true) }
+        .toMutableList()
 
     @Composable
     fun render() {
@@ -52,9 +56,7 @@ class ChannelGroupPage(
                 Button(
                     colors = ButtonDefaults.buttonColors(AppColors.primary),
                     modifier = Modifier.align(Alignment.Center),
-                    onClick = {
-
-                    }
+                    onClick = { startDispatch() }
                 ) {
                     Text(
                         "发布更新",
@@ -65,6 +67,17 @@ class ChannelGroupPage(
             }
         }
 
+    }
+
+    private fun startDispatch() {
+        val selectedChannels = showChannels.filter { it.selected }.map { it.name }
+        val activeChannels = channels.filter { selectedChannels.contains(it.channelName) }
+        val channelParams = apkConfig.channels.associateBy { it.name }
+        activeChannels.forEach { channel ->
+            val saveParams = channelParams[channel.channelName]?.params
+            val params = channel.getParams().associateWith { p -> saveParams?.firstOrNull { it.name == p.name }?.value }
+            channel.init(params)
+        }
     }
 
 }

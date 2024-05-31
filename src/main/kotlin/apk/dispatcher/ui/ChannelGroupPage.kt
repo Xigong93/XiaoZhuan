@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.Section
+import apk.dispatcher.widget.Toast
 
 /**
  * 渠道页面
@@ -23,6 +24,7 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
 
     @Composable
     fun render() {
+
         Column(modifier = Modifier.padding(20.dp)) {
             Section("渠道") {
                 Column() {
@@ -34,7 +36,7 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
                         val state = taskLauncher.getChannelState()
                         val apkFileState = taskLauncher.getApkFileState()
                         val desc = apkFileState.value?.name
-                        ChannelView(selected,name, desc, state.value) { checked ->
+                        ChannelView(selected, name, desc, state.value) { checked ->
 
                         }
                         Spacer(modifier = Modifier.height(15.dp))
@@ -52,11 +54,15 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
                     )
                     Text("全选")
                 }
+
                 Button(
                     colors = ButtonDefaults.buttonColors(AppColors.primary),
                     modifier = Modifier.align(Alignment.Center),
-                    onClick = { viewModel.startDispatch() }
+                    onClick = {
+                        startDispatch()
+                    }
                 ) {
+
                     Text(
                         "发布更新",
                         color = Color.White,
@@ -66,6 +72,18 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
             }
         }
 
+    }
+
+    private fun startDispatch() {
+        if (viewModel.getApkDirState().value == null) {
+            Toast.show("请选择Apk文件目录")
+            return
+        }
+        if (viewModel.updateDesc.value.isEmpty()) {
+            Toast.show("请输入更新描述")
+            return
+        }
+        viewModel.startDispatch()
     }
 
 

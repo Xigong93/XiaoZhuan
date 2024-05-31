@@ -30,8 +30,8 @@ interface HuaweiConnectApi {
      */
     @POST("https://connect-api.cloud.huawei.com/api/oauth2/v1/token")
     suspend fun getToken(
-        @Body params: TokenParams
-    ): TokenResult
+        @Body params: HWTokenParams
+    ): HWTokenResp
 
 
     /**
@@ -42,7 +42,7 @@ interface HuaweiConnectApi {
         @Header("client_id") clientId: String,
         @Header("Authorization") token: String,
         @Query("packageName") packageName: String,
-    ): AppIdResult
+    ): HWAppIdResp
 
     /**
      * 获取文件上传地址
@@ -54,14 +54,14 @@ interface HuaweiConnectApi {
         @Query("appId") appId: String,
         @Query("fileName") fileName: String,
         @Query("contentLength") contentLength: Long,
-    ): UploadUrlResult
+    ): HWUploadUrlResp
 
     /**
      * 上传文件
      */
     suspend fun uploadFile(
         file: File,
-        url: UploadUrlResult.UploadUrl,
+        url: HWUploadUrlResp.UploadUrl,
         progressChange: ProgressChange
     ): Unit = withContext(Dispatchers.IO) {
         val client = OkhttpFactory.default()
@@ -92,8 +92,8 @@ interface HuaweiConnectApi {
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
         @Body
-        versionDesc: VersionDesc
-    ): SampleResult
+        versionDesc: HWVersionDesc
+    ): HWResp
 
 
     /**
@@ -104,6 +104,6 @@ interface HuaweiConnectApi {
         @Header("client_id") clientId: String,
         @Header("Authorization") token: String,
         @Query("appId") appId: String
-    ): SampleResult
+    ): HWResp
 
 }

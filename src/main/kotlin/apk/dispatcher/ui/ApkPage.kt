@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,9 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.widget.*
+import apk.dispatcher.widget.Section
+import apk.dispatcher.widget.TwoPage
+import apk.dispatcher.widget.UpdateDescView
 import java.io.File
 import javax.swing.JFileChooser
+import javax.swing.JFileChooser.DIRECTORIES_ONLY
 
 
 class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
@@ -68,10 +70,12 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
         // 创建 JFrame 实例
 
         val chooser = JFileChooser()
-        chooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY;
+        chooser.fileSelectionMode = DIRECTORIES_ONLY;
         chooser.showOpenDialog(null)
         val selectedFile = chooser.selectedFile
-        apkViewModel.selectedApkDir(selectedFile)
+        if (selectedFile != null) {
+            apkViewModel.selectedApkDir(selectedFile)
+        }
 
     }
 

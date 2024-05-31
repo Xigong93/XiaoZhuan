@@ -5,9 +5,9 @@ import com.squareup.moshi.JsonClass
 
 
 @JsonClass(generateAdapter = false)
-data class AppIdResult(
+data class HWAppIdResp(
     @Json(name = "ret")
-    val result: Result,
+    val result: HWResult,
     @Suppress("SpellCheckingInspection")
     @Json(name = "appids")
     val list: List<AppId>?

@@ -5,13 +5,13 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = false)
-class SampleResult(
+class HWResp(
     @Json(name = "ret")
-    val result: Result
+    val result: HWResult
 )
 
 @JsonClass(generateAdapter = false)
-data class Result(
+data class HWResult(
     @Json(name = "code")
     val code: Int,
     @Json(name = "msg")

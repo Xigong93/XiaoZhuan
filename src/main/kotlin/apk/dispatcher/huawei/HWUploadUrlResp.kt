@@ -4,9 +4,9 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class UploadUrlResult(
+class HWUploadUrlResp(
     @Json(name = "ret")
-    val result: Result,
+    val result: HWResult,
     @Json(name = "urlInfo")
     val url: UploadUrl?
 ) {

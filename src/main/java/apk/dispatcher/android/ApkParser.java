@@ -16,7 +16,7 @@ import java.util.zip.ZipFile;
  */
 public class ApkParser {
 
-    public ApkInfo parse(File apkFile) throws Exception {
+    public static ApkInfo parse(File apkFile) throws Exception {
         // Axml 转 xml
         String xml = getManifestXml(apkFile);
         // xml 转 json
@@ -41,7 +41,7 @@ public class ApkParser {
         return new ApkInfo(apkFile.getAbsolutePath(), applicationId, versionCode, versionName);
     }
 
-    private String getManifestXml(File apkFile) {
+    private static String getManifestXml(File apkFile) {
         try (ZipFile z = new ZipFile(apkFile);
              InputStream is = z.getInputStream(z.getEntry("AndroidManifest.xml"))
         ) {

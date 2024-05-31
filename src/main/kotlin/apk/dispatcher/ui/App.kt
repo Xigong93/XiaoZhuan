@@ -33,12 +33,14 @@ import apk.dispatcher.ApkConfig
 import apk.dispatcher.ApkConfigDao
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.HorizontalTabBar
+import apk.dispatcher.widget.Toast
 
 @Composable
 @Preview
 fun App() {
     val appWindow = remember { AppWindow() }
     appWindow.Render()
+    Toast.install()
 }
 
 private class AppWindow {

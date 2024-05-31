@@ -29,7 +29,7 @@ class HuaweiConnectClient {
         val appId = getAppId(clientId, token, apkInfo.applicationId)
         val uploadUrl = getUploadUrl(clientId, token, appId, file)
         uploadFile(file, uploadUrl, progressChange)
-        changeUpdateDesc(clientId, token, appId, updateDesc)
+        modifyUpdateDesc(clientId, token, appId, updateDesc)
         submit(clientId, token, appId)
     }
 
@@ -38,7 +38,7 @@ class HuaweiConnectClient {
      * 获取token
      */
     private suspend fun getToken(clientId: String, clientSecret: String): String {
-        val result = connectApi.getToken(TokenParams(clientId, clientSecret))
+        val result = connectApi.getToken(HWTokenParams(clientId, clientSecret))
         result.result.throwOnFail()
         return checkNotNull(result.token)
     }
@@ -62,7 +62,7 @@ class HuaweiConnectClient {
         token: String,
         appId: String,
         file: File,
-    ): UploadUrlResult.UploadUrl {
+    ): HWUploadUrlResp.UploadUrl {
         val result = connectApi.getUploadUrl(clientId, token, appId, file.name, file.length())
         result.result.throwOnFail()
         return checkNotNull(result.url)
@@ -73,7 +73,7 @@ class HuaweiConnectClient {
      */
     private suspend fun uploadFile(
         file: File,
-        url: UploadUrlResult.UploadUrl,
+        url: HWUploadUrlResp.UploadUrl,
         progressChange: ProgressChange
     ) {
         connectApi.uploadFile(file, url, progressChange)
@@ -82,13 +82,13 @@ class HuaweiConnectClient {
     /**
      * 修改新版本更新描述
      */
-    private suspend fun changeUpdateDesc(
+    private suspend fun modifyUpdateDesc(
         clientId: String,
         token: String,
         appId: String,
         updateDesc: String
     ) {
-        val desc = VersionDesc(updateDesc)
+        val desc = HWVersionDesc(updateDesc)
         val result = connectApi.updateVersionDesc(clientId, token, appId, desc)
         result.result.throwOnFail()
     }

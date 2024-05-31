@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = false)
-data class TokenParams(
+data class HWTokenParams(
     @Json(name = "client_id")
     val clientId: String,
     @Json(name = "client_secret")
@@ -15,9 +15,9 @@ data class TokenParams(
 }
 
 @JsonClass(generateAdapter = false)
-data class TokenResult(
+data class HWTokenResp(
     @Json(name = "access_token")
     val token: String?,
     @Json(name = "ret")
-    val result: Result
+    val result: HWResult
 )

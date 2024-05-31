@@ -12,7 +12,6 @@ import apk.dispatcher.util.getApkInfo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileFilter
 
 class ApkViewModel(
     private val apkConfig: ApkConfig
@@ -50,7 +49,7 @@ class ApkViewModel(
         mainScope.launch {
             try {
                 val apkFile = PathUtil.listApkFile(dir).first()
-                val launchers = selectedLauncher()
+                val launchers = selectedLaunchers()
                 launchers.forEach { it.selectFile(dir) }
                 apkInfoState.value = getApkInfo(apkFile)
             } catch (e: Exception) {
@@ -63,7 +62,7 @@ class ApkViewModel(
 
     fun startDispatch() {
         mainScope.launch {
-            val launchers = selectedLauncher()
+            val launchers = selectedLaunchers()
             val apkFile = requireNotNull(apkDirState.value)
             val updateDesc = requireNotNull(updateDesc.value)
             launchers.forEach {
@@ -76,6 +75,6 @@ class ApkViewModel(
 
     }
 
-    private fun selectedLauncher() = taskLaunchers.filter { selectedChannels.contains(it.name) }
+    private fun selectedLaunchers() = taskLaunchers.filter { selectedChannels.contains(it.name) }
 
 }

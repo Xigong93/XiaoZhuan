@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = false)
-data class VersionDesc(
+data class HWVersionDesc(
     @Json(name = "newFeatures")
     val desc: String
 ) {

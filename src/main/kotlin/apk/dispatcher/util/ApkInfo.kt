@@ -26,5 +26,5 @@ data class ApkInfo(
  */
 @kotlin.jvm.Throws
 suspend fun getApkInfo(file: File): ApkInfo {
-    return withContext(Dispatchers.IO) { ApkParser().parse(file) }
+    return withContext(Dispatchers.IO) { ApkParser.parse(file) }
 }

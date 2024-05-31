@@ -47,10 +47,10 @@ class TaskLauncher(
     }
 
 
-    suspend fun start(apkDir: File, updateDesc: String) {
+    suspend fun start(apkFile: File, updateDesc: String) {
         task.init(getParams())
         task.setListener(stateListener)
-        task.startUpload(apkDir, updateDesc)
+        task.startUpload(apkFile, updateDesc)
     }
 
     private fun findApkFile(apkDir: File): File {

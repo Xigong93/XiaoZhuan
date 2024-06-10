@@ -50,7 +50,7 @@ object Toast {
             }
             if (showToast) {
                 scope.launch {
-                    delay(1000)
+                    delay(2000)
                     messageState.value = ""
                 }
             }

@@ -34,11 +34,11 @@ private class ApkConfigDaoImpl : ApkConfigDao {
 
     @Throws
     override fun saveApkConfig(apkConfig: ApkConfig) {
-        writeApkConfig(getApkConfigFile(apkConfig), apkConfig)
+        writeApkConfig(apkConfig.file, apkConfig)
     }
 
     override fun removeApkConfig(apkConfig: ApkConfig) {
-        getApkConfigFile(apkConfig).delete()
+        apkConfig.file.delete()
     }
 
     private fun readApkConfig(file: File): ApkConfig? {
@@ -53,7 +53,6 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     }
 
     private fun writeApkConfig(file: File, apkConfig: ApkConfig) {
-        require(!file.exists()) { "文件不能重名" }
         val json = jsonAdapter.toJson(apkConfig)
         file.parentFile?.mkdirs()
         file.writeText(json, charset = Charsets.UTF_8)
@@ -64,9 +63,8 @@ private class ApkConfigDaoImpl : ApkConfigDao {
         return File(homeDir, ".apkDispatcher")
     }
 
-    private fun getApkConfigFile(apkConfig: ApkConfig): File {
-        return File(getApkDispatcherDir(), "${apkConfig.name}${FILE_SUFFIX}")
-    }
+    private val ApkConfig.file: File
+        get() = File(getApkDispatcherDir(), "${applicationId}${FILE_SUFFIX}")
 
     companion object {
         private const val FILE_SUFFIX = ".apk.json"

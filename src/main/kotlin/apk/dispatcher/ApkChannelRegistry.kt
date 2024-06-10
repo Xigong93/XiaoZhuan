@@ -19,4 +19,9 @@ object ApkChannelRegistry {
     )
 
     val channels: List<ApkChannelTask> = mockChannels
+
+
+    fun getChannel(name: String): ApkChannelTask? {
+        return channels.firstOrNull { it.channelName == name }
+    }
 }

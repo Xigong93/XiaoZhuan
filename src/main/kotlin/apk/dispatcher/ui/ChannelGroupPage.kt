@@ -2,6 +2,7 @@ package apk.dispatcher.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.style.AppShapes
 import apk.dispatcher.widget.Section
 import apk.dispatcher.widget.Toast
 
@@ -37,7 +39,7 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
                         val apkFileState = taskLauncher.getApkFileState()
                         val desc = apkFileState.value?.name
                         ChannelView(selected, name, desc, state.value) { checked ->
-
+                            viewModel.selectChannel(name, checked)
                         }
                         Spacer(modifier = Modifier.height(15.dp))
                     }
@@ -45,11 +47,18 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
             }
             Spacer(modifier = Modifier.weight(1.0f))
             Box(modifier = Modifier.fillMaxWidth()) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val allSelected = viewModel.selectedChannels.containsAll(viewModel.channels.map { it.channelName })
+                val allSelected = viewModel.allChannelSelected()
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                    .clip(AppShapes.roundButton)
+                    .clickable {
+                        viewModel.selectAll(allSelected.not())
+                    }
+                    .padding(end = 12.dp)) {
                     Checkbox(
                         allSelected,
-                        onCheckedChange = { all -> },
+                        onCheckedChange = { all ->
+                            viewModel.selectAll(all)
+                        },
                         colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
                     )
                     Text("全选")
@@ -76,11 +85,15 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
 
     private fun startDispatch() {
         if (viewModel.getApkDirState().value == null) {
-            Toast.show("请选择Apk文件目录")
+            Toast.show("请选择Apk文件夹")
             return
         }
         if (viewModel.updateDesc.value.isEmpty()) {
             Toast.show("请输入更新描述")
+            return
+        }
+        if (viewModel.selectedChannels.isEmpty()) {
+            Toast.show("请选择渠道")
             return
         }
         viewModel.startDispatch()

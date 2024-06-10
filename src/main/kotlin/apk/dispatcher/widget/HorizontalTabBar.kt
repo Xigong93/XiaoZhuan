@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.style.AppShapes
 
 @Composable
 fun HorizontalTabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (index: Int) -> Unit) {
@@ -22,9 +23,11 @@ fun HorizontalTabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (inde
             TabItem(
                 title = label,
                 selected = index == selectedIndex,
-                modifier = Modifier.clickable {
-                    tabClick(index)
-                }
+                modifier = Modifier
+                    .clip(AppShapes.roundButton)
+                    .clickable {
+                        tabClick(index)
+                    }
             )
         }
     }

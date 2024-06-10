@@ -14,17 +14,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.style.AppShapes
 
 @Composable
 fun VerticalTabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (index: Int) -> Unit) {
-    Column {
+    Column(modifier = Modifier.width(IntrinsicSize.Min)) {
         tabs.withIndex().forEach { (index, label) ->
             TabItem(
                 title = label,
                 selected = index == selectedIndex,
-                modifier = Modifier.clickable {
-                    tabClick(index)
-                }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(AppShapes.roundButton)
+                    .clickable { tabClick(index) }
+                    .padding(vertical = 6.dp)
             )
         }
     }

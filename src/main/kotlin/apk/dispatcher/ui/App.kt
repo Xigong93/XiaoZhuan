@@ -32,6 +32,7 @@ import androidx.compose.ui.zIndex
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.ApkConfigDao
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.ui.config.ApkConfigPage
 import apk.dispatcher.widget.HorizontalTabBar
 import apk.dispatcher.widget.Toast
 
@@ -85,7 +86,7 @@ private class AppWindow {
     /**
      * 设置配置页面
      */
-    val configPage = mutableStateOf<ConfigPage?>(null)
+    val configPage = mutableStateOf<ApkConfigPage?>(null)
 
     /**
      * 是否显示菜单
@@ -114,7 +115,10 @@ private class AppWindow {
 
     @Composable
     fun Render() {
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(AppColors.pageBackground)
+        ) {
             PopupMenu()
             val configPage = configPage.value
             if (configPage != null) {
@@ -189,7 +193,7 @@ private class AppWindow {
     }
 
     private fun showConfigPage(apkConfig: ApkConfig?) {
-        configPage.value = ConfigPage(apkConfig) {
+        configPage.value = ApkConfigPage(apkConfig) {
             configPage.value = null
             reload()
         }

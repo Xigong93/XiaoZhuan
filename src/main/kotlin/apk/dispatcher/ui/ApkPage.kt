@@ -15,9 +15,11 @@ import androidx.compose.ui.unit.sp
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.Section
+import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.TwoPage
 import apk.dispatcher.widget.UpdateDescView
 import java.io.File
+import javax.swing.JColorChooser
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
 
@@ -43,7 +45,7 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
         val dividerHeight = 30.dp
         Section("操作") {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = { selectFile() }) {
+                OutlinedButton(onClick = { showSelectedDirDialog() }) {
                     Text("选择Apk文件夹", color = AppColors.fontGray)
                 }
                 Spacer(Modifier.width(10.dp))
@@ -52,8 +54,8 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
             }
         }
         Spacer(Modifier.height(dividerHeight))
-        Section("版本信息") {
-            VersionCodeBox()
+        Section("Apk信息") {
+            ApkInfoBox()
         }
         Spacer(Modifier.height(dividerHeight))
         Section("更新描述") {
@@ -61,26 +63,20 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
         }
     }
 
-    private fun selectFile() {
-//        val frame = JFrame()
-//        val fileDialog = FileDialog(frame, "选择Apk文件夹", FileDialog.LOAD)
-//        fileDialog.isVisible = true
-//        val dir = fileDialog.directory
-//        selectedApkDir.value = dir ?: ""
-        // 创建 JFrame 实例
 
-        val chooser = JFileChooser()
+    private fun showSelectedDirDialog() {
+        val chooser = JFileChooser(apkViewModel.getApkDir())
         chooser.fileSelectionMode = DIRECTORIES_ONLY;
-        chooser.showOpenDialog(null)
-        val selectedFile = chooser.selectedFile
-        if (selectedFile != null) {
-            apkViewModel.selectedApkDir(selectedFile)
+        val result = chooser.showOpenDialog(null)
+        if (result != JFileChooser.APPROVE_OPTION) return
+        val dir = chooser.selectedFile ?: return
+        if (!apkViewModel.selectedApkDir(dir)) {
+            Toast.show("无效目录,未包含有效的Apk文件")
         }
-
     }
 
     @Composable
-    private fun VersionCodeBox() {
+    private fun ApkInfoBox() {
         val textSize = 14.sp
         Column(
             modifier = Modifier.width(300.dp)
@@ -90,6 +86,7 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
         ) {
             val apkInfo = apkViewModel.getApkInfoState().value
             val version = apkInfo?.versionName?.let { "v${it}" }
+            val applicationId = apkInfo?.applicationId ?: ""
             Row {
                 Text(
                     "版本号:",
@@ -106,13 +103,27 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
             Spacer(Modifier.height(12.dp))
             Row {
                 Text(
-                    "Apk大小:",
+                    "文件大小:",
                     color = AppColors.fontGray,
                     fontSize = textSize,
                     modifier = Modifier.width(70.dp)
                 )
                 Text(
                     getFileSize(),
+                    color = AppColors.fontBlack,
+                    fontSize = textSize
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            Row {
+                Text(
+                    "包名:",
+                    color = AppColors.fontGray,
+                    fontSize = textSize,
+                    modifier = Modifier.width(70.dp)
+                )
+                Text(
+                    applicationId,
                     color = AppColors.fontBlack,
                     fontSize = textSize
                 )
@@ -126,7 +137,7 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
     }
 
 
-    fun getFileSize(): String {
+    private fun getFileSize(): String {
         val apkInfo = apkViewModel.getApkInfoState().value
         val fileSize = apkInfo?.path?.let { File(it) }?.length() ?: 0
         val mb = fileSize.toFloat() / (1024 * 1024)

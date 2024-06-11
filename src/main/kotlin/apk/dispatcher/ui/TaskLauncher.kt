@@ -47,7 +47,8 @@ class TaskLauncher(
     }
 
 
-    suspend fun start(apkFile: File, updateDesc: String) {
+    suspend fun start(updateDesc: String) {
+        val apkFile = requireNotNull(apkFileState.value)
         task.init(getParams())
         task.setListener(stateListener)
         task.startUpload(apkFile, updateDesc)

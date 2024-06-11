@@ -6,8 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = false)
 data class HWVersionDesc(
     @Json(name = "newFeatures")
-    val desc: String
-) {
+    val desc: String,
     @Json(name = "lang")
     val language: String = "zh-CN"
-}
+)

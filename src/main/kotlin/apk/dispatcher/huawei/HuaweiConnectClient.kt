@@ -2,7 +2,12 @@ package apk.dispatcher.huawei
 
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.getApkInfo
+import kotlinx.coroutines.delay
 import java.io.File
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class HuaweiConnectClient {
 
@@ -29,6 +34,8 @@ class HuaweiConnectClient {
         val appId = getAppId(clientId, token, apkInfo.applicationId)
         val uploadUrl = getUploadUrl(clientId, token, appId, file)
         uploadFile(file, uploadUrl, progressChange)
+        refreshApk(clientId, token, appId, file, uploadUrl)
+        waitApkReady(clientId, token, appId, apkInfo.versionName)
         modifyUpdateDesc(clientId, token, appId, updateDesc)
         submit(clientId, token, appId)
     }
@@ -39,7 +46,7 @@ class HuaweiConnectClient {
      */
     private suspend fun getToken(clientId: String, clientSecret: String): String {
         val result = connectApi.getToken(HWTokenParams(clientId, clientSecret))
-        result.result.throwOnFail()
+        result.result?.throwOnFail()
         return checkNotNull(result.token)
     }
 
@@ -77,6 +84,47 @@ class HuaweiConnectClient {
         progressChange: ProgressChange
     ) {
         connectApi.uploadFile(file, url, progressChange)
+    }
+
+    /**
+     * 刷新Apk文件
+     */
+    private suspend fun refreshApk(
+        clientId: String,
+        token: String,
+        appId: String,
+        file: File,
+        url: HWUploadUrlResp.UploadUrl,
+    ) {
+        val fileInfo = HWRefreshApk.FileInfo(file.name, url.objectId)
+        val params = HWRefreshApk(files = listOf(fileInfo))
+        val result = connectApi.refreshApkFile(clientId, token, appId, params)
+        result.result.throwOnFail()
+    }
+
+    /**
+     * 等待Apk编译完成
+     */
+    private suspend fun waitApkReady(
+        clientId: String,
+        token: String,
+        appId: String,
+        versionNumber: String
+    ) {
+//        val startTime = System.currentTimeMillis()
+//        while (true) {
+//            if (System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(3)) {
+//                throw TimeoutException("检测apk状态超时")
+//            }
+//            val result = connectApi.getApkCompileState(clientId, token, appId)
+//            result.result.throwOnFail()
+//            if (result.pkgStateList.first().isSuccess()) {
+//                break
+//            }
+//            delay(1.seconds)
+//        }
+        // 官方文档要求等待2分钟后再提交
+        delay(2.minutes)
     }
 
     /**

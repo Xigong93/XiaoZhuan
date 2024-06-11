@@ -1,5 +1,6 @@
 package apk.dispatcher
 
+import apk.dispatcher.util.PathUtil
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
@@ -25,7 +26,7 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     private val jsonAdapter by lazy { moshi.adapter(ApkConfig::class.java) }
 
     override fun getApkConfigList(): List<ApkConfig> {
-        val files = getApkDispatcherDir().listFiles() ?: emptyArray()
+        val files = PathUtil.getApkDispatcherDir().listFiles() ?: emptyArray()
         return files
             .filter { it.name.endsWith(FILE_SUFFIX) }
             .mapNotNull(::readApkConfig)
@@ -58,13 +59,9 @@ private class ApkConfigDaoImpl : ApkConfigDao {
         file.writeText(json, charset = Charsets.UTF_8)
     }
 
-    private fun getApkDispatcherDir(): File {
-        val homeDir = File(requireNotNull(System.getProperty("user.home")))
-        return File(homeDir, ".apkDispatcher")
-    }
 
     private val ApkConfig.file: File
-        get() = File(getApkDispatcherDir(), "${applicationId}${FILE_SUFFIX}")
+        get() = File(PathUtil.getApkDispatcherDir(), "${applicationId}${FILE_SUFFIX}")
 
     companion object {
         private const val FILE_SUFFIX = ".apk.json"

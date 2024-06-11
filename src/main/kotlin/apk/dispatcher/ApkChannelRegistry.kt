@@ -18,7 +18,7 @@ object ApkChannelRegistry {
         MockChannelTask("小米", "MI")
     )
 
-    val channels: List<ApkChannelTask> = mockChannels
+    val channels: List<ApkChannelTask> = realChannels
 
 
     fun getChannel(name: String): ApkChannelTask? {

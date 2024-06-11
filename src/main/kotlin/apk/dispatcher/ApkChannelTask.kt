@@ -1,5 +1,6 @@
 package apk.dispatcher
 
+import apk.dispatcher.util.defaultLogger
 import java.io.File
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -22,7 +23,7 @@ abstract class ApkChannelTask {
     abstract val fileNameIdentify: String
 
 
-    private val logger by lazy { Logger.getLogger(channelName) }
+    private val logger = defaultLogger
 
     /**
      * 初始化参数
@@ -52,7 +53,7 @@ abstract class ApkChannelTask {
             listener?.onSuccess()
             logger.info("上传成功")
         } catch (e: Exception) {
-            logger.log(Level.ALL, "上传失败", e)
+            logger.log(Level.INFO, "上传失败", e)
             listener?.onError(e)
         }
 

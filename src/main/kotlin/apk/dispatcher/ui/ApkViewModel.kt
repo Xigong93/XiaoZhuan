@@ -47,7 +47,7 @@ class ApkViewModel(
 
     fun getApkInfoState(): State<ApkInfo?> = apkInfoState
 
-    fun selectedApkDir(dir: File):Boolean {
+    fun selectedApkDir(dir: File): Boolean {
         return try {
             val apkFile = PathUtil.listApkFile(dir).first()
             val launchers = selectedLaunchers()
@@ -66,13 +66,12 @@ class ApkViewModel(
     fun startDispatch() {
         mainScope.launch {
             val launchers = selectedLaunchers()
-            val apkFile = requireNotNull(apkDirState.value)
             val updateDesc = requireNotNull(updateDesc.value)
             launchers.forEach {
                 it.prepare()
             }
             launchers.forEach {
-                it.start(apkFile, updateDesc)
+                it.start(updateDesc)
             }
         }
 

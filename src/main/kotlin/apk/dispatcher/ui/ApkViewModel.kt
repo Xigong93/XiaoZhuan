@@ -10,18 +10,20 @@ import apk.dispatcher.ApkConfigDao
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.PathUtil
 import apk.dispatcher.util.getApkInfo
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
+import kotlin.coroutines.EmptyCoroutineContext
 
 class ApkViewModel(
     private val apkConfig: ApkConfig
 ) {
 
-    private val mainScope = GlobalScope
+    private val mainScope = CoroutineScope(EmptyCoroutineContext)
 
-    val updateDesc = mutableStateOf<String>("")
+    val updateDesc = mutableStateOf<String>(apkConfig.extension.updateDesc ?: "")
 
     private val apkDirState = mutableStateOf<File?>(null)
 
@@ -53,7 +55,6 @@ class ApkViewModel(
             val launchers = selectedLaunchers()
             launchers.forEach { it.selectFile(dir) }
             apkInfoState.value = runBlocking { getApkInfo(apkFile) }
-            saveApkDir(dir)
             apkDirState.value = dir
             true
         } catch (e: Exception) {
@@ -66,10 +67,11 @@ class ApkViewModel(
     fun startDispatch() {
         mainScope.launch {
             val launchers = selectedLaunchers()
-            val updateDesc = requireNotNull(updateDesc.value)
+            val updateDesc = requireNotNull(updateDesc.value).trim()
             launchers.forEach {
                 it.prepare()
             }
+            updateApkConfig()
             launchers.forEach {
                 it.start(updateDesc)
             }
@@ -77,10 +79,15 @@ class ApkViewModel(
 
     }
 
-    private fun saveApkDir(apkDir: File) {
-        if (apkDir.isDirectory) {
-            ApkConfigDao().saveApkConfig(apkConfig.copy(extension = apkConfig.extension.copy(apkDir = apkDir.absolutePath)))
-        }
+    private fun updateApkConfig() {
+        val updateDesc = requireNotNull(updateDesc.value).trim()
+        val apkDir = requireNotNull(apkDirState.value)
+        val newExtension = apkConfig.extension.copy(
+            apkDir = apkDir.absolutePath,
+            updateDesc = updateDesc
+        )
+        val configDao = ApkConfigDao()
+        configDao.saveApkConfig(apkConfig.copy(extension = newExtension))
     }
 
     fun getApkDir(): File? {

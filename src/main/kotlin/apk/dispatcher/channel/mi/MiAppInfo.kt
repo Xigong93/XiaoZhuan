@@ -1,4 +1,4 @@
-package apk.dispatcher.mi
+package apk.dispatcher.channel.mi
 
 import apk.dispatcher.MoshiFactory
 import com.squareup.moshi.Json

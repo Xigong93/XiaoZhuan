@@ -1,8 +1,10 @@
 package apk.dispatcher
 
 import apk.dispatcher.channel.*
-import apk.dispatcher.huawei.HuaweiChannelTask
-import apk.dispatcher.mi.MiChannelTask
+import apk.dispatcher.channel.huawei.HuaweiChannelTask
+import apk.dispatcher.channel.mi.MiChannelTask
+import apk.dispatcher.channel.oppo.OPPOChannelTask
+import apk.dispatcher.channel.vivo.VIVOChannelTask
 
 object ApkChannelRegistry {
 

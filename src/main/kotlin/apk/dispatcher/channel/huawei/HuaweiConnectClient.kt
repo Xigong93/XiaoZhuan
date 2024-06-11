@@ -1,4 +1,4 @@
-package apk.dispatcher.huawei
+package apk.dispatcher.channel.huawei
 
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.getApkInfo

@@ -1,4 +1,4 @@
-package apk.dispatcher.huawei
+package apk.dispatcher.channel.huawei
 
 import apk.dispatcher.OkhttpFactory
 import apk.dispatcher.RetrofitFactory
@@ -78,7 +78,7 @@ interface HuaweiConnectApi {
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
         @Query("pkgIds") pkgIds: String = appId,
-    ):HWApkState
+    ): HWApkState
 
     /**
      * 获取Apk编译状态
@@ -89,7 +89,7 @@ interface HuaweiConnectApi {
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
         @Query("pkgVersion") pkgVersion: String ,
-    ):HWApkState
+    ): HWApkState
     /**
      * 更新版本描述
      */

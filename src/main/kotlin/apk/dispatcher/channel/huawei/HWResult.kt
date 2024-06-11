@@ -1,4 +1,4 @@
-package apk.dispatcher.huawei
+package apk.dispatcher.channel.huawei
 
 import apk.dispatcher.ApiException
 import com.squareup.moshi.Json

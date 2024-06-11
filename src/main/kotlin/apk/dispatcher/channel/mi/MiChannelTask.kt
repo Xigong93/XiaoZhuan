@@ -1,4 +1,4 @@
-package apk.dispatcher.mi
+package apk.dispatcher.channel.mi
 
 import apk.dispatcher.ApkChannelTask
 import apk.dispatcher.util.getApkInfo

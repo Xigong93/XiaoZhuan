@@ -61,9 +61,9 @@ data class ApkConfig(
         /** 是否支持多渠道包 */
         @Json(name = "enableChannel")
         val enableChannel: Boolean = true,
-        /** 是否支持32和64位合并包 */
-        @Json(name = "enableCombineAbi")
-        val enableCombineAbi: Boolean = true,
+        /** 更新描述 */
+        @Json(name = "updateDesc")
+        val updateDesc: String? = null,
         /** 上次选择的Apk目录 */
         @Json(name = "apkDir")
         val apkDir: String? = null

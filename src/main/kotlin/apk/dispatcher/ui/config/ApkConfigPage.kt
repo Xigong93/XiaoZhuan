@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import apk.dispatcher.ApkChannelRegistry
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.VerticalTabBar
 
 /**
@@ -58,7 +59,7 @@ class ApkConfigPage(
                     viewModel.apkConfigState = it
                 }
             } else {
-                val channel = viewModel.apkConfigState.channels[tabIndex-1]
+                val channel = viewModel.apkConfigState.channels[tabIndex - 1]
                 ChannelConfigPage(channel) {
                     viewModel.updateChannel(it)
                 }
@@ -112,14 +113,11 @@ private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> U
 
         }
         Spacer(modifier = spaceHeight)
-        CheckboxRow(Modifier,"开启渠道包", apkConfig.extension.enableChannel) {
-            onValueChange(apkConfig.copy(extension = apkConfig.extension.copy(enableChannel = it)))
+        CheckboxRow(Modifier, "开启渠道包", true) {
+            Toast.show("暂不支持非渠道包")
+//            onValueChange(apkConfig.copy(extension = apkConfig.extension.copy(enableChannel = it)))
+        }
 
-        }
-        Spacer(modifier = spaceHeight)
-        CheckboxRow(Modifier,"32位和64位兼容包", apkConfig.extension.enableCombineAbi) {
-            onValueChange(apkConfig.copy(extension = apkConfig.extension.copy(enableCombineAbi = it)))
-        }
 
     }
 }

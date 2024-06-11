@@ -2,6 +2,7 @@ package apk.dispatcher
 
 import apk.dispatcher.channel.*
 import apk.dispatcher.huawei.HuaweiChannelTask
+import apk.dispatcher.mi.MiChannelTask
 
 object ApkChannelRegistry {
 

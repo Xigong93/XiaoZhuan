@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -20,6 +22,7 @@ fun ChannelConfigPage(config: ApkConfig.Channel, onConfigChange: (newConfig: Apk
         Column(
             modifier = Modifier
                 .padding(start = 10.dp)
+                .verticalScroll(rememberScrollState())
                 .alpha(if (config.enable) 1.0f else 0.5f)
         ) {
             for (param in config.params) {

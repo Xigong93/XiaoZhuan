@@ -7,6 +7,9 @@ import okio.source
 import java.io.File
 import java.io.IOException
 
+/**
+ * 取值范围[0,1]
+ */
 typealias ProgressChange = (progress: Float) -> Unit
 
 class ProgressRequestBody(
@@ -38,14 +41,6 @@ class ProgressRequestBody(
         }
     }
 
-    interface ProgressListener {
-        /**
-         * 取值范围[0,1]
-         *
-         * @param percent
-         */
-        fun onProgressUpdate(percent: Float)
-    }
 
     companion object {
         private const val SEGMENT_SIZE = 2048 // okio.Segment.SIZE

@@ -27,6 +27,14 @@ dependencies {
 
 }
 
+// 小米应用市场
+dependencies {
+    implementation("com.google.code.gson:gson:2.8.6")
+//    implementation("net.sf.json-lib:json-lib:2.2.3")
+    implementation("commons-codec:commons-codec:1.4")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.62")
+}
+
 
 compose.desktop {
     application {

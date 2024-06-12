@@ -79,19 +79,6 @@ object MiApiSigner {
         return Hex.encodeHexString(baos.toByteArray())
     }
 
-    /*
-     * 获取文件md5
-     */
-    @Throws(java.lang.Exception::class)
-    fun getFileMD5(file: File): String {
-        try {
-            FileInputStream(file).use { fis ->
-                return DigestUtils.md5Hex(fis)
-            }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-            throw e
-        }
-    }
+
 
 }

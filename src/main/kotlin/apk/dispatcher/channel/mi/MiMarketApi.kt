@@ -1,10 +1,7 @@
 package apk.dispatcher.channel.mi
 
 import apk.dispatcher.OkhttpFactory
-import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.ProgressRequestBody
-import apk.dispatcher.util.getJsonResult
-import apk.dispatcher.util.getTextResult
+import apk.dispatcher.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -89,7 +86,7 @@ class MiMarketApi(
                 })
                 put(JSONObject().apply {
                     put("name", "apk")
-                    put("hash", MiApiSigner.getFileMD5(apkFile))
+                    put("hash", FileUtil.getFileMD5(apkFile))
                 })
             })
         }

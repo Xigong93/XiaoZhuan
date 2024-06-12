@@ -1,6 +1,7 @@
 package apk.dispatcher
 
 import apk.dispatcher.channel.*
+import apk.dispatcher.channel.honor.HonorChannelTask
 import apk.dispatcher.channel.huawei.HuaweiChannelTask
 import apk.dispatcher.channel.mi.MiChannelTask
 import apk.dispatcher.channel.oppo.OPPOChannelTask
@@ -13,7 +14,7 @@ object ApkChannelRegistry {
         MiChannelTask(),
         OPPOChannelTask(),
         VIVOChannelTask(),
-        HonourChannelTask()
+        HonorChannelTask()
     )
 
     private val mockChannels: List<ApkChannelTask> = listOf(

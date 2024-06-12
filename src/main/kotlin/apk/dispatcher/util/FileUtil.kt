@@ -11,4 +11,11 @@ object FileUtil {
     fun getFileMD5(file: File): String {
         return FileInputStream(file).use { DigestUtils.md5Hex(it) }
     }
+
+    /**
+     * 获取文件md5
+     */
+    fun getFileSha256(file: File): String {
+        return FileInputStream(file).use { DigestUtils.sha256Hex(it) }
+    }
 }

@@ -56,7 +56,10 @@ class TaskLauncher(
 
     private fun findApkFile(apkDir: File): File {
         val apks = PathUtil.listApkFile(apkDir)
-        val fileId = task.fileNameIdentify
+        val fileId = apkConfig.getChannel(name)
+            ?.getParam(ApkChannelTask.FILE_NAME_IDENTIFY)
+            ?.value
+            ?: task.fileNameIdentify
         val file = apks.firstOrNull { it.name.contains(fileId, true) }
         return checkNotNull(file) { "找不到文件名中包含:${fileId}的文件" }
     }

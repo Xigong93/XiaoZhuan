@@ -39,7 +39,9 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     }
 
     override fun removeApkConfig(apkConfig: ApkConfig) {
-        apkConfig.file.delete()
+        val bakFile = File(apkConfig.file.absolutePath + ".bak")
+        if (bakFile.exists()) bakFile.delete()
+        apkConfig.file.renameTo(bakFile)
     }
 
     private fun readApkConfig(file: File): ApkConfig? {

@@ -2,6 +2,7 @@ package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.ApkChannelTask
 import apk.dispatcher.util.defaultLogger
+import apk.dispatcher.util.getApkInfo
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -25,14 +26,17 @@ class OPPOChannelTask : ApkChannelTask() {
     override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
 
         val maretApi = OPPOMaretApi(clientId, clientSecret)
+        val apkInfo = getApkInfo(file)
         val token = maretApi.getToken()
         defaultLogger.info("token=$token")
+        val appInfo = maretApi.getAppInfo(token, apkInfo.applicationId)
         val uploadUrl = maretApi.getUploadUrl(token)
         defaultLogger.info("uploadUrl=$uploadUrl")
         val apkResult = maretApi.uploadApk(uploadUrl, token, file) {
             progress((it * 100).roundToInt())
         }
         defaultLogger.info("apkResult=$apkResult")
+        maretApi.submit(token, apkInfo, appInfo, updateDesc, apkResult)
     }
 
     companion object {

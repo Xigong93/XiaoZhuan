@@ -1,12 +1,15 @@
 package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.OkhttpFactory
+import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.ProgressRequestBody
 import apk.dispatcher.util.getJsonResult
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
@@ -34,11 +37,25 @@ class OPPOMaretApi(
     }
 
     /**
+     * 获取App信息
+     */
+    suspend fun getAppInfo(token: String, packageName: String): OPPOAppInfo = withContext(Dispatchers.IO) {
+        val params = mapOf(
+            "pkg_name" to packageName
+        )
+        val requestUrl = getRequestUrl("${DOMAIN}/resource/v1/app/info", params, token, true)
+        val request = Request.Builder().url(requestUrl).get().build()
+        val result = okHttpClient.getJsonResult(request)
+        result.checkSuccess("获取App信息")
+        OPPOAppInfo(result.get("data").asJsonObject)
+    }
+
+    /**
      * 获取上传的url
      */
     suspend fun getUploadUrl(token: String): OPPOUploadUrl = withContext(Dispatchers.IO) {
         val url = "$DOMAIN/resource/v1/upload/get-upload-url"
-        val requestUrl = getRequestUrl(url, emptyMap(), token)
+        val requestUrl = getRequestUrl(url, emptyMap(), token, true)
         val request = Request.Builder().url(requestUrl).get().build()
         val body = okHttpClient.getJsonResult(request)
         body.checkSuccess("获取上传url")
@@ -49,24 +66,30 @@ class OPPOMaretApi(
     }
 
 
+    /**
+     * 上传apk
+     */
     suspend fun uploadApk(
         uploadUrl: OPPOUploadUrl,
         token: String,
         apkFile: File,
         progressChange: ProgressChange,
-    ): JsonObject = withContext(Dispatchers.IO) {
+    ): OPPOApkResult = withContext(Dispatchers.IO) {
         val params = mapOf(
             "type" to "apk",
             "sign" to uploadUrl.sign,
         )
-        val requestUrl = getRequestUrl(uploadUrl.url, params, token)
+        val requestUrl = getRequestUrl(uploadUrl.url, params, token, false)
         val apkBody = ProgressRequestBody(
             mediaType = "application/octet-stream".toMediaType(),
             file = apkFile,
             progressChange = progressChange
         )
         val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM) // 强制指定类型，默认是mixed
             .addFormDataPart("file", apkFile.name, apkBody)
+            .addFormDataPart("type", "apk")
+            .addFormDataPart("sign", uploadUrl.sign)
             .build()
         val request = Request.Builder()
             .url(requestUrl)
@@ -74,16 +97,78 @@ class OPPOMaretApi(
             .build()
         val result = okHttpClient.getJsonResult(request)
         result.checkSuccess("上传Apk")
-        result
+        OPPOApkResult(result.get("data").asJsonObject)
     }
 
-    private fun getRequestUrl(originUrl: String, params: Map<String, String>, token: String): HttpUrl {
+    suspend fun submit(
+        token: String,
+        apkInfo: ApkInfo,
+        appInfo: OPPOAppInfo,
+        updateDesc: String,
+        apkResult: OPPOApkResult
+    ) = withContext(Dispatchers.IO) {
+        val apkUrl = JsonArray().apply {
+            add(JsonObject().apply {
+                addProperty("url", apkResult.url)
+                addProperty("md5", apkResult.md5)
+                addProperty("cpu_code", 0) //多包平台，64 位 CPU 包为 64，32 位 CPU 包为 32，非多包应用为 0
+            })
+        }
+        val params = mapOf(
+            "pkg_name" to apkInfo.applicationId,
+            "version_code" to apkInfo.versionCode.toString(),
+            "apk_url" to apkUrl.toString(),
+            "update_desc" to updateDesc,
+            "online_type" to "1", // 1. 审核后立即发布 2. 定时发布
+            "second_category_id" to appInfo.secondCategory,
+            "third_category_id" to appInfo.thirdCategory,
+            "summary" to appInfo.summary,
+            "detail_desc" to appInfo.detailDesc,
+            "privacy_source_url" to appInfo.privacyUrl,
+            "icon_url" to appInfo.iconUrl,
+            "pic_url" to appInfo.picUrl,
+            "test_desc" to appInfo.testDesc,
+            "business_username" to appInfo.businessUsername,
+            "business_email" to appInfo.businessEmail,
+            "business_mobile" to appInfo.businessMobile,
+            "copyright_url" to appInfo.copyrightUrl,
+        )
+        val body = FormBody.Builder()
+            .apply {
+                params.forEach { add(it.key, it.value) }
+            }
+            .build()
+        val requestUrl = getRequestUrl("${DOMAIN}/resource/v1/app/upd", params, token, false)
+        val request = Request.Builder()
+            .url(requestUrl)
+            .post(body)
+            .build()
+        val result = okHttpClient.getJsonResult(request)
+        result.checkSuccess("提交版本")
+    }
+
+    /**
+     * @param paramsAppendQuery 是否将参数添加到url中(仅get请求需要这么做)
+     */
+    private fun getRequestUrl(
+        originUrl: String,
+        params: Map<String, String>,
+        token: String,
+        paramsAppendQuery: Boolean
+    ): HttpUrl {
+        val timestamp = (System.currentTimeMillis() / 1000).toString()
         val newParams = params.toMutableMap().apply {
             put("access_token", token)
-            put("timestamp", (System.currentTimeMillis() / 1000).toString())
+            put("timestamp", timestamp)
         }
         return originUrl.toHttpUrl().newBuilder()
-            .apply { newParams.forEach { addQueryParameter(it.key, it.value) } }
+            .apply {
+                if (paramsAppendQuery) {
+                    newParams.forEach { setQueryParameter(it.key, it.value) }
+                }
+            }
+            .addQueryParameter("access_token", token)
+            .addQueryParameter("timestamp", timestamp)
             .addQueryParameter("api_sign", OPPOApiSigner.sign(clientSecret, newParams))
             .build()
     }

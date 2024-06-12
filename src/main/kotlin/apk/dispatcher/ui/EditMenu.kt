@@ -17,6 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.util.PathUtil
+import apk.dispatcher.widget.Toast
+import java.awt.Desktop
+import java.io.IOException
+
 
 class EditMenu() {
     var eventListener: EventListener? = null
@@ -43,11 +48,30 @@ class EditMenu() {
                 eventListener?.onEditClick()
             }
             Divider()
+            item("打开配置") {
+                openApkDispatchDir()
+            }
+            Divider()
             item("删除", color = Color.Red) {
                 eventListener?.onDeleteClick()
             }
         }
 
+    }
+
+    private fun openApkDispatchDir() {
+        try {
+            // 替换为你要打开的目录路径
+            val directory = PathUtil.getApkDispatcherDir()
+            if (Desktop.isDesktopSupported()) {
+                val desktop = Desktop.getDesktop()
+                desktop.open(directory)
+            } else {
+                Toast.show("请手动打开:${directory.absolutePath}")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     @Composable

@@ -10,11 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
+import apk.dispatcher.ApkChannelTask
 import apk.dispatcher.ApkConfig
 
 
 @Composable
-fun ChannelConfigPage(config: ApkConfig.Channel, onConfigChange: (newConfig: ApkConfig.Channel) -> Unit) {
+fun ChannelConfigPage(
+    enableChannel: Boolean,
+    config: ApkConfig.Channel,
+    onConfigChange: (newConfig: ApkConfig.Channel) -> Unit
+) {
     Column {
         CheckboxRow(modifier = Modifier.padding(vertical = 8.dp), name = "是否启用", check = config.enable) {
             onConfigChange(config.copy(enable = it))
@@ -26,6 +31,10 @@ fun ChannelConfigPage(config: ApkConfig.Channel, onConfigChange: (newConfig: Apk
                 .alpha(if (config.enable) 1.0f else 0.5f)
         ) {
             for (param in config.params) {
+                // 未启用渠道包时，不显示这个选项
+                if (param.name == ApkChannelTask.FILE_NAME_IDENTIFY && !enableChannel) {
+                    continue
+                }
                 InputRaw(param.name, "", param.value) { newValue ->
                     onConfigChange(createNewChannel(config, param, newValue))
                 }

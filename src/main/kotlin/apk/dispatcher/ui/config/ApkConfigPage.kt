@@ -25,6 +25,7 @@ class ApkConfigPage(
 ) {
     private val viewModel = ApkConfigVM(apkConfig)
 
+
     @Composable
     fun render() {
         var currentIndex by remember { mutableStateOf(0) }
@@ -41,7 +42,6 @@ class ApkConfigPage(
                     }
                 }
                 ConfigList(currentIndex)
-
             }
             BottomButtons(onSaveClick = {
                 if (viewModel.saveApkConfig()) {
@@ -60,7 +60,7 @@ class ApkConfigPage(
                 }
             } else {
                 val channel = viewModel.apkConfigState.channels[tabIndex - 1]
-                ChannelConfigPage(channel) {
+                ChannelConfigPage(viewModel.apkConfigState.extension.enableChannel, channel) {
                     viewModel.updateChannel(it)
                 }
             }
@@ -113,9 +113,8 @@ private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> U
 
         }
         Spacer(modifier = spaceHeight)
-        CheckboxRow(Modifier, "开启渠道包", true) {
-            Toast.show("暂不支持非渠道包")
-//            onValueChange(apkConfig.copy(extension = apkConfig.extension.copy(enableChannel = it)))
+        CheckboxRow(Modifier, "开启渠道包", apkConfig.extension.enableChannel) {
+            onValueChange(apkConfig.copy(extension = apkConfig.extension.copy(enableChannel = it)))
         }
 
 

@@ -21,9 +21,12 @@ import apk.dispatcher.widget.UpdateDescView
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
+import javax.swing.JFileChooser.FILES_ONLY
+import javax.swing.filechooser.FileFilter
+import javax.swing.filechooser.FileNameExtensionFilter
 
 
-class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
+class ApkPage(private val apkConfig: ApkConfig) : Page(apkConfig.name) {
 
     private val apkViewModel = ApkViewModel(apkConfig)
 
@@ -44,8 +47,15 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
         val dividerHeight = 30.dp
         Section("操作") {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = { showSelectedDirDialog() }) {
-                    Text("选择Apk文件夹", color = AppColors.fontGray)
+                OutlinedButton(onClick = {
+                    if (apkConfig.extension.enableChannel) {
+                        showSelectedDirDialog()
+                    } else {
+                        showSelectedApkDialog()
+                    }
+                }) {
+                    val text = if (apkConfig.extension.enableChannel) "选择Apk文件夹" else "选择apk"
+                    Text(text, color = AppColors.fontGray)
                 }
                 Spacer(Modifier.width(10.dp))
                 val apkPath = apkViewModel.getApkDirState().value?.path ?: ""
@@ -71,6 +81,18 @@ class ApkPage(apkConfig: ApkConfig) : Page(apkConfig.name) {
         val dir = chooser.selectedFile ?: return
         if (!apkViewModel.selectedApkDir(dir)) {
             Toast.show("无效目录,未包含有效的Apk文件")
+        }
+    }
+
+    private fun showSelectedApkDialog() {
+        val chooser = JFileChooser(apkViewModel.getApkDir())
+        chooser.fileSelectionMode = FILES_ONLY;
+        chooser.fileFilter = FileNameExtensionFilter("Apk 文件", "apk")
+        val result = chooser.showOpenDialog(null)
+        if (result != JFileChooser.APPROVE_OPTION) return
+        val dir = chooser.selectedFile ?: return
+        if (!apkViewModel.selectedApkDir(dir)) {
+            Toast.show("解析Apk文件失败")
         }
     }
 

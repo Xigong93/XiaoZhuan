@@ -1,7 +1,7 @@
 package apk.dispatcher.util
 
 import java.io.File
-import java.io.FileFilter
+import java.nio.file.Files
 
 object PathUtil {
 
@@ -10,9 +10,12 @@ object PathUtil {
         return File(homeDir, ".apkDispatcher")
     }
 
-    fun listApkFile(dir: File): Array<File> {
-        return dir.listFiles(FileFilter {
-            it.name.endsWith(".apk", true)
-        }) ?: emptyArray()
+    fun listApkFile(dir: File): List<File> {
+        return dir.walkBottomUp()
+            .maxDepth(3)
+            .toList()
+            .filter { it.name.endsWith(".apk", true) }
+            .sortedByDescending { Files.getLastModifiedTime(it.toPath()) }
+            .take(9)
     }
 }

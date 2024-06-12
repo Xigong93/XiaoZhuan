@@ -1,7 +1,10 @@
 package apk.dispatcher.channel.vivo
 
 import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.util.defaultLogger
+import apk.dispatcher.util.getApkInfo
 import java.io.File
+import kotlin.math.roundToInt
 
 class VIVOChannelTask : ApkChannelTask() {
 
@@ -21,6 +24,15 @@ class VIVOChannelTask : ApkChannelTask() {
     }
 
     override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
+        val api = VIVOMarketApi(accessKey, accessSecret)
+        val apkInfo = getApkInfo(file)
+        val appDetail = api.getAppInfo(apkInfo.applicationId)
+        defaultLogger.info("查看App详情:${appDetail}")
+        val apkResult = api.uploadApk(file, apkInfo.applicationId) {
+            progress((it * 100).roundToInt())
+        }
+        defaultLogger.info("上传apk结果:${apkResult}")
+        api.submit(apkResult, updateDesc, appDetail)
 
     }
 

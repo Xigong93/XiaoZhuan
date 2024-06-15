@@ -48,13 +48,13 @@ class ApkPage(private val apkConfig: ApkConfig) : Page(apkConfig.name) {
         Section("操作") {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedButton(onClick = {
-                    if (apkConfig.extension.enableChannel) {
+                    if (apkConfig.enableChannel) {
                         showSelectedDirDialog()
                     } else {
                         showSelectedApkDialog()
                     }
                 }) {
-                    val text = if (apkConfig.extension.enableChannel) "选择Apk文件夹" else "选择apk"
+                    val text = if (apkConfig.enableChannel) "选择Apk文件夹" else "选择apk"
                     Text(text, color = AppColors.fontGray)
                 }
                 Spacer(Modifier.width(10.dp))

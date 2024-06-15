@@ -51,11 +51,7 @@ class ApkViewModel(
 
     fun selectedApkDir(dir: File): Boolean {
         return try {
-            val apkFile = if (apkConfig.extension.enableChannel) {
-                PathUtil.listApkFile(dir).first()
-            } else {
-                dir
-            }
+            val apkFile = if (dir.isDirectory) PathUtil.listApkFile(dir).first() else dir
             val launchers = selectedLaunchers()
             launchers.forEach { it.selectFile(dir) }
             apkInfoState.value = runBlocking { getApkInfo(apkFile) }
@@ -66,8 +62,6 @@ class ApkViewModel(
             false
         }
     }
-
-
 
 
     fun startDispatch() {

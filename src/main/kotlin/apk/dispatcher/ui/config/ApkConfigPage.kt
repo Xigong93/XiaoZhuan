@@ -60,7 +60,7 @@ class ApkConfigPage(
                 }
             } else {
                 val channel = viewModel.apkConfigState.channels[tabIndex - 1]
-                ChannelConfigPage(viewModel.apkConfigState.extension.enableChannel, channel) {
+                ChannelConfigPage(viewModel.apkConfigState.enableChannel, channel) {
                     viewModel.updateChannel(it)
                 }
             }
@@ -113,8 +113,8 @@ private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> U
 
         }
         Spacer(modifier = spaceHeight)
-        CheckboxRow(Modifier, "开启渠道包", apkConfig.extension.enableChannel) {
-            onValueChange(apkConfig.copy(extension = apkConfig.extension.copy(enableChannel = it)))
+        CheckboxRow(Modifier, "开启渠道包", apkConfig.enableChannel) {
+            onValueChange(apkConfig.copy(enableChannel = it))
         }
 
 

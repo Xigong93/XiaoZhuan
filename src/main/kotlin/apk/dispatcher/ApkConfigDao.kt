@@ -50,7 +50,6 @@ private class ApkConfigDaoImpl : ApkConfigDao {
             jsonAdapter.fromJson(json)
         } catch (e: Exception) {
             e.printStackTrace()
-            file.delete()
             null
         }
     }

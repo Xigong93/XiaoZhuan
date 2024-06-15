@@ -20,6 +20,9 @@ data class ApkConfig(
     val createTime: Long,
     @Json(name = "channels")
     val channels: List<Channel>,
+    /** 是否支持多渠道包 */
+    @Json(name = "enableChannel")
+    val enableChannel: Boolean = true,
     @Json(name = "extension")
     val extension: Extension
 ) {
@@ -58,9 +61,6 @@ data class ApkConfig(
 
     @JsonClass(generateAdapter = true)
     data class Extension(
-        /** 是否支持多渠道包 */
-        @Json(name = "enableChannel")
-        val enableChannel: Boolean = true,
         /** 更新描述 */
         @Json(name = "updateDesc")
         val updateDesc: String? = null,

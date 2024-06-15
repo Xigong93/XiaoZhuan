@@ -38,11 +38,7 @@ class TaskLauncher(
     }
 
     fun selectFile(apkDir: File) {
-        val apkFile = if (apkConfig.extension.enableChannel) {
-            findApkFile(apkDir)
-        } else {
-            apkDir
-        }
+        val apkFile = if (apkDir.isDirectory) findApkFile(apkDir) else apkDir
         apkFileState.value = apkFile
     }
 

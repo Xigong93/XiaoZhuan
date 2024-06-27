@@ -1,7 +1,6 @@
 package apk.dispatcher.channel.vivo
 
-import apk.dispatcher.BuildConfig
-import apk.dispatcher.OkhttpFactory
+import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.ProgressRequestBody
@@ -20,7 +19,7 @@ class VIVOMarketApi(
     private val accessKey: String,
     private val accessSecret: String,
 ) {
-    private val okHttpClient = OkhttpFactory.default()
+    private val okHttpClient = OkHttpFactory.default()
 
     suspend fun getAppInfo(packageName: String): VIVOAppInfo = withContext(Dispatchers.IO) {
         val params = mapOf(

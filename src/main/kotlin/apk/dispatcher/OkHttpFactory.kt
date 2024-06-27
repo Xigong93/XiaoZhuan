@@ -15,7 +15,9 @@ import kotlin.time.toJavaDuration
 // 有几个平台的接口响应非常慢，所以这个时间要设置的大一些
 private val timeout = 30.seconds.toJavaDuration()
 
-object OkhttpFactory {
+private const val DEBUG_NETWORK = false
+
+object OkHttpFactory {
 
 
     private val okHttpClient = OkHttpClient
@@ -24,7 +26,7 @@ object OkhttpFactory {
         .writeTimeout(timeout)
         .build()
 
-    fun default() = if (BuildConfig.DEBUG) debugClient() else okHttpClient
+    fun default() = if (DEBUG_NETWORK) debugClient() else okHttpClient
 }
 
 private fun debugClient(): OkHttpClient {

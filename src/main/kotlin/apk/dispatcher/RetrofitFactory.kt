@@ -13,7 +13,7 @@ object RetrofitFactory {
             .build()
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .callFactory(OkhttpFactory.default())
+            .callFactory(OkHttpFactory.default())
             .baseUrl(domain)
             .build()
             .create()

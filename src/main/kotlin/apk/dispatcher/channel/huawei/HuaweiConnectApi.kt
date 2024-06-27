@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.huawei
 
-import apk.dispatcher.OkhttpFactory
+import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.RetrofitFactory
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.ProgressRequestBody
@@ -123,7 +123,7 @@ suspend fun HuaweiConnectApi.uploadFile(
     url: HWUploadUrlResp.UploadUrl,
     progressChange: ProgressChange
 ): Unit = withContext(Dispatchers.IO) {
-    val client = OkhttpFactory.default()
+    val client = OkHttpFactory.default()
     val headers = Headers.Builder()
     url.headers.forEach { (k, v) ->
         headers.add(k, v)

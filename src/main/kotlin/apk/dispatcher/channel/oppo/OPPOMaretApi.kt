@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.oppo
 
-import apk.dispatcher.OkhttpFactory
+import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.ProgressRequestBody
@@ -22,7 +22,7 @@ class OPPOMaretApi(
     private val clientSecret: String,
 ) {
 
-    private val okHttpClient = OkhttpFactory.default()
+    private val okHttpClient = OkHttpFactory.default()
 
     /**
      * 获取token

@@ -1,11 +1,10 @@
 package apk.dispatcher.channel.honor
 
-import apk.dispatcher.OkhttpFactory
+import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.RetrofitFactory
 import apk.dispatcher.util.ProgressChange
 import apk.dispatcher.util.ProgressRequestBody
 import apk.dispatcher.util.getJsonResult
-import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Headers
@@ -113,7 +112,7 @@ suspend fun HonorConnectApi.uploadFile(
     url: HonorUploadUrl,
     progressChange: ProgressChange
 ): Unit = withContext(Dispatchers.IO) {
-    val client = OkhttpFactory.default()
+    val client = OkHttpFactory.default()
     val headers = Headers.Builder()
         .add("Authorization", token)
         .build()

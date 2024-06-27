@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.mi
 
-import apk.dispatcher.OkhttpFactory
+import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,7 +25,7 @@ class MiMarketApi(
     private val publicKey: String,
     private val privateKey: String
 ) {
-    private val httpClient = OkhttpFactory.default()
+    private val httpClient = OkHttpFactory.default()
 
     /**
      * 获取App信息

@@ -37,7 +37,6 @@ class HonorConnectClient {
         val uploadUrl = getUploadUrl(token, appId, file)
         uploadFile(file, token, uploadUrl, progressChange)
         bindUploadedApk(token, appId, uploadUrl)
-//        waitApkReady(clientId, token, appId, apkInfo.versionName)
         modifyUpdateDesc(token, appId, updateDesc, languageInfo)
         submit(token, appId)
     }
@@ -107,31 +106,6 @@ class HonorConnectClient {
         val fileInfo = HonorBindApkFile(listOf(HonorBindApkFile.Item(url.objectId)))
         val result = connectApi.bindApkFile(token, appId, fileInfo)
         result.throwOnFail()
-    }
-
-    /**
-     * 等待Apk编译完成
-     */
-    private suspend fun waitApkReady(
-        clientId: String,
-        token: String,
-        appId: String,
-        versionNumber: String
-    ) {
-//        val startTime = System.currentTimeMillis()
-//        while (true) {
-//            if (System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(3)) {
-//                throw TimeoutException("检测apk状态超时")
-//            }
-//            val result = connectApi.getApkCompileState(clientId, token, appId)
-//            result.result.throwOnFail()
-//            if (result.pkgStateList.first().isSuccess()) {
-//                break
-//            }
-//            delay(1.seconds)
-//        }
-        // 官方文档要求等待2分钟后再提交
-        delay(2.minutes)
     }
 
     /**

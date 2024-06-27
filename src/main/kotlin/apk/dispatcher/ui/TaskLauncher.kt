@@ -24,6 +24,10 @@ class TaskLauncher(
             updateState(ChannelState.Uploading(0))
         }
 
+        override fun onProcessing(action: String) {
+            updateState(ChannelState.Processing(action))
+        }
+
         override fun onProgress(progress: Int) {
             updateState(ChannelState.Uploading(progress))
         }

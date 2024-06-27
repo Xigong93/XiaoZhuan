@@ -3,7 +3,6 @@ package apk.dispatcher
 import apk.dispatcher.util.defaultLogger
 import java.io.File
 import java.util.logging.Level
-import java.util.logging.Logger
 
 abstract class ApkChannelTask {
 
@@ -45,10 +44,15 @@ abstract class ApkChannelTask {
     @kotlin.jvm.Throws
     suspend fun startUpload(apkFile: File, updateDesc: String) {
         logger.info("开始上传")
+        listener?.onProcessing("请求中")
         try {
             listener?.onStart()
             performUpload(apkFile, updateDesc) {
-                listener?.onProgress(it)
+                if (it == 100) {
+                    listener?.onProcessing("提交中")
+                } else {
+                    listener?.onProgress(it)
+                }
             }
             listener?.onSuccess()
             logger.info("上传成功")
@@ -56,7 +60,6 @@ abstract class ApkChannelTask {
             logger.log(Level.INFO, "上传失败", e)
             listener?.onError(e)
         }
-
     }
 
 
@@ -97,6 +100,8 @@ abstract class ApkChannelTask {
     interface StateListener {
 
         fun onStart()
+
+        fun onProcessing(action: String)
 
         /**
          * 取值范围0到100

@@ -22,7 +22,6 @@ import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
 import javax.swing.JFileChooser.FILES_ONLY
-import javax.swing.filechooser.FileFilter
 import javax.swing.filechooser.FileNameExtensionFilter
 
 
@@ -54,7 +53,7 @@ class ApkPage(private val apkConfig: ApkConfig) : Page(apkConfig.name) {
                         showSelectedApkDialog()
                     }
                 }) {
-                    val text = if (apkConfig.enableChannel) "选择Apk文件夹" else "选择apk"
+                    val text = if (apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
                     Text(text, color = AppColors.fontGray)
                 }
                 Spacer(Modifier.width(10.dp))
@@ -74,7 +73,7 @@ class ApkPage(private val apkConfig: ApkConfig) : Page(apkConfig.name) {
 
 
     private fun showSelectedDirDialog() {
-        val chooser = JFileChooser(apkViewModel.getApkDir())
+        val chooser = JFileChooser(apkViewModel.getLastApkDir())
         chooser.fileSelectionMode = DIRECTORIES_ONLY;
         val result = chooser.showOpenDialog(null)
         if (result != JFileChooser.APPROVE_OPTION) return
@@ -85,7 +84,7 @@ class ApkPage(private val apkConfig: ApkConfig) : Page(apkConfig.name) {
     }
 
     private fun showSelectedApkDialog() {
-        val chooser = JFileChooser(apkViewModel.getApkDir())
+        val chooser = JFileChooser(apkViewModel.getLastApkDir())
         chooser.fileSelectionMode = FILES_ONLY;
         chooser.fileFilter = FileNameExtensionFilter("Apk 文件", "apk")
         val result = chooser.showOpenDialog(null)

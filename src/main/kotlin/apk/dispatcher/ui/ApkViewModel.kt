@@ -11,7 +11,6 @@ import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.PathUtil
 import apk.dispatcher.util.getApkInfo
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -23,7 +22,7 @@ class ApkViewModel(
 
     private val mainScope = CoroutineScope(EmptyCoroutineContext)
 
-    val updateDesc = mutableStateOf<String>(apkConfig.extension.updateDesc ?: "")
+    val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
 
     private val apkDirState = mutableStateOf<File?>(null)
 
@@ -76,8 +75,22 @@ class ApkViewModel(
                 it.start(updateDesc)
             }
         }
-
     }
+
+    fun retryDispatch() {
+        mainScope.launch {
+            val launchers = selectedLaunchers().filter { it.getChannelState().value is ChannelState.Error }
+            val updateDesc = requireNotNull(updateDesc.value).trim()
+            launchers.forEach {
+                it.prepare()
+            }
+            updateApkConfig()
+            launchers.forEach {
+                it.start(updateDesc)
+            }
+        }
+    }
+
 
     private fun updateApkConfig() {
         val updateDesc = requireNotNull(updateDesc.value).trim()
@@ -90,8 +103,11 @@ class ApkViewModel(
         configDao.saveApkConfig(apkConfig.copy(extension = newExtension))
     }
 
-    fun getApkDir(): File? {
-        return apkConfig.extension.apkDir?.let { File(it) }?.takeIf { it.isDirectory }
+    /**
+     * 获取上一次选择的Apk文件或目录
+     */
+    fun getLastApkDir(): File? {
+        return apkConfig.extension.apkDir?.let { File(it) }?.takeIf { it.exists() }
     }
 
 
@@ -126,6 +142,6 @@ class ApkViewModel(
         }
     }
 
-    private fun selectedLaunchers() = taskLaunchers.filter { selectedChannels.contains(it.name) }
+    fun selectedLaunchers() = taskLaunchers.filter { selectedChannels.contains(it.name) }
 
 }

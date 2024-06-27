@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import apk.dispatcher.ui.upload.UploadDialog
+import apk.dispatcher.widget.ConfirmDialog
 import apk.dispatcher.widget.Section
 import apk.dispatcher.widget.Toast
 
@@ -35,10 +37,9 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
                         val selected = viewModel.selectedChannels.contains(chan.channelName)
                         val name = chan.channelName
                         val taskLauncher = viewModel.taskLaunchers.first { it.name == name }
-                        val state = taskLauncher.getChannelState()
                         val apkFileState = taskLauncher.getApkFileState()
                         val desc = apkFileState.value?.name
-                        ChannelView(selected, name, desc, state.value) { checked ->
+                        ChannelView(selected, name, desc) { checked ->
                             viewModel.selectChannel(name, checked)
                         }
                         Spacer(modifier = Modifier.height(15.dp))
@@ -63,12 +64,27 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
                     )
                     Text("全选")
                 }
+                var showUploading by remember { mutableStateOf(false) }
+                if (showUploading) {
+                    UploadDialog(viewModel) { showUploading = false }
+                }
+                var showAlert by remember { mutableStateOf(false) }
+                if (showAlert) {
+                    showConfirmDialog(onConfirm = {
+                        showAlert = false
+                        showUploading = true
+                    }, onDismiss = {
+                        showAlert = false
 
+                    })
+                }
                 Button(
                     colors = ButtonDefaults.buttonColors(AppColors.primary),
                     modifier = Modifier.align(Alignment.Center),
                     onClick = {
-                        startDispatch()
+                        if (checkForm()) {
+                            showAlert = true
+                        }
                     }
                 ) {
 
@@ -83,22 +99,45 @@ class ChannelGroupPage(private val viewModel: ApkViewModel) {
 
     }
 
-    private fun startDispatch() {
+    private fun checkForm(): Boolean {
         if (viewModel.getApkDirState().value == null) {
-            Toast.show("请选择Apk文件夹")
-            return
+            Toast.show("请选择Apk文件")
+            return false
         }
         if (viewModel.updateDesc.value.isEmpty()) {
             Toast.show("请输入更新描述")
-            return
+            return false
         }
         if (viewModel.selectedChannels.isEmpty()) {
             Toast.show("请选择渠道")
-            return
+            return false
         }
-        viewModel.startDispatch()
+        return true
     }
 
+
+    @Composable
+    private fun showConfirmDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+        val apkInfo = viewModel.getApkInfoState().value ?: return
+        val selectedChannels = viewModel.selectedChannels
+        val message = buildString {
+            append("包名:  ${apkInfo.applicationId}")
+            append("\n")
+            append("版本:  ${apkInfo.versionName}(${apkInfo.versionCode})")
+            append("\n")
+            append("渠道:  ${selectedChannels.joinToString(",")}")
+        }
+
+
+        ConfirmDialog(
+            message, "确定上传",
+            onConfirm = {
+                onConfirm()
+            }, onDismiss = {
+                onDismiss()
+            }
+        )
+    }
 
 }
 
@@ -125,14 +164,17 @@ private fun ChannelView(
     selected: Boolean,
     name: String,
     desc: String?,
-    state: ChannelState?,
     onCheckChange: (Boolean) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
             .background(Color.White)
+            .clickable {
+                onCheckChange(!selected)
+            }
             .padding(16.dp)
     ) {
         Checkbox(
@@ -152,25 +194,6 @@ private fun ChannelView(
             fontSize = 12.sp,
             color = AppColors.fontGray
         )
-        Spacer(modifier = Modifier.weight(1.0f))
-
-        val color = if (state is ChannelState.Error) {
-            Color.Red
-        } else {
-            AppColors.fontBlack
-        }
-        val stateDesc = when (state) {
-            is ChannelState.Waiting -> "等待中"
-            is ChannelState.Uploading -> "已上传${state.progress}%"
-            is ChannelState.Success -> "上传成功"
-            is ChannelState.Error -> "上传失败"
-            else -> ""
-        }
-        Text(
-            stateDesc,
-            fontSize = 14.sp,
-            color = color,
-        )
 
     }
 }
@@ -178,6 +201,7 @@ private fun ChannelView(
 
 sealed class ChannelState {
     object Waiting : ChannelState()
+    class Processing(val action: String) : ChannelState()
 
     /**
      * @param progress 取值范围[0,100]
@@ -185,26 +209,7 @@ sealed class ChannelState {
     class Uploading(val progress: Int) : ChannelState()
     object Success : ChannelState()
     class Error(val message: String) : ChannelState()
-}
 
-//data class Channel(
-//    /**
-//     * 名称
-//     */
-//    val name: String,
-//    /**
-//     * 描述信息
-//     */
-//    val desc: String,
-//    /**
-//     * 状态
-//     */
-//    val state: ChannelState?,
-//
-//    /**
-//     * 是否已选中
-//     */
-//    val selected: Boolean
-//)
-//
-//fun Channel(name: String) = Channel(name, "", null, true)
+    val finish: Boolean get() = this == Success || this is Error
+    val success: Boolean get() = this == Success
+}

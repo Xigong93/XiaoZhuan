@@ -10,63 +10,66 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import apk.dispatcher.ApkChannelRegistry
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.VerticalTabBar
 
 /**
  * 配置页面
  */
-class ApkConfigPage(
+@Composable
+fun ApkConfigPage(
     apkConfig: ApkConfig? = null,
-    private val onCloseClick: () -> Unit
+    navController: NavController,
 ) {
-    private val viewModel = ApkConfigVM(apkConfig)
+    val viewModel = remember { ApkConfigVM(apkConfig) }
 
-
-    @Composable
-    fun render() {
-        var currentIndex by remember { mutableStateOf(0) }
-        val channels = ApkChannelRegistry.channels
-        val titles = remember { listOf("基本信息") + channels.map { it.channelName } }
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
-                Row(modifier = Modifier.width(200.dp)) {
-                    VerticalTabBar(titles, currentIndex) {
-                        currentIndex = it
-                    }
+    var currentIndex by remember { mutableStateOf(0) }
+    val channels = ApkChannelRegistry.channels
+    val titles = remember { listOf("基本信息") + channels.map { it.channelName } }
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
+            Row(modifier = Modifier.width(200.dp)) {
+                VerticalTabBar(titles, currentIndex) {
+                    currentIndex = it
                 }
-                ConfigList(currentIndex)
             }
-            BottomButtons(onSaveClick = {
+            ConfigList(currentIndex, viewModel)
+        }
+        BottomButtons(
+            onSaveClick = {
                 if (viewModel.saveApkConfig()) {
-                    onCloseClick()
+                    navController.popBackStack()
                 }
-            }, onCloseClick = onCloseClick)
-        }
-    }
+            }, onCloseClick = {
+                navController.popBackStack()
 
-    @Composable
-    fun ConfigList(tabIndex: Int) {
-        AnimatedContent(tabIndex) {
-            if (tabIndex == 0) {
-                BasicApkConfig(viewModel.apkConfigState) {
-                    viewModel.apkConfigState = it
-                }
-            } else {
-                val channel = viewModel.apkConfigState.channels[tabIndex - 1]
-                ChannelConfigPage(viewModel.apkConfigState.enableChannel, channel) {
-                    viewModel.updateChannel(it)
-                }
+            }
+        )
+    }
+}
+
+
+@Composable
+private fun ConfigList(tabIndex: Int, viewModel: ApkConfigVM) {
+    AnimatedContent(tabIndex) {
+        if (tabIndex == 0) {
+            BasicApkConfig(viewModel.apkConfigState) {
+                viewModel.apkConfigState = it
+            }
+        } else {
+            val channel = viewModel.apkConfigState.channels[tabIndex - 1]
+            ChannelConfigPage(viewModel.apkConfigState.enableChannel, channel) {
+                viewModel.updateChannel(it)
             }
         }
-
     }
+
 }
 
 

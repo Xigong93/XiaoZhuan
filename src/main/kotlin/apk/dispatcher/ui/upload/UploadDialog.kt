@@ -25,9 +25,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
-import apk.dispatcher.ui.ApkViewModel
-import apk.dispatcher.ui.ChannelState
-import apk.dispatcher.ui.TaskLauncher
+import apk.dispatcher.ui.home.ApkViewModel
+import apk.dispatcher.ui.home.ChannelState
+import apk.dispatcher.TaskLauncher
 
 
 @Composable

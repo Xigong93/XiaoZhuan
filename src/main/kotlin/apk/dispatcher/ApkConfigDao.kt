@@ -13,6 +13,8 @@ fun ApkConfigDao(): ApkConfigDao {
 interface ApkConfigDao {
     fun getApkConfigList(): List<ApkConfig>
 
+    fun getApkConfig(id: String): ApkConfig?
+
     @Throws
     fun saveApkConfig(apkConfig: ApkConfig)
 
@@ -31,6 +33,15 @@ private class ApkConfigDaoImpl : ApkConfigDao {
             .filter { it.name.endsWith(FILE_SUFFIX) }
             .mapNotNull(::readApkConfig)
             .sortedBy { it.createTime }
+    }
+
+    override fun getApkConfig(id: String): ApkConfig? {
+        val file = File(PathUtil.getApkDispatcherDir(), "${id}${FILE_SUFFIX}")
+        return if (file.exists()) {
+            readApkConfig(file)
+        } else {
+            null
+        }
     }
 
     @Throws

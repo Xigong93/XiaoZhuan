@@ -1,10 +1,9 @@
-package apk.dispatcher.ui
+package apk.dispatcher
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import apk.dispatcher.ApkChannelTask
-import apk.dispatcher.ApkConfig
+import apk.dispatcher.ui.home.ChannelState
 import apk.dispatcher.util.PathUtil
 import java.io.File
 

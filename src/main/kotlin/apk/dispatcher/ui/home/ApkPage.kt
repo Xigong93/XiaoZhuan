@@ -1,4 +1,4 @@
-package apk.dispatcher.ui
+package apk.dispatcher.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

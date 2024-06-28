@@ -3,6 +3,7 @@ package apk.dispatcher.widget
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import apk.dispatcher.style.AppColors
@@ -24,60 +25,56 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-class UpdateDescView(private val updateDesc: MutableState<String>) {
+@Composable
+fun UpdateDescView(updateDesc: MutableState<String>) {
+    val textSize = 14.sp
+    val interactionSource = remember { MutableInteractionSource() }
+    val clearVisible by interactionSource.collectIsHoveredAsState()
+    Box(
+        modifier = Modifier
+            .hoverable(interactionSource)
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Composable
-    fun render() {
-        val textSize = 14.sp
-        var clearVisible by remember { mutableStateOf(false) }
-        Box(
-            modifier = Modifier
-                .onPointerEvent(PointerEventType.Enter) { clearVisible = true }
-                .onPointerEvent(PointerEventType.Exit) { clearVisible = false }
-        ) {
-            val focusRequester = remember { FocusRequester() }
-//            val focusManager = LocalFocusManager.current
-            OutlinedTextField(
-                value = updateDesc.value,
-                placeholder = {
-                    Text(
-                        "请填写更新描述",
-                        color = AppColors.fontGray,
-                        fontSize = textSize
-                    )
-                },
-                onValueChange = { updateDesc.value = it },
-                textStyle = TextStyle(fontSize = textSize),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = AppColors.primary,
-                    backgroundColor = Color.White
-                ),
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .width(300.dp)
-                    .height(120.dp)
-            )
-
-
-            AnimatedVisibility(
-                clearVisible && updateDesc.value.isNotEmpty(),
-                modifier = Modifier.align(Alignment.BottomEnd)
-            ) {
-
-                Image(painter = painterResource("input_clear.png"),
-                    contentDescription = "清空",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clip(CircleShape)
-                        .size(22.dp)
-                        .clickable {
-                            updateDesc.value = ""
-                            focusRequester.requestFocus()
-                        }
+    ) {
+        val focusRequester = remember { FocusRequester() }
+        OutlinedTextField(
+            value = updateDesc.value,
+            placeholder = {
+                Text(
+                    "请填写更新描述",
+                    color = AppColors.fontGray,
+                    fontSize = textSize
                 )
-            }
+            },
+            onValueChange = { updateDesc.value = it },
+            textStyle = TextStyle(fontSize = textSize),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = AppColors.primary,
+                backgroundColor = Color.White
+            ),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .width(300.dp)
+                .height(120.dp)
+        )
 
+
+        AnimatedVisibility(
+            clearVisible && updateDesc.value.isNotEmpty(),
+            modifier = Modifier.align(Alignment.BottomEnd)
+        ) {
+
+            Image(painter = painterResource("input_clear.png"),
+                contentDescription = "清空",
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clip(CircleShape)
+                    .size(22.dp)
+                    .clickable {
+                        updateDesc.value = ""
+                        focusRequester.requestFocus()
+                    }
+            )
         }
+
     }
 }

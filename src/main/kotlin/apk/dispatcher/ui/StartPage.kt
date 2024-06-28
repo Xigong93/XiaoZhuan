@@ -25,7 +25,7 @@ fun StartPage(navController: NavController) {
             colors = ButtonDefaults.buttonColors(AppColors.primary),
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
-                navController.navigate(AppScreens.Edit.name + "/0")
+                navController.navigate(AppScreens.Edit.name)
             }
         ) {
             Text(

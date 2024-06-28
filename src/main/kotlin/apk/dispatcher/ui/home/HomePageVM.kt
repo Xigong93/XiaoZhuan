@@ -20,12 +20,12 @@ class HomePageVM {
      */
     var showMenu by mutableStateOf(false)
 
-    var pages = apkConfigs.value.map { ApkPage(it) }
 
-    val currentApk:ApkConfig get() {
-        val index = selectedTab.value
-        return apkConfigs.value[index]
-    }
+    val currentApk: ApkConfig
+        get() {
+            val index = selectedTab.value
+            return apkConfigs.value[index]
+        }
 
     init {
         reload()
@@ -33,9 +33,6 @@ class HomePageVM {
 
     fun reload() {
         apkConfigs.value = apkConfigDao.getApkConfigList()
-
-        pages = apkConfigs.value.map { ApkPage(it) }
-
         selectedTab.value = selectedTab.value.coerceIn(0, (apkConfigs.value.size - 1).coerceAtLeast(0))
     }
 

@@ -23,123 +23,103 @@ import apk.dispatcher.widget.Toast
 /**
  * 渠道页面
  */
-class ChannelGroupPage(private val viewModel: ApkViewModel) {
-
-
-    @Composable
-    fun render() {
-
-        Column(modifier = Modifier.padding(20.dp)) {
-            Section("渠道") {
-                Column() {
-                    Spacer(modifier = Modifier.height(15.dp))
-                    viewModel.channels.withIndex().forEach { (index, chan) ->
-                        val selected = viewModel.selectedChannels.contains(chan.channelName)
-                        val name = chan.channelName
-                        val taskLauncher = viewModel.taskLaunchers.first { it.name == name }
-                        val apkFileState = taskLauncher.getApkFileState()
-                        val desc = apkFileState.value?.name
-                        ChannelView(selected, name, desc) { checked ->
-                            viewModel.selectChannel(name, checked)
-                        }
-                        Spacer(modifier = Modifier.height(15.dp))
+@Composable
+fun ChannelGroupPage(viewModel: ApkViewModel) {
+    Column(modifier = Modifier.padding(20.dp)) {
+        Section("渠道") {
+            Column() {
+                Spacer(modifier = Modifier.height(15.dp))
+                viewModel.channels.withIndex().forEach { (index, chan) ->
+                    val selected = viewModel.selectedChannels.contains(chan.channelName)
+                    val name = chan.channelName
+                    val taskLauncher = viewModel.taskLaunchers.first { it.name == name }
+                    val apkFileState = taskLauncher.getApkFileState()
+                    val desc = apkFileState.value?.name
+                    ChannelView(selected, name, desc) { checked ->
+                        viewModel.selectChannel(name, checked)
                     }
+                    Spacer(modifier = Modifier.height(15.dp))
                 }
             }
-            Spacer(modifier = Modifier.weight(1.0f))
-            Box(modifier = Modifier.fillMaxWidth()) {
-                val allSelected = viewModel.allChannelSelected()
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                    .clip(AppShapes.roundButton)
-                    .clickable {
-                        viewModel.selectAll(allSelected.not())
-                    }
-                    .padding(end = 12.dp)) {
-                    Checkbox(
-                        allSelected,
-                        onCheckedChange = { all ->
-                            viewModel.selectAll(all)
-                        },
-                        colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
-                    )
-                    Text("全选")
+        }
+        Spacer(modifier = Modifier.weight(1.0f))
+        Box(modifier = Modifier.fillMaxWidth()) {
+            val allSelected = viewModel.allChannelSelected()
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .clip(AppShapes.roundButton)
+                .clickable {
+                    viewModel.selectAll(allSelected.not())
                 }
-                var showUploading by remember { mutableStateOf(false) }
-                if (showUploading) {
-                    UploadDialog(viewModel) { showUploading = false }
-                }
-                var showAlert by remember { mutableStateOf(false) }
-                if (showAlert) {
-                    showConfirmDialog(onConfirm = {
+                .padding(end = 12.dp)) {
+                Checkbox(
+                    allSelected,
+                    onCheckedChange = { all ->
+                        viewModel.selectAll(all)
+                    },
+                    colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
+                )
+                Text("全选")
+            }
+            var showUploading by remember { mutableStateOf(false) }
+            if (showUploading) {
+                UploadDialog(viewModel) { showUploading = false }
+            }
+            var showAlert by remember { mutableStateOf(false) }
+            if (showAlert) {
+                showConfirmDialog(viewModel,
+                    onConfirm = {
                         showAlert = false
                         showUploading = true
                     }, onDismiss = {
                         showAlert = false
 
-                    })
-                }
-                Button(
-                    colors = ButtonDefaults.buttonColors(AppColors.primary),
-                    modifier = Modifier.align(Alignment.Center),
-                    onClick = {
-                        if (checkForm()) {
-                            showAlert = true
-                        }
                     }
-                ) {
-
-                    Text(
-                        "发布更新",
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 40.dp)
-                    )
+                )
+            }
+            Button(
+                colors = ButtonDefaults.buttonColors(AppColors.primary),
+                modifier = Modifier.align(Alignment.Center),
+                onClick = {
+                    if (viewModel.checkForm()) {
+                        showAlert = true
+                    }
                 }
+            ) {
+
+                Text(
+                    "发布更新",
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 40.dp)
+                )
             }
         }
-
     }
-
-    private fun checkForm(): Boolean {
-        if (viewModel.getApkDirState().value == null) {
-            Toast.show("请选择Apk文件")
-            return false
-        }
-        if (viewModel.updateDesc.value.isEmpty()) {
-            Toast.show("请输入更新描述")
-            return false
-        }
-        if (viewModel.selectedChannels.isEmpty()) {
-            Toast.show("请选择渠道")
-            return false
-        }
-        return true
-    }
-
-
-    @Composable
-    private fun showConfirmDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-        val apkInfo = viewModel.getApkInfoState().value ?: return
-        val selectedChannels = viewModel.selectedChannels
-        val message = buildString {
-            append("包名:  ${apkInfo.applicationId}")
-            append("\n")
-            append("版本:  ${apkInfo.versionName}(${apkInfo.versionCode})")
-            append("\n")
-            append("渠道:  ${selectedChannels.joinToString(",")}")
-        }
-
-
-        ConfirmDialog(
-            message, "确定上传",
-            onConfirm = {
-                onConfirm()
-            }, onDismiss = {
-                onDismiss()
-            }
-        )
-    }
-
 }
+
+
+@Composable
+private fun showConfirmDialog(viewModel: ApkViewModel, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    val apkInfo = viewModel.getApkInfoState().value ?: return
+    val selectedChannels = viewModel.selectedChannels
+    val message = buildString {
+        append("包名:  ${apkInfo.applicationId}")
+        append("\n")
+        append("版本:  ${apkInfo.versionName}(${apkInfo.versionCode})")
+        append("\n")
+        append("渠道:  ${selectedChannels.joinToString(",")}")
+    }
+
+
+    ConfirmDialog(
+        message, "确定上传",
+        onConfirm = {
+            onConfirm()
+        }, onDismiss = {
+            onDismiss()
+        }
+    )
+}
+
 
 @Preview
 @Composable

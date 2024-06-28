@@ -35,7 +35,7 @@ fun App() {
         composable(route = AppScreens.Home.name) {
             HomePage(navController)
         }
-        composable(route = "${AppScreens.Edit.name}/{id}") { entry ->
+        composable(route = "${AppScreens.Edit.name}?id={id}") { entry ->
             val id = entry.arguments?.getString("id")
             val apkConfig = id?.let { configDao.getApkConfig(it) }
             ApkConfigPage(apkConfig, navController)

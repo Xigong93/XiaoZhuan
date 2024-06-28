@@ -36,11 +36,12 @@ fun HomePage(navController: NavController) {
             MenuDialog(listener = remember {
                 object : MenuDialogListener {
                     override fun onAddClick() {
-                        navController.navigate(AppScreens.Edit.name + "/0")
+                        navController.navigate(AppScreens.Edit.name)
                     }
 
                     override fun onEditClick() {
-                        navController.navigate("${AppScreens.Edit.name}/${viewModel.currentApk.applicationId}")
+                        val id = viewModel.currentApk.applicationId
+                        navController.navigate("${AppScreens.Edit.name}?id=$id")
                     }
 
                     override fun onDeleteClick() {
@@ -84,9 +85,8 @@ private fun Content(viewModel: HomePageVM) {
             )
         }
         Divider()
-        val apkPage = viewModel.pages[viewModel.selectedTab.value]
-        AnimatedContent(apkPage) {
-            apkPage.render()
+        AnimatedContent(viewModel.currentApk) {
+            ApkPage(viewModel.currentApk)
         }
     }
 }

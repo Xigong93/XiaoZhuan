@@ -1,10 +1,10 @@
-package apk.dispatcher
+package apk.dispatcher.channel
 
 import apk.dispatcher.util.defaultLogger
 import java.io.File
 import java.util.logging.Level
 
-abstract class ApkChannelTask {
+abstract class ChannelTask {
 
     abstract val channelName: String
 

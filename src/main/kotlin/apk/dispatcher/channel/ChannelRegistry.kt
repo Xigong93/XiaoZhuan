@@ -1,15 +1,14 @@
-package apk.dispatcher
+package apk.dispatcher.channel
 
-import apk.dispatcher.channel.*
 import apk.dispatcher.channel.honor.HonorChannelTask
 import apk.dispatcher.channel.huawei.HuaweiChannelTask
 import apk.dispatcher.channel.mi.MiChannelTask
 import apk.dispatcher.channel.oppo.OPPOChannelTask
 import apk.dispatcher.channel.vivo.VIVOChannelTask
 
-object ApkChannelRegistry {
+object ChannelRegistry {
 
-    private val realChannels: List<ApkChannelTask> = listOf(
+    private val realChannels: List<ChannelTask> = listOf(
         HuaweiChannelTask(),
         MiChannelTask(),
         OPPOChannelTask(),
@@ -17,15 +16,15 @@ object ApkChannelRegistry {
         HonorChannelTask()
     )
 
-    private val mockChannels: List<ApkChannelTask> = listOf(
+    private val mockChannels: List<ChannelTask> = listOf(
         MockChannelTask("华为", "HUAWEI"),
         MockChannelTask("小米", "MI")
     )
 
-    val channels: List<ApkChannelTask> = realChannels
+    val channels: List<ChannelTask> = realChannels
 
 
-    fun getChannel(name: String): ApkChannelTask? {
+    fun getChannel(name: String): ChannelTask? {
         return channels.firstOrNull { it.channelName == name }
     }
 }

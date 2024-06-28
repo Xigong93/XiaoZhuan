@@ -3,16 +3,17 @@ package apk.dispatcher.ui.home
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import apk.dispatcher.ApkChannelRegistry
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelRegistry
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.ApkConfigDao
-import apk.dispatcher.TaskLauncher
+import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.PathUtil
 import apk.dispatcher.util.getApkInfo
 import apk.dispatcher.widget.Toast
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -30,8 +31,8 @@ class ApkViewModel(
 
     private val apkInfoState = mutableStateOf<ApkInfo?>(null)
 
-    val channels: List<ApkChannelTask> =
-        ApkChannelRegistry.channels.filter { apkConfig.getChannel(it.channelName)?.enable == true }
+    val channels: List<ChannelTask> =
+        ChannelRegistry.channels.filter { apkConfig.getChannel(it.channelName)?.enable == true }
 
     /**
      * 选中的Channel
@@ -64,7 +65,9 @@ class ApkViewModel(
         }
     }
 
-
+    /**
+     * 开始分发
+     */
     fun startDispatch() {
         mainScope.launch {
             val launchers = selectedLaunchers()
@@ -79,6 +82,9 @@ class ApkViewModel(
         }
     }
 
+    /**
+     * 重试
+     */
     fun retryDispatch() {
         mainScope.launch {
             val launchers = selectedLaunchers().filter { it.getChannelState().value is ChannelState.Error }
@@ -91,6 +97,13 @@ class ApkViewModel(
                 it.start(updateDesc)
             }
         }
+    }
+
+    /**
+     * 取消分发
+     */
+    fun cancelDispatch() {
+        mainScope.cancel("用户取消")
     }
 
 

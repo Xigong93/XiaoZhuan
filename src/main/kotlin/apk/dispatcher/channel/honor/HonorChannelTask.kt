@@ -1,11 +1,11 @@
 package apk.dispatcher.channel.honor
 
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.util.defaultLogger
 import java.io.File
 import kotlin.math.roundToInt
 
-class HonorChannelTask : ApkChannelTask() {
+class HonorChannelTask : ChannelTask() {
 
     override val channelName: String = "荣耀"
 

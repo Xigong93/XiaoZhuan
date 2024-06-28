@@ -1,12 +1,12 @@
 package apk.dispatcher.channel.oppo
 
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.util.defaultLogger
 import apk.dispatcher.util.getApkInfo
 import java.io.File
 import kotlin.math.roundToInt
 
-class OPPOChannelTask : ApkChannelTask() {
+class OPPOChannelTask : ChannelTask() {
 
     override val channelName: String = "OPPO"
 

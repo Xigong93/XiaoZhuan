@@ -1,12 +1,12 @@
 package apk.dispatcher.channel.vivo
 
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.util.defaultLogger
 import apk.dispatcher.util.getApkInfo
 import java.io.File
 import kotlin.math.roundToInt
 
-class VIVOChannelTask : ApkChannelTask() {
+class VIVOChannelTask : ChannelTask() {
 
     override val channelName: String = "VIVO"
 

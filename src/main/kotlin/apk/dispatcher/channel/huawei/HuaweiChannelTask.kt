@@ -1,11 +1,11 @@
 package apk.dispatcher.channel.huawei
 
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelTask
 import java.io.File
 import java.util.logging.Logger
 import kotlin.math.roundToInt
 
-class HuaweiChannelTask : ApkChannelTask() {
+class HuaweiChannelTask : ChannelTask() {
 
     override val channelName: String = "华为"
 

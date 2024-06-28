@@ -1,12 +1,12 @@
 package apk.dispatcher.channel.mi
 
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.util.getApkInfo
 import java.io.File
 import java.util.logging.Logger
 import kotlin.math.roundToInt
 
-class MiChannelTask : ApkChannelTask() {
+class MiChannelTask : ChannelTask() {
 
     override val channelName: String = "小米"
 

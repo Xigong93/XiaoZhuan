@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import apk.dispatcher.ApkChannelRegistry
+import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.VerticalTabBar
@@ -27,7 +27,7 @@ fun ApkConfigPage(
     val viewModel = remember { ApkConfigVM(apkConfig) }
 
     var currentIndex by remember { mutableStateOf(0) }
-    val channels = ApkChannelRegistry.channels
+    val channels = ChannelRegistry.channels
     val titles = remember { listOf("基本信息") + channels.map { it.channelName } }
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),

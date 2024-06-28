@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.ApkConfig
 
 
@@ -32,7 +32,7 @@ fun ChannelConfigPage(
         ) {
             for (param in config.params) {
                 // 未启用渠道包时，不显示这个选项
-                if (param.name == ApkChannelTask.FILE_NAME_IDENTIFY && !enableChannel) {
+                if (param.name == ChannelTask.FILE_NAME_IDENTIFY && !enableChannel) {
                     continue
                 }
                 InputRaw(param.name, "", param.value) { newValue ->

@@ -12,10 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.navArgument
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.ui.AppScreens
 import apk.dispatcher.util.PathUtil
 import apk.dispatcher.widget.Toast
 import java.awt.Desktop

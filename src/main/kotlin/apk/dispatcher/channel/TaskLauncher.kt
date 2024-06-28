@@ -1,15 +1,16 @@
-package apk.dispatcher
+package apk.dispatcher.channel
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import apk.dispatcher.ApkConfig
 import apk.dispatcher.ui.home.ChannelState
 import apk.dispatcher.util.PathUtil
 import java.io.File
 
 class TaskLauncher(
     private val apkConfig: ApkConfig,
-    private val task: ApkChannelTask
+    private val task: ChannelTask
 ) {
 
     val name = task.channelName
@@ -18,7 +19,7 @@ class TaskLauncher(
 
     private val channelState: MutableState<ChannelState?> = mutableStateOf(null)
 
-    private val stateListener = object : ApkChannelTask.StateListener {
+    private val stateListener = object : ChannelTask.StateListener {
         override fun onStart() {
             updateState(ChannelState.Uploading(0))
         }
@@ -60,7 +61,7 @@ class TaskLauncher(
     private fun findApkFile(apkDir: File): File {
         val apks = PathUtil.listApkFile(apkDir)
         val fileId = apkConfig.getChannel(name)
-            ?.getParam(ApkChannelTask.FILE_NAME_IDENTIFY)
+            ?.getParam(ChannelTask.FILE_NAME_IDENTIFY)
             ?.value
             ?: task.fileNameIdentify
         val file = apks.firstOrNull { it.name.contains(fileId, true) }
@@ -75,10 +76,10 @@ class TaskLauncher(
         channelState.value = newState
     }
 
-    private fun getParams(): Map<ApkChannelTask.Param, String?> {
+    private fun getParams(): Map<ChannelTask.Param, String?> {
         val channelParams = apkConfig.channels.associateBy { it.name }
         val saveParams = channelParams[task.channelName]?.params
-        val getParam = { p: ApkChannelTask.Param -> saveParams?.firstOrNull { it.name == p.name }?.value }
+        val getParam = { p: ChannelTask.Param -> saveParams?.firstOrNull { it.name == p.name }?.value }
         return task.getParams().associateWith { p -> getParam(p) }
     }
 }

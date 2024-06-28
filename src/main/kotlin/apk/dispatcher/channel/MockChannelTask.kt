@@ -1,6 +1,5 @@
 package apk.dispatcher.channel
 
-import apk.dispatcher.ApkChannelTask
 import apk.dispatcher.util.defaultLogger
 import kotlinx.coroutines.delay
 import java.io.File
@@ -8,7 +7,7 @@ import java.io.File
 class MockChannelTask(
     override val channelName: String,
     override val fileNameIdentify: String
-) : ApkChannelTask() {
+) : ChannelTask() {
 
     override val paramDefine: List<Param> = listOf(
         Param("AppId"),

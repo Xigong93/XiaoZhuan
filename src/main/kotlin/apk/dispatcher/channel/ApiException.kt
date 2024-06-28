@@ -1,4 +1,4 @@
-package apk.dispatcher
+package apk.dispatcher.channel
 
 class ApiException(
     val code: Int,

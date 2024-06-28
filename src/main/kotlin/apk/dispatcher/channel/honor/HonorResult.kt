@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.honor
 
-import apk.dispatcher.ApiException
+import apk.dispatcher.channel.ApiException
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

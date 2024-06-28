@@ -3,15 +3,15 @@ package apk.dispatcher.ui.config
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import apk.dispatcher.ApkChannelRegistry
-import apk.dispatcher.ApkChannelTask
+import apk.dispatcher.channel.ChannelRegistry
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.ApkConfig
 import apk.dispatcher.ApkConfigDao
 import apk.dispatcher.widget.Toast
 
 class ApkConfigVM(
     apkConfig: ApkConfig?,
-    private val channels: List<ApkChannelTask> = ApkChannelRegistry.channels
+    private val channels: List<ChannelTask> = ChannelRegistry.channels
 
 ) {
     var apkConfigState by mutableStateOf(createApkConfig(apkConfig))
@@ -81,7 +81,7 @@ class ApkConfigVM(
     }
 
     private fun createChannelConfig(name: String, oldChannel: ApkConfig.Channel?): ApkConfig.Channel {
-        val params = ApkChannelRegistry.getChannel(name)?.getParams()?.map {
+        val params = ChannelRegistry.getChannel(name)?.getParams()?.map {
             val oldValue = oldChannel?.getParam(it.name)?.value
             ApkConfig.Param(it.name, oldValue ?: it.defaultValue ?: "")
         }

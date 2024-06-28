@@ -1,15 +1,16 @@
-package apk.dispatcher.ui.home
+package apk.dispatcher.page.home
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.ApkConfig
-import apk.dispatcher.ApkConfigDao
+import apk.dispatcher.config.ApkConfig
+import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.util.ApkInfo
-import apk.dispatcher.util.PathUtil
+import apk.dispatcher.AppPath
+import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.getApkInfo
 import apk.dispatcher.widget.Toast
 import kotlinx.coroutines.CoroutineScope
@@ -53,7 +54,7 @@ class ApkViewModel(
 
     fun selectedApkDir(dir: File): Boolean {
         return try {
-            val apkFile = if (dir.isDirectory) PathUtil.listApkFile(dir).first() else dir
+            val apkFile = if (dir.isDirectory) AppPath.listApk(dir).first() else dir
             val launchers = selectedLaunchers()
             launchers.forEach { it.selectFile(dir) }
             apkInfoState.value = runBlocking { getApkInfo(apkFile) }
@@ -115,7 +116,7 @@ class ApkViewModel(
             updateDesc = updateDesc
         )
         val configDao = ApkConfigDao()
-        configDao.saveApkConfig(apkConfig.copy(extension = newExtension))
+        configDao.saveConfig(apkConfig.copy(extension = newExtension))
     }
 
     /**
@@ -176,23 +177,8 @@ class ApkViewModel(
     }
 
     fun getFileSize(): String {
-        val apkInfo = getApkInfoState().value
-        val fileSize = apkInfo?.path?.let { File(it) }?.length() ?: 0
-        return formatFileSize(fileSize)
+        val apkInfo = getApkInfoState().value ?: return ""
+        val file = File(apkInfo.path)
+        return FileUtil.getFileSize(file)
     }
 }
-
-private fun formatFileSize(size: Long): String {
-    val units = arrayOf("B", "KB", "MB", "GB", "TB")
-    val digitGrouping = 2
-    val si = 1000.0
-    var bytes = size.toDouble()
-    var unitIndex = 0
-    while (bytes >= si && unitIndex < units.size - 1) {
-        bytes /= si
-        unitIndex++
-    }
-    return String.format("%.${digitGrouping}f %s", bytes, units[unitIndex])
-}
-
-

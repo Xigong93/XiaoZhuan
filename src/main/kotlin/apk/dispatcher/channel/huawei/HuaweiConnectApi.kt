@@ -2,18 +2,14 @@ package apk.dispatcher.channel.huawei
 
 import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.RetrofitFactory
+import apk.dispatcher.util.ProgressBody
 import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.ProgressRequestBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Query
+import okhttp3.Request
+import retrofit2.http.*
 import java.io.File
 
 fun HuaweiConnectApi(): HuaweiConnectApi {
@@ -120,7 +116,7 @@ suspend fun HuaweiConnectApi.uploadFile(
         headers.add(k, v)
     }
     val contentType = "application/octet-stream".toMediaType()
-    val body = ProgressRequestBody(
+    val body = ProgressBody(
         contentType, file, progressChange
     )
     val request = Request.Builder()

@@ -1,13 +1,12 @@
 package apk.dispatcher.channel.huawei
 
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.defaultLogger
-import apk.dispatcher.util.getApkInfo
 import kotlinx.coroutines.delay
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class HuaweiConnectClient {
@@ -24,12 +23,12 @@ class HuaweiConnectClient {
     @Throws
     suspend fun uploadApk(
         file: File,
+        apkInfo: ApkInfo,
         clientId: String,
         clientSecret: String,
         updateDesc: String,
         progressChange: ProgressChange
     ) {
-        val apkInfo = getApkInfo(file)
         val rawToken = getToken(clientId, clientSecret)
         val token = "Bearer $rawToken"
         val appId = getAppId(clientId, token, apkInfo.applicationId)
@@ -46,7 +45,7 @@ class HuaweiConnectClient {
      * 获取token
      */
     private suspend fun getToken(clientId: String, clientSecret: String): String {
-        defaultLogger.info("获取token")
+        AppLogger.info(LOG_TAG, "获取token")
         val result = connectApi.getToken(HWTokenParams(clientId, clientSecret))
         result.result?.throwOnFail()
         return checkNotNull(result.token)
@@ -56,7 +55,7 @@ class HuaweiConnectClient {
      * 获取AppId
      */
     private suspend fun getAppId(clientId: String, token: String, applicationId: String): String {
-        defaultLogger.info("获取AppId")
+        AppLogger.info(LOG_TAG, "获取AppId")
         val result = connectApi.getAppId(clientId, token, applicationId)
         result.result.throwOnFail()
         val appIds = result.list ?: emptyList()
@@ -73,7 +72,7 @@ class HuaweiConnectClient {
         appId: String,
         file: File,
     ): HWUploadUrlResp.UploadUrl {
-        defaultLogger.info("获取Apk上传地址")
+        AppLogger.info(LOG_TAG, "获取Apk上传地址")
         val result = connectApi.getUploadUrl(clientId, token, appId, file.name, file.length())
         result.result.throwOnFail()
         return checkNotNull(result.url)
@@ -87,7 +86,7 @@ class HuaweiConnectClient {
         url: HWUploadUrlResp.UploadUrl,
         progressChange: ProgressChange
     ) {
-        defaultLogger.info("上传Apk文件")
+        AppLogger.info(LOG_TAG, "上传Apk文件")
         connectApi.uploadFile(file, url, progressChange)
     }
 
@@ -101,7 +100,7 @@ class HuaweiConnectClient {
         file: File,
         url: HWUploadUrlResp.UploadUrl,
     ): HWBindFileResp {
-        defaultLogger.info("绑定Apk文件")
+        AppLogger.info(LOG_TAG, "绑定Apk文件")
         val fileInfo = HWRefreshApk.FileInfo(file.name, url.objectId)
         val params = HWRefreshApk(files = listOf(fileInfo))
         val result = connectApi.bindApkFile(clientId, token, appId, params)
@@ -118,7 +117,7 @@ class HuaweiConnectClient {
         appId: String,
         bindFileResult: HWBindFileResp,
     ) {
-        defaultLogger.info("等待Apk编译完成")
+        AppLogger.info(LOG_TAG, "等待Apk编译完成")
         val startTime = System.currentTimeMillis()
         while (true) {
             delay(10.seconds)
@@ -131,7 +130,7 @@ class HuaweiConnectClient {
                 break
             }
         }
-        defaultLogger.info("Apk编译完成")
+        AppLogger.info(LOG_TAG, "Apk编译完成")
     }
 
     /**
@@ -143,7 +142,7 @@ class HuaweiConnectClient {
         appId: String,
         updateDesc: String
     ) {
-        defaultLogger.info("修改新版本更新描述")
+        AppLogger.info(LOG_TAG, "修改新版本更新描述")
         val desc = HWVersionDesc(updateDesc)
         val result = connectApi.updateVersionDesc(clientId, token, appId, desc)
         result.result.throwOnFail()
@@ -157,9 +156,13 @@ class HuaweiConnectClient {
         token: String,
         appId: String,
     ) {
-        defaultLogger.info("提交审核")
+        AppLogger.info(LOG_TAG, "提交审核")
         val result = connectApi.submit(clientId, token, appId)
         result.result.throwOnFail()
+    }
+
+    companion object {
+        private const val LOG_TAG = "华为Api"
     }
 
 }

@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.home
+package apk.dispatcher.page.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.util.PathUtil
+import apk.dispatcher.AppPath
 import apk.dispatcher.widget.Toast
 import java.awt.Desktop
 import java.io.IOException
@@ -45,7 +45,7 @@ fun MenuDialog(listener: MenuDialogListener, onDismiss: () -> Unit) {
 private fun openApkDispatchDir() {
     try {
         // 替换为你要打开的目录路径
-        val directory = PathUtil.getApkDispatcherDir()
+        val directory = AppPath.getRootDir()
         if (Desktop.isDesktopSupported()) {
             val desktop = Desktop.getDesktop()
             desktop.open(directory)

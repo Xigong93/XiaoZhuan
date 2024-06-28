@@ -1,8 +1,8 @@
 package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.util.defaultLogger
-import apk.dispatcher.util.getApkInfo
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -19,23 +19,23 @@ class OPPOChannelTask : ChannelTask() {
     private var clientSecret = ""
 
     override fun init(params: Map<Param, String?>) {
+        AppLogger.debug(channelName,"参数:$params")
         clientId = params[CLIENT_ID_PARAM] ?: ""
         clientSecret = params[CLIENT_SECRET_PARAM] ?: ""
     }
 
-    override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
+    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
 
         val maretApi = OPPOMaretApi(clientId, clientSecret)
-        val apkInfo = getApkInfo(file)
         val token = maretApi.getToken()
-        defaultLogger.info("token=$token")
+        AppLogger.info(channelName, "token=$token")
         val appInfo = maretApi.getAppInfo(token, apkInfo.applicationId)
         val uploadUrl = maretApi.getUploadUrl(token)
-        defaultLogger.info("uploadUrl=$uploadUrl")
+        AppLogger.info(channelName, "uploadUrl=$uploadUrl")
         val apkResult = maretApi.uploadApk(uploadUrl, token, file) {
             progress((it * 100).roundToInt())
         }
-        defaultLogger.info("apkResult=$apkResult")
+        AppLogger.info(channelName, "apkResult=$apkResult")
         maretApi.submit(token, apkInfo, appInfo, updateDesc, apkResult)
     }
 

@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.config
+package apk.dispatcher.page.config
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.ApkConfig
+import apk.dispatcher.config.ApkConfig
 
 
 @Composable

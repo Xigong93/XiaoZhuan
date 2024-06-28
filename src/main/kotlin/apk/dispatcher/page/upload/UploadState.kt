@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.upload
+package apk.dispatcher.page.upload
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.ui.home.ChannelState
+import apk.dispatcher.page.home.ChannelState
 
 @Composable
 fun ChannelUploadState(name: String, state: ChannelState, modifier: Modifier = Modifier) {

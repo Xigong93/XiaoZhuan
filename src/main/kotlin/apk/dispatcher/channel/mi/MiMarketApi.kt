@@ -90,7 +90,7 @@ class MiMarketApi(
                 })
             })
         }
-        val apkBody = ProgressRequestBody(
+        val apkBody = ProgressBody(
             mediaType = "application/octet-stream".toMediaType(),
             file = apkFile,
             progressChange = progressChange

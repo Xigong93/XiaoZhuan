@@ -1,15 +1,14 @@
 package apk.dispatcher.channel.huawei
 
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
 import java.io.File
-import java.util.logging.Logger
 import kotlin.math.roundToInt
 
 class HuaweiChannelTask : ChannelTask() {
 
     override val channelName: String = "华为"
-
-    private val logger = Logger.getLogger(channelName)
 
     override val fileNameIdentify: String = "HUAWEI"
 
@@ -22,13 +21,13 @@ class HuaweiChannelTask : ChannelTask() {
     private var clientSecret = ""
 
     override fun init(params: Map<Param, String?>) {
-        logger.info("参数:$params")
+        AppLogger.debug(channelName,"参数:$params")
         clientId = params[CLIENT_ID] ?: ""
         clientSecret = params[CLIENT_SECRET] ?: ""
     }
 
-    override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
-        connectClient.uploadApk(file, clientId, clientSecret, updateDesc) {
+    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
+        connectClient.uploadApk(file, apkInfo, clientId, clientSecret, updateDesc) {
             progress((it * 100).roundToInt())
         }
     }

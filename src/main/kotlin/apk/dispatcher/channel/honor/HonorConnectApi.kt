@@ -2,8 +2,8 @@ package apk.dispatcher.channel.honor
 
 import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.RetrofitFactory
+import apk.dispatcher.util.ProgressBody
 import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.ProgressRequestBody
 import apk.dispatcher.util.getJsonResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -117,7 +117,7 @@ suspend fun HonorConnectApi.uploadFile(
         .add("Authorization", token)
         .build()
     val contentType = "application/vnd.android.package-archive".toMediaType()
-    val apkBody = ProgressRequestBody(
+    val apkBody = ProgressBody(
         contentType, file, progressChange
     )
     val body = MultipartBody.Builder()

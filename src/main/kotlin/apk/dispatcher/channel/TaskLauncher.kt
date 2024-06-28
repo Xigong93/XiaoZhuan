@@ -3,9 +3,9 @@ package apk.dispatcher.channel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import apk.dispatcher.ApkConfig
-import apk.dispatcher.ui.home.ChannelState
-import apk.dispatcher.util.PathUtil
+import apk.dispatcher.config.ApkConfig
+import apk.dispatcher.page.home.ChannelState
+import apk.dispatcher.AppPath
 import java.io.File
 
 class TaskLauncher(
@@ -59,7 +59,7 @@ class TaskLauncher(
     }
 
     private fun findApkFile(apkDir: File): File {
-        val apks = PathUtil.listApkFile(apkDir)
+        val apks = AppPath.listApk(apkDir)
         val fileId = apkConfig.getChannel(name)
             ?.getParam(ChannelTask.FILE_NAME_IDENTIFY)
             ?.value

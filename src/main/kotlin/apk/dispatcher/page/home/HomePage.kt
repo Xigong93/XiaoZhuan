@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.home
+package apk.dispatcher.page.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.ui.AppScreens
+import apk.dispatcher.page.AppScreens
 import apk.dispatcher.widget.HorizontalTabBar
 
 @Composable

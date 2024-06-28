@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.config
+package apk.dispatcher.page.config
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable

@@ -2,8 +2,8 @@ package apk.dispatcher.channel.vivo
 
 import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.util.FileUtil
+import apk.dispatcher.util.ProgressBody
 import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.ProgressRequestBody
 import apk.dispatcher.util.getJsonResult
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +45,7 @@ class VIVOMarketApi(
             "packageName" to packageName,
             "fileMd5" to FileUtil.getFileMD5(apkFile)
         )
-        val apkBody = ProgressRequestBody(
+        val apkBody = ProgressBody(
             mediaType = "application/octet-stream".toMediaType(),
             file = apkFile,
             progressChange = progressChange

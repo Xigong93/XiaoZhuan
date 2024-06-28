@@ -1,6 +1,6 @@
-package apk.dispatcher
+package apk.dispatcher.config
 
-import apk.dispatcher.util.PathUtil
+import apk.dispatcher.AppPath
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
@@ -11,14 +11,14 @@ fun ApkConfigDao(): ApkConfigDao {
 }
 
 interface ApkConfigDao {
-    fun getApkConfigList(): List<ApkConfig>
+    fun getConfigList(): List<ApkConfig>
 
-    fun getApkConfig(id: String): ApkConfig?
+    fun getConfig(id: String): ApkConfig?
 
     @Throws
-    fun saveApkConfig(apkConfig: ApkConfig)
+    fun saveConfig(apkConfig: ApkConfig)
 
-    fun removeApkConfig(apkConfig: ApkConfig)
+    fun removeConfig(apkConfig: ApkConfig)
 }
 
 private class ApkConfigDaoImpl : ApkConfigDao {
@@ -27,16 +27,16 @@ private class ApkConfigDaoImpl : ApkConfigDao {
 
     private val jsonAdapter by lazy { moshi.adapter(ApkConfig::class.java) }
 
-    override fun getApkConfigList(): List<ApkConfig> {
-        val files = PathUtil.getApkDispatcherDir().listFiles() ?: emptyArray()
+    override fun getConfigList(): List<ApkConfig> {
+        val files = AppPath.getApkDir().listFiles() ?: emptyArray()
         return files
             .filter { it.name.endsWith(FILE_SUFFIX) }
             .mapNotNull(::readApkConfig)
             .sortedBy { it.createTime }
     }
 
-    override fun getApkConfig(id: String): ApkConfig? {
-        val file = File(PathUtil.getApkDispatcherDir(), "${id}${FILE_SUFFIX}")
+    override fun getConfig(id: String): ApkConfig? {
+        val file = File(AppPath.getApkDir(), "${id}$FILE_SUFFIX")
         return if (file.exists()) {
             readApkConfig(file)
         } else {
@@ -45,11 +45,11 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     }
 
     @Throws
-    override fun saveApkConfig(apkConfig: ApkConfig) {
+    override fun saveConfig(apkConfig: ApkConfig) {
         writeApkConfig(apkConfig.file, apkConfig)
     }
 
-    override fun removeApkConfig(apkConfig: ApkConfig) {
+    override fun removeConfig(apkConfig: ApkConfig) {
         val bakFile = File(apkConfig.file.absolutePath + ".bak")
         if (bakFile.exists()) bakFile.delete()
         apkConfig.file.renameTo(bakFile)
@@ -73,10 +73,10 @@ private class ApkConfigDaoImpl : ApkConfigDao {
 
 
     private val ApkConfig.file: File
-        get() = File(PathUtil.getApkDispatcherDir(), "${applicationId}${FILE_SUFFIX}")
+        get() = File(AppPath.getApkDir(), "${applicationId}$FILE_SUFFIX")
 
     companion object {
-        private const val FILE_SUFFIX = ".apk.json"
+        private const val FILE_SUFFIX = ".json"
     }
 
 

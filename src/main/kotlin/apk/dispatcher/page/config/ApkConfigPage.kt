@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.config
+package apk.dispatcher.page.config
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import apk.dispatcher.channel.ChannelRegistry
-import apk.dispatcher.ApkConfig
+import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.VerticalTabBar
 

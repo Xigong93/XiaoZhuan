@@ -1,4 +1,4 @@
-package apk.dispatcher
+package apk.dispatcher.config
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

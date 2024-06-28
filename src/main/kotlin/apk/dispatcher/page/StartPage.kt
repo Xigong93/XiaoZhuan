@@ -1,4 +1,4 @@
-package apk.dispatcher.ui
+package apk.dispatcher.page
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

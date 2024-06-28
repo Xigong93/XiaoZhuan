@@ -1,14 +1,9 @@
 package apk.dispatcher.channel.honor
 
+import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.defaultLogger
-import apk.dispatcher.util.getApkInfo
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import kotlinx.coroutines.delay
 import java.io.File
-import kotlin.time.Duration.Companion.minutes
 
 class HonorConnectClient {
 
@@ -24,12 +19,12 @@ class HonorConnectClient {
     @Throws
     suspend fun uploadApk(
         file: File,
+        apkInfo: ApkInfo,
         clientId: String,
         clientSecret: String,
         updateDesc: String,
         progressChange: ProgressChange
     ) {
-        val apkInfo = getApkInfo(file)
         val rawToken = getToken(clientId, clientSecret)
         val token = "Bearer $rawToken"
         val appId = getAppId(token, apkInfo.applicationId)

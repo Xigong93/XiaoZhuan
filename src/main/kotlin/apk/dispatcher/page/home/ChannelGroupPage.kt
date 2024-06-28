@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.home
+package apk.dispatcher.page.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
@@ -15,10 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
-import apk.dispatcher.ui.upload.UploadDialog
+import apk.dispatcher.page.upload.UploadDialog
 import apk.dispatcher.widget.ConfirmDialog
 import apk.dispatcher.widget.Section
-import apk.dispatcher.widget.Toast
 
 /**
  * 渠道页面

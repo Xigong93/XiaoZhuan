@@ -2,8 +2,8 @@ package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.util.ApkInfo
+import apk.dispatcher.util.ProgressBody
 import apk.dispatcher.util.ProgressChange
-import apk.dispatcher.util.ProgressRequestBody
 import apk.dispatcher.util.getJsonResult
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -80,7 +80,7 @@ class OPPOMaretApi(
             "sign" to uploadUrl.sign,
         )
         val requestUrl = getRequestUrl(uploadUrl.url, params, token, false)
-        val apkBody = ProgressRequestBody(
+        val apkBody = ProgressBody(
             mediaType = "application/octet-stream".toMediaType(),
             file = apkFile,
             progressChange = progressChange

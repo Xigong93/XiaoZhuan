@@ -1,7 +1,8 @@
 package apk.dispatcher.channel.honor
 
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.util.defaultLogger
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -22,16 +23,17 @@ class HonorChannelTask : ChannelTask() {
     private val connectClient = HonorConnectClient()
 
     override fun init(params: Map<Param, String?>) {
-        defaultLogger.info("参数:$params")
+        AppLogger.debug(channelName, "参数:$params")
         clientId = params[CLIENT_ID] ?: ""
         clientSecret = params[CLIENT_SECRET] ?: ""
     }
 
-    override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
-        connectClient.uploadApk(file, clientId, clientSecret, updateDesc) {
+    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
+        connectClient.uploadApk(file, apkInfo, clientId, clientSecret, updateDesc) {
             progress((it * 100).roundToInt())
         }
     }
+
     companion object {
         private val CLIENT_ID = Param("client_id", desc = "客户端ID")
         private val CLIENT_SECRET = Param("client_secret", desc = "秘钥")

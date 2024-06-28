@@ -1,8 +1,9 @@
 package apk.dispatcher.channel
 
-import apk.dispatcher.util.defaultLogger
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
+import apk.dispatcher.util.getApkInfo
 import java.io.File
-import java.util.logging.Level
 
 abstract class ChannelTask {
 
@@ -21,8 +22,6 @@ abstract class ChannelTask {
      */
     abstract val fileNameIdentify: String
 
-
-    private val logger = defaultLogger
 
     /**
      * 初始化参数
@@ -43,11 +42,11 @@ abstract class ChannelTask {
 
     @kotlin.jvm.Throws
     suspend fun startUpload(apkFile: File, updateDesc: String) {
-        logger.info("开始上传")
+        AppLogger.info(LOG_TAG,"开始上传")
         listener?.onProcessing("请求中")
         try {
             listener?.onStart()
-            performUpload(apkFile, updateDesc) {
+            performUpload(apkFile, getApkInfo(apkFile), updateDesc) {
                 if (it == 100) {
                     listener?.onProcessing("提交中")
                 } else {
@@ -55,9 +54,9 @@ abstract class ChannelTask {
                 }
             }
             listener?.onSuccess()
-            logger.info("上传成功")
+            AppLogger.info(LOG_TAG,"上传成功")
         } catch (e: Exception) {
-            logger.log(Level.INFO, "上传失败", e)
+            AppLogger.error(LOG_TAG, "上传失败", e)
             listener?.onError(e)
         }
     }
@@ -67,7 +66,7 @@ abstract class ChannelTask {
      * 执行结束，表示上传成功，抛出异常代表出错
      */
     @kotlin.jvm.Throws
-    abstract suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit)
+    abstract suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit)
 
 
     /**
@@ -115,5 +114,7 @@ abstract class ChannelTask {
 
     companion object {
         const val FILE_NAME_IDENTIFY = "fileNameIdentify"
+
+        private const val LOG_TAG = "渠道上传"
     }
 }

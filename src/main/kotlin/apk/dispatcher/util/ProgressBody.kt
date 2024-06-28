@@ -12,7 +12,7 @@ import java.io.IOException
  */
 typealias ProgressChange = (progress: Float) -> Unit
 
-class ProgressRequestBody(
+class ProgressBody(
     private val mediaType: MediaType,
     private val file: File,
     private val progressChange: ProgressChange

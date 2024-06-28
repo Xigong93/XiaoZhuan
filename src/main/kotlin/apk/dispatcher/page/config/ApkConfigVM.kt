@@ -1,12 +1,12 @@
-package apk.dispatcher.ui.config
+package apk.dispatcher.page.config
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.ApkConfig
-import apk.dispatcher.ApkConfigDao
+import apk.dispatcher.config.ApkConfig
+import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.widget.Toast
 
 class ApkConfigVM(
@@ -51,7 +51,7 @@ class ApkConfigVM(
         }
 
         try {
-            apkConfigDao.saveApkConfig(apkConfig)
+            apkConfigDao.saveConfig(apkConfig)
             return true
         } catch (e: Exception) {
             e.printStackTrace()

@@ -1,8 +1,8 @@
 package apk.dispatcher.channel.vivo
 
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.util.defaultLogger
-import apk.dispatcher.util.getApkInfo
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -19,19 +19,19 @@ class VIVOChannelTask : ChannelTask() {
     private var accessSecret = ""
 
     override fun init(params: Map<Param, String?>) {
+        AppLogger.debug(channelName, "参数:$params")
         accessKey = params[ACCESS_KEY] ?: ""
         accessSecret = params[ACCESS_SECRET] ?: ""
     }
 
-    override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
+    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
         val api = VIVOMarketApi(accessKey, accessSecret)
-        val apkInfo = getApkInfo(file)
         val appDetail = api.getAppInfo(apkInfo.applicationId)
-        defaultLogger.info("查看App详情:${appDetail}")
+        AppLogger.info(channelName, "查看App详情:${appDetail}")
         val apkResult = api.uploadApk(file, apkInfo.applicationId) {
             progress((it * 100).roundToInt())
         }
-        defaultLogger.info("上传apk结果:${apkResult}")
+        AppLogger.info(channelName, "上传apk结果:${apkResult}")
         api.submit(apkResult, updateDesc, appDetail)
 
     }

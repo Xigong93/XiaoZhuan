@@ -1,6 +1,7 @@
 package apk.dispatcher.channel
 
-import apk.dispatcher.util.defaultLogger
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.util.ApkInfo
 import kotlinx.coroutines.delay
 import java.io.File
 
@@ -18,13 +19,16 @@ class MockChannelTask(
 
     }
 
-    override suspend fun performUpload(file: File, updateDesc: String, progress: (Int) -> Unit) {
-        defaultLogger.info("Mock ${channelName},开始上传")
+    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
+        AppLogger.info(LOG_TAG, "Mock ${channelName},开始上传")
         repeat(100) {
             delay(100)
             progress(it)
         }
-        defaultLogger.info("Mock ${channelName},上传完成")
+        AppLogger.info(LOG_TAG, "Mock ${channelName},上传完成")
     }
 
+    companion object {
+        private const val LOG_TAG = "模拟上传"
+    }
 }

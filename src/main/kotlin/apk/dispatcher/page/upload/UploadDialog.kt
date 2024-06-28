@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.upload
+package apk.dispatcher.page.upload
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,8 +23,8 @@ import androidx.compose.ui.window.DialogProperties
 import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
-import apk.dispatcher.ui.home.ApkViewModel
-import apk.dispatcher.ui.home.ChannelState
+import apk.dispatcher.page.home.ApkViewModel
+import apk.dispatcher.page.home.ChannelState
 
 
 @Composable

@@ -1,4 +1,4 @@
-package apk.dispatcher.ui
+package apk.dispatcher.page
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,16 +9,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import apk.dispatcher.ApkConfigDao
-import apk.dispatcher.ui.config.ApkConfigPage
-import apk.dispatcher.ui.home.HomePage
+import apk.dispatcher.config.ApkConfigDao
+import apk.dispatcher.page.config.ApkConfigPage
+import apk.dispatcher.page.home.HomePage
 
 @Composable
-fun App() {
+fun PageNavHost() {
     val navController = rememberNavController()
     val configDao = remember { ApkConfigDao() }
-    val startPage = if (configDao.getApkConfigList().isEmpty()) {
+    val startPage = if (configDao.getConfigList().isEmpty()) {
         AppScreens.Start.name
     } else {
         AppScreens.Home.name
@@ -37,9 +36,8 @@ fun App() {
         }
         composable(route = "${AppScreens.Edit.name}?id={id}") { entry ->
             val id = entry.arguments?.getString("id")
-            val apkConfig = id?.let { configDao.getApkConfig(it) }
+            val apkConfig = id?.let { configDao.getConfig(it) }
             ApkConfigPage(apkConfig, navController)
         }
     }
-
 }

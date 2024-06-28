@@ -1,4 +1,4 @@
-package apk.dispatcher.ui.home
+package apk.dispatcher.page.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,13 +13,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import apk.dispatcher.ApkConfig
+import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.Section
 import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.TwoPage
 import apk.dispatcher.widget.UpdateDescView
-import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
 import javax.swing.JFileChooser.FILES_ONLY

@@ -1,4 +1,4 @@
-package apk.dispatcher.ui
+package apk.dispatcher.page
 
 enum class AppScreens {
     Start,

@@ -1,10 +1,10 @@
-package apk.dispatcher.ui.home
+package apk.dispatcher.page.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import apk.dispatcher.ApkConfig
-import apk.dispatcher.ApkConfigDao
+import apk.dispatcher.config.ApkConfig
+import apk.dispatcher.config.ApkConfigDao
 
 class HomePageVM {
     val selectedTab = mutableStateOf(0)
@@ -32,12 +32,12 @@ class HomePageVM {
     }
 
     fun reload() {
-        apkConfigs.value = apkConfigDao.getApkConfigList()
+        apkConfigs.value = apkConfigDao.getConfigList()
         selectedTab.value = selectedTab.value.coerceIn(0, (apkConfigs.value.size - 1).coerceAtLeast(0))
     }
 
     fun deleteCurrent() {
-        apkConfigDao.removeApkConfig(currentApk)
+        apkConfigDao.removeConfig(currentApk)
         reload()
     }
 

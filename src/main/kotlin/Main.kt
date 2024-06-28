@@ -6,27 +6,36 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import apk.dispatcher.ui.App
+import apk.dispatcher.log.AppLogger
+import apk.dispatcher.log.CrashHandler
+import apk.dispatcher.page.PageNavHost
 import apk.dispatcher.widget.Toast
 
 
-fun main() = application {
-    val windowState = rememberWindowState(
-        width = 1000.dp, height = 800.dp,
-        position = WindowPosition(Alignment.Center)
-    )
-    Window(
-        title = "软件版本更新",
-        resizable = false,
-        state = windowState,
-        onCloseRequest = ::exitApplication
-    ) {
-        RootWindow()
+fun main() {
+    CrashHandler.install()
+    AppLogger.info("main", "App启动")
+    application {
+        val windowState = rememberWindowState(
+            width = 1000.dp, height = 800.dp,
+            position = WindowPosition(Alignment.Center)
+        )
+        Window(
+            title = "软件版本更新",
+            resizable = false,
+            state = windowState,
+            onCloseRequest = {
+                AppLogger.info("main", "App关闭")
+                exitApplication()
+            }
+        ) {
+            RootWindow()
+        }
     }
 }
 
 @Composable
 fun RootWindow() {
-    App()
+    PageNavHost()
     Toast.install()
 }

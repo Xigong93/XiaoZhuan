@@ -59,15 +59,15 @@ interface HuaweiConnectApi {
     ): HWUploadUrlResp
 
     /**
-     * Apk上传以后，通过这个接口刷新文件
+     * Apk上传以后，绑定文件
      */
     @PUT("api/publish/v2/app-file-info")
-    suspend fun refreshApkFile(
+    suspend fun bindApkFile(
         @Header("client_id") clientId: String,
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
         @Body params: HWRefreshApk
-    ): HWResp
+    ): HWBindFileResp
 
     /**
      * 获取Apk编译状态
@@ -77,19 +77,10 @@ interface HuaweiConnectApi {
         @Header("client_id") clientId: String,
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
-        @Query("pkgIds") pkgIds: String = appId,
+        @Query("pkgIds") pkgIds: String ,
     ): HWApkState
 
-    /**
-     * 获取Apk编译状态
-     */
-    @GET("api/publish/v2/aab/complile/status")
-    suspend fun getApkCompileState2(
-        @Header("client_id") clientId: String,
-        @Header("Authorization") token: String,
-        @Query("appId") appId: String,
-        @Query("pkgVersion") pkgVersion: String ,
-    ): HWApkState
+
     /**
      * 更新版本描述
      */

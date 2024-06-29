@@ -1,10 +1,13 @@
 package apk.dispatcher.widget
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.ScrollableTabRow
+import androidx.compose.material.Tab
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,17 +21,40 @@ import apk.dispatcher.style.AppShapes
 
 @Composable
 fun HorizontalTabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (index: Int) -> Unit) {
-    Row {
+//    val scrollState = rememberScrollState()
+//    Row(modifier = Modifier.horizontalScroll(scrollState)) {
+//        tabs.withIndex().forEach { (index, label) ->
+//            TabItem(
+//                title = label,
+//                selected = index == selectedIndex,
+//                modifier = Modifier
+//                    .clip(AppShapes.roundButton)
+//                    .clickable {
+//                        tabClick(index)
+//                    }
+//            )
+//        }
+//    }
+
+    ScrollableTabRow(selectedIndex, backgroundColor = Color.Transparent) {
         tabs.withIndex().forEach { (index, label) ->
-            TabItem(
-                title = label,
-                selected = index == selectedIndex,
-                modifier = Modifier
-                    .clip(AppShapes.roundButton)
-                    .clickable {
-                        tabClick(index)
-                    }
-            )
+            val selected = index == selectedIndex
+            Tab(selected, onClick = {}, text = {
+                Text(
+                    label,
+                    color = if (selected) AppColors.primary else AppColors.fontGray,
+                    fontSize = 16.sp
+                )
+            })
+//            TabItem(
+//                title = label,
+//                selected = index == selectedIndex,
+//                modifier = Modifier
+//                    .clip(AppShapes.roundButton)
+//                    .clickable {
+//                        tabClick(index)
+//                    }
+//            )
         }
     }
 }

@@ -1,8 +1,7 @@
 package apk.dispatcher.page.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,25 +23,43 @@ import apk.dispatcher.widget.Section
  */
 @Composable
 fun ChannelGroupPage(viewModel: ApkViewModel) {
-    Column(modifier = Modifier.padding(20.dp)) {
-        Section("渠道") {
-            Column() {
-                Spacer(modifier = Modifier.height(15.dp))
-                viewModel.channels.withIndex().forEach { (index, chan) ->
-                    val selected = viewModel.selectedChannels.contains(chan.channelName)
-                    val name = chan.channelName
-                    val taskLauncher = viewModel.taskLaunchers.first { it.name == name }
-                    val apkFileState = taskLauncher.getApkFileState()
-                    val desc = apkFileState.value?.name
-                    ChannelView(selected, name, desc) { checked ->
-                        viewModel.selectChannel(name, checked)
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .padding(20.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Section("渠道") {
+                val scrollState = rememberScrollState()
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier.verticalScroll(scrollState)
+                            .weight(1f)
+                    ) {
+                        Spacer(modifier = Modifier.height(15.dp))
+                        viewModel.channels.withIndex().forEach { (index, chan) ->
+                            val selected = viewModel.selectedChannels.contains(chan.channelName)
+                            val name = chan.channelName
+                            val taskLauncher = viewModel.taskLaunchers.first { it.name == name }
+                            val apkFileState = taskLauncher.getApkFileState()
+                            val desc = apkFileState.value?.name
+                            ChannelView(selected, name, desc) { checked ->
+                                viewModel.selectChannel(name, checked)
+                            }
+                            Spacer(modifier = Modifier.height(15.dp))
+                        }
                     }
-                    Spacer(modifier = Modifier.height(15.dp))
+                    VerticalScrollbar(
+                        rememberScrollbarAdapter(scrollState),
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
                 }
+
             }
         }
-        Spacer(modifier = Modifier.weight(1.0f))
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .padding(vertical = 14.dp)
+        ) {
             val allSelected = viewModel.allChannelSelected()
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                 .clip(AppShapes.roundButton)
@@ -150,7 +167,7 @@ private fun ChannelView(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.White)
+            .background(AppColors.cardBackground)
             .clickable {
                 onCheckChange(!selected)
             }

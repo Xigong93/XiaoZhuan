@@ -20,19 +20,22 @@ import apk.dispatcher.style.AppColors
  */
 @Composable
 fun StartPage(navController: NavController) {
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-        Button(
-            colors = ButtonDefaults.buttonColors(AppColors.primary),
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = {
-                navController.navigate(AppScreens.Edit.name)
+    Page {
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+            Button(
+                colors = ButtonDefaults.buttonColors(AppColors.primary),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                    navController.navigate("edit")
+                }
+            ) {
+                Text(
+                    "新建App",
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 40.dp)
+                )
             }
-        ) {
-            Text(
-                "新建App",
-                color = Color.White,
-                modifier = Modifier.padding(horizontal = 40.dp)
-            )
         }
     }
+
 }

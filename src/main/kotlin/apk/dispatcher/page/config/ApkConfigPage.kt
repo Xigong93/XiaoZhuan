@@ -1,7 +1,10 @@
 package apk.dispatcher.page.config
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -13,60 +16,77 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.config.ApkConfig
+import apk.dispatcher.config.ApkConfigDao
+import apk.dispatcher.page.Page
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.VerticalTabBar
+import kotlinx.coroutines.launch
 
 /**
  * 配置页面
  */
+@ExperimentalFoundationApi
 @Composable
 fun ApkConfigPage(
-    apkConfig: ApkConfig? = null,
     navController: NavController,
+    appId: String? = null,
 ) {
-    val viewModel = remember { ApkConfigVM(apkConfig) }
+    val viewModel = remember {
+        val apkConfig = appId?.let { ApkConfigDao().getConfig(it) }
+        ApkConfigVM(apkConfig)
+    }
 
-    var currentIndex by remember { mutableStateOf(0) }
     val channels = ChannelRegistry.channels
     val titles = remember { listOf("基本信息") + channels.map { it.channelName } }
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
-            Row(modifier = Modifier.width(200.dp)) {
-                VerticalTabBar(titles, currentIndex) {
-                    currentIndex = it
-                }
-            }
-            ConfigList(currentIndex, viewModel)
-        }
-        BottomButtons(
-            onSaveClick = {
-                if (viewModel.saveApkConfig()) {
-                    navController.popBackStack()
-                }
-            }, onCloseClick = {
-                navController.popBackStack()
+    val pageState = rememberPagerState(pageCount = { titles.size })
 
+    val scope = rememberCoroutineScope()
+    Page {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
+
+                Row(modifier = Modifier.width(200.dp)) {
+                    VerticalTabBar(titles, pageState.currentPage) {
+                        scope.launch {
+                            pageState.animateScrollToPage(it)
+                        }
+                    }
+                }
+                VerticalPager(
+                    pageState, modifier =
+                    Modifier.fillMaxSize().padding(20.dp)
+                ) { page ->
+                    ConfigList(page, viewModel)
+                }
             }
-        )
+            BottomButtons(
+                onSaveClick = {
+                    if (viewModel.saveApkConfig()) {
+                        navController.popBackStack()
+                    }
+                }, onCloseClick = {
+                    navController.popBackStack()
+
+                }
+            )
+        }
     }
 }
 
 
 @Composable
 private fun ConfigList(tabIndex: Int, viewModel: ApkConfigVM) {
-    AnimatedContent(tabIndex) {
-        if (tabIndex == 0) {
-            BasicApkConfig(viewModel.apkConfigState) {
-                viewModel.apkConfigState = it
-            }
-        } else {
-            val channel = viewModel.apkConfigState.channels[tabIndex - 1]
-            ChannelConfigPage(viewModel.apkConfigState.enableChannel, channel) {
-                viewModel.updateChannel(it)
-            }
+    if (tabIndex == 0) {
+        BasicApkConfig(viewModel.apkConfigState) {
+            viewModel.apkConfigState = it
+        }
+    } else {
+        val channel = viewModel.apkConfigState.channels[tabIndex - 1]
+        ChannelConfigPage(viewModel.apkConfigState.enableChannel, channel) {
+            viewModel.updateChannel(it)
         }
     }
 

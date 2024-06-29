@@ -25,7 +25,7 @@ fun ChannelUploadState(name: String, state: ChannelState, modifier: Modifier = M
     Row(
         modifier = Modifier.height(100.dp)
             .clip(RoundedCornerShape(6))
-            .background(Color(0xfff4f4f4))
+            .background(AppColors.cardBackground)
             .padding(horizontal = 14.dp)
             .then(modifier)
     ) {

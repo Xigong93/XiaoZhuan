@@ -17,7 +17,10 @@ object AppColors {
     /**
      * 页面背景
      */
-    val pageBackground = Color(0xfff6f6f6)
+    val pageBackground = Color.White
+
+
+    val cardBackground = Color(0xfff4f4f4)
 
     /**
      * 黑色字

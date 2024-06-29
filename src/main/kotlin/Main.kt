@@ -9,7 +9,7 @@ import androidx.compose.ui.window.rememberWindowState
 import apk.dispatcher.BuildConfig
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.log.CrashHandler
-import apk.dispatcher.page.PageNavHost
+import apk.dispatcher.page.AppNavigation
 import apk.dispatcher.widget.Toast
 
 
@@ -38,6 +38,6 @@ fun main() {
 
 @Composable
 fun RootWindow() {
-    PageNavHost()
+    AppNavigation()
     Toast.install()
 }

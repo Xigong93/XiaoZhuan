@@ -24,7 +24,7 @@ class ApkViewModel(
     val apkConfig: ApkConfig
 ) {
 
-    private val mainScope = CoroutineScope(EmptyCoroutineContext)
+     val mainScope = CoroutineScope(EmptyCoroutineContext)
 
     val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
 

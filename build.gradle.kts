@@ -9,7 +9,7 @@ group = "xigong"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    maven("https://maven.aliyun.com/repository/public")
+//    maven("https://maven.aliyun.com/repository/public")
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -27,6 +27,11 @@ dependencies {
 //    implementation("org.jetbrains.androidx.navigation:navigation-common-desktop:2.8.0-alpha02")
     implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha02")
 
+    // Enables FileKit without Compose dependencies
+    implementation("io.github.vinceglb:filekit-core:0.6.1")
+
+    // Enables FileKit with Composable utilities
+    implementation("io.github.vinceglb:filekit-compose:0.6.1")
 }
 
 // 小米应用市场
@@ -41,6 +46,13 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "MainKt"
+        buildTypes {
+            jvmArgs("-DbuildType=debug")
+            release {
+                proguard.isEnabled = false
+                jvmArgs("-DbuildType=release")
+            }
+        }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ApkDispatcher"

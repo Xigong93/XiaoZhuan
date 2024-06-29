@@ -6,6 +6,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import apk.dispatcher.BuildConfig
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.log.CrashHandler
 import apk.dispatcher.page.PageNavHost
@@ -15,6 +16,7 @@ import apk.dispatcher.widget.Toast
 fun main() {
     CrashHandler.install()
     AppLogger.info("main", "App启动")
+    BuildConfig.print()
     application {
         val windowState = rememberWindowState(
             width = 1000.dp, height = 800.dp,

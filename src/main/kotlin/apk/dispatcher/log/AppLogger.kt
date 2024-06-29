@@ -1,11 +1,14 @@
 package apk.dispatcher.log
 
 import apk.dispatcher.AppPath
+import apk.dispatcher.BuildConfig
 import java.io.*
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 private val DefaultLogger: AppLogger by lazy { AppLoggerImpl() }
 
@@ -19,10 +22,12 @@ interface AppLogger {
 
     fun log(level: Level, tag: String, message: String, throwable: Throwable? = null)
 
+    fun awaitTermination(timeout: Duration)
+
     enum class Level {
         Debug,
-        Error,
-        Info
+        Info,
+        Error
     }
 
     companion object : AppLogger by DefaultLogger
@@ -33,13 +38,13 @@ private class AppLoggerImpl : AppLogger {
 
     private val fileWriter: Writer
 
-    private val infoConsoleWriter = System.out.writer()
+    private val infoConsole = System.out.writer()
 
-    private val errorConsoleWriter = System.err.writer()
-
-    private val loggerExecutor = Executors.newSingleThreadExecutor { Thread(it).apply { name = "Logger" } }
+    private val errorConsole = System.err.writer()
 
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
+
+    private val loggerExecutor = Executors.newSingleThreadExecutor { Thread(it).apply { name = "Logger" } }
 
     init {
         val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -61,28 +66,40 @@ private class AppLoggerImpl : AppLogger {
     }
 
     override fun log(level: AppLogger.Level, tag: String, message: String, throwable: Throwable?) {
-        val threadName = Thread.currentThread().name
-        // dateFormatter 线程安全处理，防止时间错乱
-        val time: String = synchronized(dateFormatter) { dateFormatter.format(Date()) }
-
-        // 输出到控制台
-        if (level == AppLogger.Level.Error) {
-            errorConsoleWriter.writeLog(threadName, time, level, tag, message, throwable)
-        } else {
-            infoConsoleWriter.writeLog(threadName, time, level, tag, message, throwable)
-        }
-
-        // 写入文件
+        if (loggerExecutor.isShutdown) return
+        val thread = Thread.currentThread().name
         loggerExecutor.execute {
-            fileWriter.writeLog(threadName, time, level, tag, message, throwable)
+            try {
+                val time = dateFormatter.format(Date())
+                // 输出到控制台
+                if (level == AppLogger.Level.Error) {
+                    errorConsole.writeLog(level, thread, time, tag, message, throwable)
+                } else {
+                    infoConsole.writeLog(level, thread, time, tag, message, throwable)
+                }
+                // 写入文件
+                if (loggable(level)) {
+                    fileWriter.writeLog(level, thread, time, tag, message, throwable)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+    }
 
+    override fun awaitTermination(timeout: Duration) {
+        try {
+            loggerExecutor.shutdown()
+            loggerExecutor.awaitTermination(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun Writer.writeLog(
+        level: AppLogger.Level,
         threadName: String,
         time: String,
-        level: AppLogger.Level,
         tag: String,
         message: String,
         t: Throwable?
@@ -106,8 +123,16 @@ private class AppLoggerImpl : AppLogger {
         flush()
     }
 
+    private fun loggable(level: AppLogger.Level): Boolean {
+        return if (BuildConfig.DEBUG) {
+            true
+        } else {
+            level >= AppLogger.Level.Info
+        }
+    }
 
 }
+
 
 private fun getStackTraceString(tr: Throwable): String {
     // This is to reduce the amount of log spew that apps do in the non-error

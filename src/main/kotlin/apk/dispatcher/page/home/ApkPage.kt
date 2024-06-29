@@ -19,6 +19,10 @@ import apk.dispatcher.widget.Section
 import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.TwoPage
 import apk.dispatcher.widget.UpdateDescView
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.pickFile
+import kotlinx.coroutines.launch
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
 import javax.swing.JFileChooser.FILES_ONLY
@@ -42,9 +46,9 @@ private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedButton(onClick = {
                 if (viewModel.apkConfig.enableChannel) {
-                    showSelectedDirDialog(viewModel)
+                    showSelectedDirDialog2(viewModel)
                 } else {
-                    showSelectedApkDialog(viewModel)
+                    showSelectedApkDialog2(viewModel)
                 }
             }) {
                 val text = if (viewModel.apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
@@ -66,28 +70,6 @@ private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
 }
 
 
-private fun showSelectedDirDialog(apkViewModel: ApkViewModel) {
-    val chooser = JFileChooser(apkViewModel.getLastApkDir())
-    chooser.fileSelectionMode = DIRECTORIES_ONLY;
-    val result = chooser.showOpenDialog(null)
-    if (result != JFileChooser.APPROVE_OPTION) return
-    val dir = chooser.selectedFile ?: return
-    if (!apkViewModel.selectedApkDir(dir)) {
-        Toast.show("无效目录,未包含有效的Apk文件")
-    }
-}
-
-private fun showSelectedApkDialog(apkViewModel: ApkViewModel) {
-    val chooser = JFileChooser(apkViewModel.getLastApkDir())
-    chooser.fileSelectionMode = FILES_ONLY;
-    chooser.fileFilter = FileNameExtensionFilter("Apk 文件", "apk")
-    val result = chooser.showOpenDialog(null)
-    if (result != JFileChooser.APPROVE_OPTION) return
-    val dir = chooser.selectedFile ?: return
-    if (!apkViewModel.selectedApkDir(dir)) {
-        Toast.show("解析Apk文件失败")
-    }
-}
 
 @Composable
 private fun ApkInfoBox(apkViewModel: ApkViewModel) {

@@ -40,7 +40,7 @@ fun ApkSelector(viewModel: HomePageVM) {
                 }
                 .padding(12.dp)
         ) {
-            Text(viewModel.currentApk.name, fontSize = 14.sp, color = textColor)
+            Text(viewModel.currentApk?.name ?: "", fontSize = 14.sp, color = textColor)
             Spacer(Modifier.weight(1f))
             Image(
                 painterResource("arrow_down.png"),

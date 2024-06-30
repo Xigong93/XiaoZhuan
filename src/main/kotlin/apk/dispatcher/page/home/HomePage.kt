@@ -25,43 +25,69 @@ import androidx.navigation.NavController
 import apk.dispatcher.page.Page
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import apk.dispatcher.widget.ConfirmDialog
+import apk.dispatcher.widget.Toast
 
 @Composable
 fun HomePage(navController: NavController) {
     Page {
         val viewModel = remember { HomePageVM() }
-        Content(viewModel)
+        var showConfirmDialog by remember { mutableStateOf(false) }
+        var showMenu by remember { mutableStateOf(false) }
 
-        if (viewModel.showMenu) {
-            MenuDialog(listener = remember {
-                object : MenuDialogListener {
-                    override fun onAddClick() {
-                        navController.navigate("edit")
-                    }
+        Content(viewModel, { showMenu = true })
+        if (showMenu) {
+            Menu(navController, viewModel, onClose = {
+                showMenu = false
+            }, onDelete = {
+                showConfirmDialog = true
+            })
+        }
 
-                    override fun onEditClick() {
-                        val id = viewModel.currentApk.applicationId
-                        navController.navigate("edit?id=$id")
-                    }
-
-                    override fun onDeleteClick() {
-                        viewModel.deleteCurrent()
-                    }
-
+        if (showConfirmDialog) {
+            val name = viewModel.currentApk?.name
+            ConfirmDialog("确定删除${name}吗？", onConfirm = {
+                viewModel.deleteCurrent()
+                if (viewModel.apkList.isEmpty()) {
+                    navController.popBackStack()
                 }
-            }) {
-                viewModel.showMenu = false
-            }
+                Toast.show("${name}已删除")
+                showConfirmDialog = false
+            }, onDismiss = {
+                showConfirmDialog = false
+            })
         }
     }
 
 }
 
+@Composable
+private fun Menu(navController: NavController, viewModel: HomePageVM, onClose: () -> Unit, onDelete: () -> Unit) {
+    MenuDialog(listener = remember {
+        object : MenuDialogListener {
+            override fun onAddClick() {
+                navController.navigate("edit")
+            }
+
+            override fun onEditClick() {
+                val id = viewModel.currentApk?.applicationId ?: ""
+                navController.navigate("edit?id=$id")
+            }
+
+            override fun onDeleteClick() {
+                onDelete()
+            }
+        }
+    }, onDismiss = onClose)
+}
+
 
 @Composable
-private fun Content(viewModel: HomePageVM) {
+private fun Content(viewModel: HomePageVM, showMenuClick: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -78,12 +104,15 @@ private fun Content(viewModel: HomePageVM) {
                 modifier = Modifier.size(32.dp)
                     .clip(CircleShape)
                     .clickable {
-                        viewModel.showMenu = true
+                        showMenuClick()
                     }
             )
         }
         Divider()
-        ApkPage(viewModel.currentApk)
+        val currentApk = viewModel.currentApk
+        if (currentApk != null) {
+            ApkPage(currentApk)
+        }
     }
 }
 

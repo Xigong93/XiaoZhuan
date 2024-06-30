@@ -24,18 +24,22 @@ fun MenuDialog(listener: MenuDialogListener, onDismiss: () -> Unit) {
     CursorDropdownMenu(true, onDismissRequest = onDismiss, modifier = Modifier.padding(0.dp)) {
         Column(modifier = Modifier.width(200.dp)) {
             item("新增") {
+                onDismiss()
                 listener.onAddClick()
             }
             Divider()
             item("编辑") {
+                onDismiss()
                 listener.onEditClick()
             }
             Divider()
             item("打开配置") {
+                onDismiss()
                 openApkDispatchDir()
             }
             Divider()
             item("删除", color = Color.Red) {
+                onDismiss()
                 listener.onDeleteClick()
             }
         }

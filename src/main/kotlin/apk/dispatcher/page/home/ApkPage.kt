@@ -31,7 +31,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 @Composable
 fun ApkPage(apkConfig: ApkConfig) {
-    val apkViewModel = remember { ApkViewModel(apkConfig) }
+    val apkViewModel = remember(apkConfig) { ApkViewModel(apkConfig) }
     TwoPage(
         leftPage = { LeftPage(apkViewModel) },
         rightPage = { ChannelGroupPage(apkViewModel) },
@@ -70,60 +70,46 @@ private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
 }
 
 
-
 @Composable
 private fun ApkInfoBox(apkViewModel: ApkViewModel) {
-    val textSize = 14.sp
     Column(
         modifier = Modifier.width(300.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(Color.White)
+            .background(AppColors.cardBackground)
             .padding(16.dp)
     ) {
         val apkInfo = apkViewModel.getApkInfoState().value
         val version = apkInfo?.versionName?.let { "v${it}" }
         val applicationId = apkInfo?.applicationId ?: ""
-        Row {
-            Text(
-                "版本号:",
-                color = AppColors.fontGray,
-                fontSize = textSize,
-                modifier = Modifier.width(70.dp)
-            )
-            Text(
-                version ?: "",
-                color = AppColors.fontBlack,
-                fontSize = textSize
-            )
-        }
+        item("名称:", apkViewModel.apkConfig.name)
         Spacer(Modifier.height(12.dp))
-        Row {
-            Text(
-                "文件大小:",
-                color = AppColors.fontGray,
-                fontSize = textSize,
-                modifier = Modifier.width(70.dp)
-            )
-            Text(
-                apkViewModel.getFileSize(),
-                color = AppColors.fontBlack,
-                fontSize = textSize
-            )
-        }
+
+        item("包名:", applicationId)
+
         Spacer(Modifier.height(12.dp))
-        Row {
-            Text(
-                "包名:",
-                color = AppColors.fontGray,
-                fontSize = textSize,
-                modifier = Modifier.width(70.dp)
-            )
-            Text(
-                applicationId,
-                color = AppColors.fontBlack,
-                fontSize = textSize
-            )
-        }
+
+        item("版本:", version ?: "")
+
+        Spacer(Modifier.height(12.dp))
+        item("大小:", apkViewModel.getFileSize())
+
+    }
+}
+
+@Composable
+private fun item(title: String, desc: String) {
+    Row {
+        Text(
+            title,
+            color = AppColors.fontGray,
+            fontSize = 14.sp,
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            desc,
+            color = AppColors.fontBlack,
+            fontSize = 14.sp
+        )
     }
 }
 

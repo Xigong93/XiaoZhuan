@@ -21,40 +21,17 @@ import apk.dispatcher.style.AppShapes
 
 @Composable
 fun HorizontalTabBar(tabs: List<String>, selectedIndex: Int = 0, tabClick: (index: Int) -> Unit) {
-//    val scrollState = rememberScrollState()
-//    Row(modifier = Modifier.horizontalScroll(scrollState)) {
-//        tabs.withIndex().forEach { (index, label) ->
-//            TabItem(
-//                title = label,
-//                selected = index == selectedIndex,
-//                modifier = Modifier
-//                    .clip(AppShapes.roundButton)
-//                    .clickable {
-//                        tabClick(index)
-//                    }
-//            )
-//        }
-//    }
-
-    ScrollableTabRow(selectedIndex, backgroundColor = Color.Transparent) {
+    Row {
         tabs.withIndex().forEach { (index, label) ->
-            val selected = index == selectedIndex
-            Tab(selected, onClick = {}, text = {
-                Text(
-                    label,
-                    color = if (selected) AppColors.primary else AppColors.fontGray,
-                    fontSize = 16.sp
-                )
-            })
-//            TabItem(
-//                title = label,
-//                selected = index == selectedIndex,
-//                modifier = Modifier
-//                    .clip(AppShapes.roundButton)
-//                    .clickable {
-//                        tabClick(index)
-//                    }
-//            )
+            TabItem(
+                title = label,
+                selected = index == selectedIndex,
+                modifier = Modifier
+                    .clip(AppShapes.roundButton)
+                    .clickable {
+                        tabClick(index)
+                    }
+            )
         }
     }
 }

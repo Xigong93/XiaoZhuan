@@ -22,6 +22,10 @@ object AppColors {
 
     val cardBackground = Color(0xfff4f4f4)
 
+    val divider = Color(0xfff4f4f4)
+
+    val border = Color(0xffd9d9d9)
+
     /**
      * 黑色字
      */

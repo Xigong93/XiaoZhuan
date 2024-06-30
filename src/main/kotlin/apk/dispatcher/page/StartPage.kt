@@ -8,11 +8,14 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import apk.dispatcher.config.ApkConfigDao
+import apk.dispatcher.log.AppLogger
 import apk.dispatcher.style.AppColors
 
 /**
@@ -34,6 +37,16 @@ fun StartPage(navController: NavController) {
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 40.dp)
                 )
+            }
+        }
+
+        DisposableEffect(Unit) {
+            AppLogger.info("启动页", "启动")
+            if (ApkConfigDao().getConfigList().isNotEmpty()) {
+                navController.navigate("home")
+            }
+            onDispose {
+                AppLogger.info("启动页", "销毁")
             }
         }
     }

@@ -59,6 +59,15 @@ interface HonorConnectApi {
     ): HonorResult<HonorAppInfo>
 
     /**
+     * 获取App审核状态
+     */
+    @GET("openapi/v1/publish/get-app-current-release")
+    suspend fun getReviewState(
+        @Header("Authorization") token: String,
+        @Query("appId") appId: String
+    ): HonorResult<HonorReviewState>
+
+    /**
      * 获取文件上传地址
      */
     @POST("openapi/v1/publish/get-file-upload-url")

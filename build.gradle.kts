@@ -24,7 +24,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
     implementation("org.json:json:20210307")
-//    implementation("org.jetbrains.androidx.navigation:navigation-common-desktop:2.8.0-alpha02")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0")
     implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha02")
 
 }

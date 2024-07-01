@@ -4,13 +4,14 @@ import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.getApkInfo
 import java.io.File
+import kotlin.jvm.Throws
 
 abstract class ChannelTask {
 
     abstract val channelName: String
 
 
-    private var listener: StateListener? = null
+    private var submitStateListener: SubmitStateListener? = null
 
     /**
      * 声明需要的参数
@@ -31,8 +32,8 @@ abstract class ChannelTask {
     /**
      * 添加监听器
      */
-    fun setListener(listener: StateListener) {
-        this.listener = listener
+    fun setSubmitStateListener(listener: SubmitStateListener) {
+        this.submitStateListener = listener
     }
 
     fun getParams(): List<Param> {
@@ -42,32 +43,38 @@ abstract class ChannelTask {
 
     @kotlin.jvm.Throws
     suspend fun startUpload(apkFile: File, updateDesc: String) {
-        AppLogger.info(LOG_TAG,"开始上传")
-        listener?.onProcessing("请求中")
+        AppLogger.info(LOG_TAG, "开始上传")
+        submitStateListener?.onProcessing("请求中")
         try {
-            listener?.onStart()
+            submitStateListener?.onStart()
             performUpload(apkFile, getApkInfo(apkFile), updateDesc) {
                 if (it == 100) {
-                    listener?.onProcessing("提交中")
+                    submitStateListener?.onProcessing("提交中")
                 } else {
-                    listener?.onProgress(it)
+                    submitStateListener?.onProgress(it)
                 }
             }
-            listener?.onSuccess()
-            AppLogger.info(LOG_TAG,"上传成功")
+            submitStateListener?.onSuccess()
+            AppLogger.info(LOG_TAG, "上传成功")
         } catch (e: Exception) {
             AppLogger.error(LOG_TAG, "上传失败", e)
-            listener?.onError(e)
+            submitStateListener?.onError(e)
         }
     }
-
 
     /**
      * 执行结束，表示上传成功，抛出异常代表出错
      */
-    @kotlin.jvm.Throws
+    @Throws
     abstract suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit)
 
+
+    /**
+     * 获取APP应用市场状态
+     * @param applicationId 包名
+     */
+    @Throws
+    abstract suspend fun getMarketState(applicationId: String): MarketState
 
     /**
      * 声明需要的参数
@@ -96,7 +103,7 @@ abstract class ChannelTask {
     )
 
 
-    interface StateListener {
+    interface SubmitStateListener {
 
         fun onStart()
 

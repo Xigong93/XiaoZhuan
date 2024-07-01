@@ -18,10 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.style.AppColors
-import apk.dispatcher.page.home.ChannelState
+import apk.dispatcher.channel.SubmitState
 
 @Composable
-fun ChannelUploadState(name: String, state: ChannelState, modifier: Modifier = Modifier) {
+fun ChannelUploadState(name: String, state: SubmitState, modifier: Modifier = Modifier) {
     Row(
         modifier = Modifier.height(100.dp)
             .clip(RoundedCornerShape(6))
@@ -33,11 +33,11 @@ fun ChannelUploadState(name: String, state: ChannelState, modifier: Modifier = M
             Spacer(Modifier.height(10.dp))
             Text(name, color = AppColors.fontBlack, fontSize = 14.sp)
             val stateDesc = when (state) {
-                is ChannelState.Waiting -> "等待中"
-                is ChannelState.Processing -> "处理中"
-                is ChannelState.Uploading -> "上传中"
-                is ChannelState.Success -> "上传成功"
-                is ChannelState.Error -> "上传失败"
+                is SubmitState.Waiting -> "等待中"
+                is SubmitState.Processing -> "处理中"
+                is SubmitState.Uploading -> "上传中"
+                is SubmitState.Success -> "上传成功"
+                is SubmitState.Error -> "上传失败"
             }
             Spacer(Modifier.weight(1f))
             Text(stateDesc, color = AppColors.fontGray, fontSize = 12.sp)
@@ -49,13 +49,13 @@ fun ChannelUploadState(name: String, state: ChannelState, modifier: Modifier = M
 }
 
 @Composable
-private fun UploadState(state: ChannelState, modifier: Modifier = Modifier) {
+private fun UploadState(state: SubmitState, modifier: Modifier = Modifier) {
     val backgroundColor = Color.White
     val ringWidth = 5.dp
     Box(Modifier.size(80.dp).then(modifier)) {
 
         when (state) {
-            is ChannelState.Waiting -> {
+            is SubmitState.Waiting -> {
                 val color = Color(0xff888888).copy(alpha = 0.7f)
                 CircularProgressIndicator(
                     progress = 1f,
@@ -74,7 +74,7 @@ private fun UploadState(state: ChannelState, modifier: Modifier = Modifier) {
                 )
             }
 
-            is ChannelState.Processing -> {
+            is SubmitState.Processing -> {
                 CircularProgressIndicator(
                     color = AppColors.primary,
                     backgroundColor = backgroundColor,
@@ -91,7 +91,7 @@ private fun UploadState(state: ChannelState, modifier: Modifier = Modifier) {
 
             }
 
-            is ChannelState.Uploading -> {
+            is SubmitState.Uploading -> {
                 CircularProgressIndicator(
                     progress = state.progress.toFloat() / 100f,
                     color = AppColors.primary,
@@ -108,7 +108,7 @@ private fun UploadState(state: ChannelState, modifier: Modifier = Modifier) {
                 )
             }
 
-            is ChannelState.Success -> {
+            is SubmitState.Success -> {
                 CircularProgressIndicator(
                     progress = 1f,
                     color = Color(0xff52c41a),
@@ -125,7 +125,7 @@ private fun UploadState(state: ChannelState, modifier: Modifier = Modifier) {
                 )
             }
 
-            is ChannelState.Error -> {
+            is SubmitState.Error -> {
                 CircularProgressIndicator(
                     progress = 0.75f,
                     color = Color(0xffff4d4f),
@@ -154,10 +154,10 @@ fun UploadStatePreview() {
             .background(AppColors.pageBackground)
             .padding(20.dp)
     ) {
-        UploadState(ChannelState.Waiting)
-        UploadState(ChannelState.Processing("处理中"))
-        UploadState(ChannelState.Uploading(35))
-        UploadState(ChannelState.Success)
-        UploadState(ChannelState.Error("参数错误"))
+        UploadState(SubmitState.Waiting)
+        UploadState(SubmitState.Processing("处理中"))
+        UploadState(SubmitState.Uploading(35))
+        UploadState(SubmitState.Success)
+        UploadState(SubmitState.Error("参数错误"))
     }
 }

@@ -40,6 +40,19 @@ class HuaweiConnectClient {
         submit(clientId, token, appId)
     }
 
+    /**
+     * 获取App信息
+     */
+    @Throws
+    suspend fun getAppInfo(clientId: String, clientSecret: String, applicationId: String): HWAppInfoResp.AppInfo {
+        val rawToken = getToken(clientId, clientSecret)
+        val token = "Bearer $rawToken"
+        val appId = getAppId(clientId, token, applicationId)
+        val appInfo = connectApi.getAppInfo(clientId, token, appId)
+        appInfo.result.throwOnFail()
+        return appInfo.appInfo
+    }
+
 
     /**
      * 获取token

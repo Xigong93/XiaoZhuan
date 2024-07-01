@@ -28,12 +28,21 @@ class HonorConnectClient {
         val rawToken = getToken(clientId, clientSecret)
         val token = "Bearer $rawToken"
         val appId = getAppId(token, apkInfo.applicationId)
-        val languageInfo = getAppInfo(token, appId)
+        val languageInfo = getAppInfo(token, appId).languageInfo.first()
         val uploadUrl = getUploadUrl(token, appId, file)
         uploadFile(file, token, uploadUrl, progressChange)
         bindUploadedApk(token, appId, uploadUrl)
         modifyUpdateDesc(token, appId, updateDesc, languageInfo)
         submit(token, appId)
+    }
+
+    suspend fun getReviewState(clientId: String, clientSecret: String, applicationId: String): HonorReviewState {
+        val rawToken = getToken(clientId, clientSecret)
+        val token = "Bearer $rawToken"
+        val appId = getAppId(token, applicationId)
+        val result = connectApi.getReviewState(token, appId)
+        result.throwOnFail()
+        return checkNotNull(result.data)
     }
 
 
@@ -56,11 +65,12 @@ class HonorConnectClient {
         return appIds.first().appId
     }
 
-    private suspend fun getAppInfo(token: String, appId: String): HonorAppInfo.LanguageInfo {
+    private suspend fun getAppInfo(token: String, appId: String): HonorAppInfo {
         val result = connectApi.getAppInfo(token, appId)
         result.throwOnFail()
-        return checkNotNull(result.data).languageInfo.first()
+        return checkNotNull(result.data)
     }
+
 
     /**
      * 获取Apk上传地址

@@ -1,5 +1,7 @@
 package apk.dispatcher.channel.oppo
 
+import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.ReviewState
 import com.google.gson.JsonObject
 
 class OPPOAppInfo(obj: JsonObject) {
@@ -14,6 +16,15 @@ class OPPOAppInfo(obj: JsonObject) {
      */
     val detailDesc: String = obj.get("detail_desc").asString
 
+
+    val versionCode: Long = obj.get("version_code").asLong
+
+    val versionName: String = obj.get("version_name").asString
+
+    /**
+     * 审核状态
+     */
+    val reviewStatus: Int = obj.get("audit_status").asInt
 
     /**
      * 隐私政策网址
@@ -51,4 +62,11 @@ class OPPOAppInfo(obj: JsonObject) {
      */
     val copyrightUrl: String = obj.get("copyright_url")?.asString ?: ""
 
+
+    fun toMarketState(): MarketState {
+        val state = if (reviewStatus == 111) ReviewState.Online else ReviewState.UnderReview
+        return MarketState(
+            state, true, versionCode, versionName
+        )
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 import apk.dispatcher.page.upload.UploadDialog
@@ -42,7 +43,18 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
                             val taskLauncher = viewModel.taskLaunchers.first { it.name == name }
                             val apkFileState = taskLauncher.getApkFileState()
                             val desc = apkFileState.value?.name
-                            ChannelView(selected, name, desc) { checked ->
+                            val loading = taskLauncher.getMarketStateProcessing().value
+                            val marketState = taskLauncher.getMarketState().value
+                            val state = when {
+                                loading || marketState == null -> "加载中"
+                                marketState.isSuccess -> {
+                                    val state = marketState.getOrThrow()
+                                    "v${state.lastVersionName} ${state.reviewState.desc}"
+                                }
+
+                                else -> "获取状态失败"
+                            }
+                            ChannelView(selected, name, desc, state) { checked ->
                                 viewModel.selectChannel(name, checked)
                             }
                             Spacer(modifier = Modifier.height(15.dp))
@@ -140,19 +152,14 @@ private fun showConfirmDialog(viewModel: ApkViewModel, onConfirm: () -> Unit, on
 @Preview
 @Composable
 private fun ChannelViewPreview() {
-//    Column(modifier = Modifier.background(AppColors.pageBackground).padding(10.dp)) {
-//        val huawei = Channel("华为", "星题库-v5.30.0-HUAWEI.apk", ChannelState.Success, true)
-//        ChannelView(huawei, onCheckChange = {})
-//        Spacer(modifier = Modifier.height(10.dp))
-//        val xiaomi = Channel("小米", "星题库-v5.30.0-MI.apk", ChannelState.Uploading(45), false)
-//        ChannelView(xiaomi, onCheckChange = {})
-//        Spacer(modifier = Modifier.height(10.dp))
-//        val oppo = Channel("OPPO", "星题库-v5.30.0-OPPO.apk", ChannelState.Success, true)
-//        ChannelView(oppo, onCheckChange = {})
-//        Spacer(modifier = Modifier.height(10.dp))
-//        val vivo = Channel("VIVO", "星题库-v5.30.0-VIVO.apk", ChannelState.Error("网络错误"), true)
-//        ChannelView(vivo, onCheckChange = {})
-//    }
+    Column(modifier = Modifier.background(AppColors.pageBackground).padding(10.dp)) {
+        ChannelView(
+            true,
+            name = "华为",
+            desc = "星题库-v5.30.0-HUAWEI.apk",
+            state = "v5.2.1 审核中",
+            onCheckChange = {})
+    }
 }
 
 @Composable
@@ -160,6 +167,7 @@ private fun ChannelView(
     selected: Boolean,
     name: String,
     desc: String?,
+    state: String,
     onCheckChange: (Boolean) -> Unit
 ) {
     Row(
@@ -190,22 +198,16 @@ private fun ChannelView(
             fontSize = 12.sp,
             color = AppColors.fontGray
         )
+        Spacer(modifier = Modifier.weight(1.0f))
+
+        Text(
+            state,
+            fontSize = 12.sp,
+            color = AppColors.fontGray
+        )
+        Spacer(modifier = Modifier.width(12.dp))
 
     }
 }
 
 
-sealed class ChannelState {
-    object Waiting : ChannelState()
-    class Processing(val action: String) : ChannelState()
-
-    /**
-     * @param progress 取值范围[0,100]
-     */
-    class Uploading(val progress: Int) : ChannelState()
-    object Success : ChannelState()
-    class Error(val message: String) : ChannelState()
-
-    val finish: Boolean get() = this == Success || this is Error
-    val success: Boolean get() = this == Success
-}

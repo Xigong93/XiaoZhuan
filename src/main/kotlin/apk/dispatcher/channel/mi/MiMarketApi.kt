@@ -32,7 +32,7 @@ class MiMarketApi(
      * @param miAccount 小米应用市场账号（邮箱)
      * @param packageName 应用包名
      */
-    suspend fun getAppInfo(packageName: String): MiAppInfoResp.MiAppInfo =
+    suspend fun getAppInfo(packageName: String): MiAppInfoResp =
         withContext(Dispatchers.IO) {
             val requestData = JSONObject().apply {
                 put("userName", miAccount)
@@ -55,7 +55,7 @@ class MiMarketApi(
             val response = httpClient.getTextResult(request)
             val infoResp = MiAppInfoResp.adapter.fromJson(response)
             checkNotNull(infoResp)
-            infoResp.packageInfo
+            infoResp
         }
 
     /**

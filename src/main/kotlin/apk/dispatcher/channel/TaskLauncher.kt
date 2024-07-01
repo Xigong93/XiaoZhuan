@@ -1,11 +1,9 @@
 package apk.dispatcher.channel
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import apk.dispatcher.config.ApkConfig
-import apk.dispatcher.page.home.ChannelState
 import apk.dispatcher.AppPath
+import apk.dispatcher.log.AppLogger
 import java.io.File
 
 class TaskLauncher(
@@ -15,31 +13,18 @@ class TaskLauncher(
 
     val name = task.channelName
 
+    private val stateListener = SubmitStateAdapter(::updateState)
+
     private val apkFileState: MutableState<File?> = mutableStateOf(null)
 
-    private val channelState: MutableState<ChannelState?> = mutableStateOf(null)
+    private val submitState: MutableState<SubmitState?> = mutableStateOf(null)
 
-    private val stateListener = object : ChannelTask.StateListener {
-        override fun onStart() {
-            updateState(ChannelState.Uploading(0))
-        }
+    private val marketState: MutableState<Result<MarketState>?> = mutableStateOf(null)
 
-        override fun onProcessing(action: String) {
-            updateState(ChannelState.Processing(action))
-        }
-
-        override fun onProgress(progress: Int) {
-            updateState(ChannelState.Uploading(progress))
-        }
-
-        override fun onSuccess() {
-            updateState(ChannelState.Success)
-        }
-
-        override fun onError(exception: Exception) {
-            updateState(ChannelState.Error("上传失败，请重试"))
-        }
-    }
+    /**
+     * 正在请求应用状态
+     */
+    private val marketStateProcessing = mutableStateOf(false)
 
     fun selectFile(apkDir: File) {
         val apkFile = if (apkDir.isDirectory) findApkFile(apkDir) else apkDir
@@ -47,15 +32,43 @@ class TaskLauncher(
     }
 
     fun prepare() {
-        updateState(ChannelState.Waiting)
+        updateState(SubmitState.Waiting)
+    }
+
+    suspend fun startSubmit(updateDesc: String) {
+        val apkFile = requireNotNull(apkFileState.value)
+        task.init(getParams())
+        task.setSubmitStateListener(stateListener)
+        task.startUpload(apkFile, updateDesc)
+    }
+
+    suspend fun loadMarketState(applicationId: String) {
+        task.init(getParams())
+        marketStateProcessing.value = true
+        marketState.value = runCatching {
+            task.getMarketState(applicationId)
+        }.onSuccess {
+            AppLogger.info(name, "获取应用市场状态成功:$it")
+        }.onFailure {
+            AppLogger.error(name, "获取应用市场状态失败", it)
+        }
+        marketStateProcessing.value = false
     }
 
 
-    suspend fun start(updateDesc: String) {
-        val apkFile = requireNotNull(apkFileState.value)
-        task.init(getParams())
-        task.setListener(stateListener)
-        task.startUpload(apkFile, updateDesc)
+    fun getApkFileState(): State<File?> = apkFileState
+
+    fun getSubmitState(): State<SubmitState?> = submitState
+
+    fun getMarketState(): State<Result<MarketState>?> = marketState
+
+    fun getMarketStateProcessing(): State<Boolean> = marketStateProcessing
+
+    private fun getParams(): Map<ChannelTask.Param, String?> {
+        val channelParams = apkConfig.channels.associateBy { it.name }
+        val saveParams = channelParams[task.channelName]?.params
+        val getParam = { p: ChannelTask.Param -> saveParams?.firstOrNull { it.name == p.name }?.value }
+        return task.getParams().associateWith { p -> getParam(p) }
     }
 
     private fun findApkFile(apkDir: File): File {
@@ -68,18 +81,30 @@ class TaskLauncher(
         return checkNotNull(file) { "找不到文件名中包含:${fileId}的文件" }
     }
 
-    fun getApkFileState(): State<File?> = apkFileState
-
-    fun getChannelState(): State<ChannelState?> = channelState
-
-    private fun updateState(newState: ChannelState) {
-        channelState.value = newState
+    private fun updateState(newState: SubmitState) {
+        submitState.value = newState
     }
 
-    private fun getParams(): Map<ChannelTask.Param, String?> {
-        val channelParams = apkConfig.channels.associateBy { it.name }
-        val saveParams = channelParams[task.channelName]?.params
-        val getParam = { p: ChannelTask.Param -> saveParams?.firstOrNull { it.name == p.name }?.value }
-        return task.getParams().associateWith { p -> getParam(p) }
+}
+
+private class SubmitStateAdapter(private val updateState: (SubmitState) -> Unit) : ChannelTask.SubmitStateListener {
+    override fun onStart() {
+        updateState(SubmitState.Uploading(0))
+    }
+
+    override fun onProcessing(action: String) {
+        updateState(SubmitState.Processing(action))
+    }
+
+    override fun onProgress(progress: Int) {
+        updateState(SubmitState.Uploading(progress))
+    }
+
+    override fun onSuccess() {
+        updateState(SubmitState.Success)
+    }
+
+    override fun onError(exception: Exception) {
+        updateState(SubmitState.Error("上传失败，请重试"))
     }
 }

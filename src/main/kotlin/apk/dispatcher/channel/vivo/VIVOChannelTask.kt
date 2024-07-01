@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.vivo
 
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
@@ -34,6 +35,13 @@ class VIVOChannelTask : ChannelTask() {
         AppLogger.info(channelName, "上传apk结果:${apkResult}")
         api.submit(apkResult, updateDesc, appDetail)
 
+    }
+
+    override suspend fun getMarketState(applicationId: String): MarketState {
+        val api = VIVOMarketApi(accessKey, accessSecret)
+        val appDetail = api.getAppInfo(applicationId)
+        AppLogger.info(channelName, "查看App详情:${appDetail}")
+        return appDetail.toMarketState()
     }
 
     companion object {

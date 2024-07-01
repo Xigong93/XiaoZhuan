@@ -28,6 +28,10 @@ class MockChannelTask(
         AppLogger.info(LOG_TAG, "Mock ${channelName},上传完成")
     }
 
+    override suspend fun getMarketState(applicationId: String): MarketState {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         private const val LOG_TAG = "模拟上传"
     }

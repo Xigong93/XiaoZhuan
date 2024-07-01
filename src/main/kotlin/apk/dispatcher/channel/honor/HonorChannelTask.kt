@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.honor
 
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
@@ -32,6 +33,12 @@ class HonorChannelTask : ChannelTask() {
         connectClient.uploadApk(file, apkInfo, clientId, clientSecret, updateDesc) {
             progress((it * 100).roundToInt())
         }
+    }
+
+    override suspend fun getMarketState(applicationId: String): MarketState {
+        val appInfo = connectClient.getReviewState(clientId, clientSecret, applicationId)
+        AppLogger.info(channelName, "appInfo:$appInfo")
+        return appInfo.toMarketState()
     }
 
     companion object {

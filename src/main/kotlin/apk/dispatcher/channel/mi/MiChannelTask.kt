@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.mi
 
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
@@ -19,7 +20,7 @@ class MiChannelTask : ChannelTask() {
     override val paramDefine: List<Param> = listOf(ACCOUNT_PARAM, PUBLIC_KEY_PARAM, PRIVATE_KEY_PARAM)
 
     override fun init(params: Map<Param, String?>) {
-        AppLogger.debug(channelName,"参数:$params")
+        AppLogger.debug(channelName, "参数:$params")
         account = params[ACCOUNT_PARAM] ?: ""
         publicKey = params[PUBLIC_KEY_PARAM] ?: ""
         privateKey = params[PRIVATE_KEY_PARAM] ?: ""
@@ -29,9 +30,16 @@ class MiChannelTask : ChannelTask() {
         val miMarketApi = MiMarketApi(account, publicKey, privateKey)
         val appInfo = miMarketApi.getAppInfo(apkInfo.applicationId)
         AppLogger.info(channelName, "AppInfo:$appInfo")
-        miMarketApi.uploadApk(file, appInfo, updateDesc) {
+        miMarketApi.uploadApk(file, appInfo.packageInfo, updateDesc) {
             progress((it * 100).roundToInt())
         }
+    }
+
+    override suspend fun getMarketState(applicationId: String): MarketState {
+        val miMarketApi = MiMarketApi(account, publicKey, privateKey)
+        val appInfo = miMarketApi.getAppInfo(applicationId)
+        AppLogger.info(channelName, "AppInfo:$appInfo")
+        return appInfo.toMarketState()
     }
 
     companion object {

@@ -43,6 +43,16 @@ interface HuaweiConnectApi {
     ): HWAppIdResp
 
     /**
+     * 获取线上APP信息
+     */
+    @GET("api/publish/v2/app-info")
+    suspend fun getAppInfo(
+        @Header("client_id") clientId: String,
+        @Header("Authorization") token: String,
+        @Query("appId") appId: String,
+    ): HWAppInfoResp
+
+    /**
      * 获取文件上传地址
      */
     @GET("api/publish/v2/upload-url/for-obs")

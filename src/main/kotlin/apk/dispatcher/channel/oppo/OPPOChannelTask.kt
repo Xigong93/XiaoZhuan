@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
@@ -19,7 +20,7 @@ class OPPOChannelTask : ChannelTask() {
     private var clientSecret = ""
 
     override fun init(params: Map<Param, String?>) {
-        AppLogger.debug(channelName,"参数:$params")
+        AppLogger.debug(channelName, "参数:$params")
         clientId = params[CLIENT_ID_PARAM] ?: ""
         clientSecret = params[CLIENT_SECRET_PARAM] ?: ""
     }
@@ -37,6 +38,15 @@ class OPPOChannelTask : ChannelTask() {
         }
         AppLogger.info(channelName, "apkResult=$apkResult")
         maretApi.submit(token, apkInfo, appInfo, updateDesc, apkResult)
+    }
+
+    override suspend fun getMarketState(applicationId: String): MarketState {
+        val maretApi = OPPOMaretApi(clientId, clientSecret)
+        val token = maretApi.getToken()
+        AppLogger.info(channelName, "token=$token")
+        val appInfo = maretApi.getAppInfo(token, applicationId)
+        AppLogger.info(channelName, "appInfo=$appInfo")
+        return appInfo.toMarketState()
     }
 
     companion object {

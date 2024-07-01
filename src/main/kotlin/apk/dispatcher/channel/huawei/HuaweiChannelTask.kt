@@ -1,5 +1,6 @@
 package apk.dispatcher.channel.huawei
 
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
@@ -21,7 +22,7 @@ class HuaweiChannelTask : ChannelTask() {
     private var clientSecret = ""
 
     override fun init(params: Map<Param, String?>) {
-        AppLogger.debug(channelName,"参数:$params")
+        AppLogger.debug(channelName, "参数:$params")
         clientId = params[CLIENT_ID] ?: ""
         clientSecret = params[CLIENT_SECRET] ?: ""
     }
@@ -30,6 +31,12 @@ class HuaweiChannelTask : ChannelTask() {
         connectClient.uploadApk(file, apkInfo, clientId, clientSecret, updateDesc) {
             progress((it * 100).roundToInt())
         }
+    }
+
+    override suspend fun getMarketState(applicationId: String): MarketState {
+        val appInfo = connectClient.getAppInfo(clientId, clientSecret, applicationId)
+        AppLogger.info(channelName, "应用市场状态:${appInfo}")
+        return appInfo.toAppState()
     }
 
 

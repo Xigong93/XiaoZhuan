@@ -3,28 +3,25 @@ package apk.dispatcher.page.home
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import apk.dispatcher.AppPath
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.SubmitState
+import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
-import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.util.ApkInfo
-import apk.dispatcher.AppPath
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.getApkInfo
 import apk.dispatcher.widget.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.io.File
-import kotlin.coroutines.EmptyCoroutineContext
 
 class ApkViewModel(
     val apkConfig: ApkConfig
 ) {
 
-     val mainScope = CoroutineScope(EmptyCoroutineContext)
+    private val mainScope = MainScope()
 
     val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
 
@@ -45,6 +42,7 @@ class ApkViewModel(
 
     init {
         selectedChannels.addAll(channels.map { it.channelName })
+        loadMarketState()
     }
 
 
@@ -78,7 +76,7 @@ class ApkViewModel(
             }
             updateApkConfig()
             launchers.forEach {
-                it.start(updateDesc)
+                it.startSubmit(updateDesc)
             }
         }
     }
@@ -88,14 +86,26 @@ class ApkViewModel(
      */
     fun retryDispatch() {
         mainScope.launch {
-            val launchers = selectedLaunchers().filter { it.getChannelState().value is ChannelState.Error }
+            val launchers = selectedLaunchers().filter { it.getSubmitState().value is SubmitState.Error }
             val updateDesc = requireNotNull(updateDesc.value).trim()
             launchers.forEach {
                 it.prepare()
             }
             updateApkConfig()
             launchers.forEach {
-                it.start(updateDesc)
+                it.startSubmit(updateDesc)
+            }
+        }
+    }
+
+    /**
+     * 获取应用市场状态
+     */
+    fun loadMarketState() {
+        mainScope.launch {
+            delay(50)
+            taskLaunchers.forEach {
+                val deferred = async { it.loadMarketState(apkConfig.applicationId) }
             }
         }
     }

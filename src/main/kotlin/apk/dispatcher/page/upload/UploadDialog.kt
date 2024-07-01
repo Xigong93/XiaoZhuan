@@ -24,7 +24,7 @@ import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 import apk.dispatcher.page.home.ApkViewModel
-import apk.dispatcher.page.home.ChannelState
+import apk.dispatcher.channel.SubmitState
 
 
 @Composable
@@ -37,8 +37,8 @@ fun UploadDialog(viewModel: ApkViewModel, onDismiss: () -> Unit) {
         properties = remember { DialogProperties(dismissOnClickOutside = false) }
     ) {
         val launchers = viewModel.selectedLaunchers()
-        val uploadSuccess = launchers.all { it.getChannelState().value?.success == true }
-        val uploadFail = launchers.all { it.getChannelState().value?.finish == true } && !uploadSuccess
+        val uploadSuccess = launchers.all { it.getSubmitState().value?.success == true }
+        val uploadFail = launchers.all { it.getSubmitState().value?.finish == true } && !uploadSuccess
         val uploading = !uploadFail && !uploadSuccess
         Column(
             modifier = Modifier
@@ -76,8 +76,8 @@ fun UploadDialog(viewModel: ApkViewModel, onDismiss: () -> Unit) {
 @Composable
 private fun BottomButtons(viewModel: ApkViewModel, onDismiss: () -> Unit) {
     val launchers = viewModel.selectedLaunchers()
-    val uploadSuccess = launchers.all { it.getChannelState().value?.success == true }
-    val uploadFail = launchers.all { it.getChannelState().value?.finish == true } && !uploadSuccess
+    val uploadSuccess = launchers.all { it.getSubmitState().value?.success == true }
+    val uploadFail = launchers.all { it.getSubmitState().value?.finish == true } && !uploadSuccess
     val uploading = !uploadFail && !uploadSuccess
     Row {
         Spacer(Modifier.weight(1f))
@@ -165,7 +165,7 @@ private fun RowScope.ChannelCell(launcher: TaskLauncher?) {
     if (launcher != null) {
         ChannelUploadState(
             launcher.name,
-            launcher.getChannelState().value ?: ChannelState.Waiting,
+            launcher.getSubmitState().value ?: SubmitState.Waiting,
             modifier = Modifier.weight(1f)
         )
     } else {

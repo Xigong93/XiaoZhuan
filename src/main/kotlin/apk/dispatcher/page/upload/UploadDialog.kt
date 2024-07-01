@@ -109,6 +109,24 @@ private fun BottomButtons(viewModel: ApkViewModel, onDismiss: () -> Unit) {
         if (uploadFail) {
             Row(
                 modifier = Modifier
+                    .hoverable(hoverSource)
+                    .border(0.5.dp, borderColor, AppShapes.roundButton)
+                    .clickable {
+                        onDismiss()
+                    }
+            ) {
+                Text(
+                    "取消",
+                    color = textColor,
+                    letterSpacing = 3.sp,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Row(
+                modifier = Modifier
                     .clip(AppShapes.roundButton)
                     .background(AppColors.primary)
                     .clickable { viewModel.retryDispatch() }

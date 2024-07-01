@@ -6,12 +6,12 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = false)
-class MiAppInfoResp(
+data class MiAppInfoResp(
     @Json(name = "packageInfo")
     val packageInfo: MiAppInfo
 ) {
     @JsonClass(generateAdapter = false)
-    class MiAppInfo(
+    data class MiAppInfo(
         @Json(name = "appName")
         val appName: String,
         @Json(name = "versionName")

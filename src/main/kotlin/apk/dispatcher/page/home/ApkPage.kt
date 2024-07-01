@@ -10,23 +10,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.Section
-import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.TwoPage
 import apk.dispatcher.widget.UpdateDescView
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.PickerType
-import io.github.vinceglb.filekit.core.pickFile
-import kotlinx.coroutines.launch
-import javax.swing.JFileChooser
-import javax.swing.JFileChooser.DIRECTORIES_ONLY
-import javax.swing.JFileChooser.FILES_ONLY
-import javax.swing.filechooser.FileNameExtensionFilter
 
 
 @Composable
@@ -46,9 +36,9 @@ private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedButton(onClick = {
                 if (viewModel.apkConfig.enableChannel) {
-                    showSelectedDirDialog2(viewModel)
+                    showSelectedDirDialog(viewModel)
                 } else {
-                    showSelectedApkDialog2(viewModel)
+                    showSelectedApkDialog(viewModel)
                 }
             }) {
                 val text = if (viewModel.apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"

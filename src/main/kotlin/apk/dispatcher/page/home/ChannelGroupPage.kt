@@ -3,6 +3,7 @@ package apk.dispatcher.page.home
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -10,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,35 +46,28 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.weight(1f))
-                Row(modifier = Modifier.size(60.dp, 30.dp)) {
-                    if (viewModel.loadingMarkState) {
-                        CircularProgressIndicator(Modifier.size(30.dp), color = AppColors.primary)
-                    } else {
-                        Box(Modifier
-                            .clip(AppShapes.roundButton)
-                            .fillMaxSize()
-                            .clickable {
-                                // 控制刷新频率，防止应用市场接口限流
-                                val diff =
-                                    (System.currentTimeMillis() - viewModel.lastUpdateMarketStateTime).milliseconds
-                                val threshold = 30.seconds
-                                val leftSeconds = (threshold - diff).inWholeSeconds
-                                if (leftSeconds > 0) {
-                                    Toast.show("刷新太频繁了，请${leftSeconds}秒后重试")
-                                } else {
-                                    viewModel.loadMarketState()
-                                }
-                            }) {
-                            Text(
-                                "刷新",
-                                color = AppColors.primary,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
 
+                Box(modifier = Modifier.size(40.dp)) {
+                    if (viewModel.loadingMarkState) {
+                        CircularProgressIndicator(
+                            color = AppColors.primary,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    } else {
+                        Image(
+                            painterResource("refresh.png"),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(AppColors.primary),
+                            modifier = Modifier.size(36.dp)
+                                .clip(CircleShape)
+                                .clickable {
+                                    tryReloadMarketState(viewModel)
+                                }
+                                .padding(2.dp)
+                        )
                     }
                 }
-
+                Spacer(Modifier.width(10.dp))
             }
             Spacer(Modifier.height(12.dp))
 
@@ -163,6 +159,19 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
                 )
             }
         }
+    }
+}
+
+private fun tryReloadMarketState(viewModel: ApkViewModel) {
+    // 控制刷新频率，防止应用市场接口限流
+    val diff =
+        (System.currentTimeMillis() - viewModel.lastUpdateMarketStateTime).milliseconds
+    val threshold = 30.seconds
+    val leftSeconds = (threshold - diff).inWholeSeconds
+    if (leftSeconds > 0) {
+        Toast.show("刷新太频繁了，请${leftSeconds}秒后重试")
+    } else {
+        viewModel.loadMarketState()
     }
 }
 

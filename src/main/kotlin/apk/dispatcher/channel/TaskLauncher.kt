@@ -40,7 +40,6 @@ class TaskLauncher(
 
     suspend fun loadMarketState(applicationId: String) {
         task.init(getParams())
-        marketState.value = null
         marketState.value = runCatching {
             task.getMarketState(applicationId)
         }.onSuccess {

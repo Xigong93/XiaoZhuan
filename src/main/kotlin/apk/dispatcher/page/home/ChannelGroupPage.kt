@@ -90,7 +90,7 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
                         val desc = apkFileState.value?.name
                         val marketState = taskLauncher.getMarketState().value
                         val state = when {
-                            marketState == null -> "加载中"
+                            viewModel.loadingMarkState || marketState == null -> "加载中"
                             marketState.isSuccess -> {
                                 val state = marketState.getOrThrow()
                                 "v${state.lastVersionName} ${state.reviewState.desc}"
@@ -245,10 +245,8 @@ private fun ChannelView(
         Text(
             state,
             fontSize = 12.sp,
-            color = AppColors.fontGray
+            color = AppColors.fontBlack
         )
-        Spacer(modifier = Modifier.width(12.dp))
-
     }
 }
 

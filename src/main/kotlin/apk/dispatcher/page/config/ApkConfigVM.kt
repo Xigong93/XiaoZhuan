@@ -10,11 +10,11 @@ import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.widget.Toast
 
 class ApkConfigVM(
-    apkConfig: ApkConfig?,
+    private val originApk: ApkConfig?,
     private val channels: List<ChannelTask> = ChannelRegistry.channels
 
 ) {
-    var apkConfigState by mutableStateOf(createApkConfig(apkConfig))
+    var apkConfigState by mutableStateOf(createApkConfig(originApk))
 
     fun updateChannel(channel: ApkConfig.Channel) {
         apkConfigState = apkConfigState.copy(channels = apkConfigState.channels.map {
@@ -51,6 +51,8 @@ class ApkConfigVM(
         }
 
         try {
+            // 先删除原来的，避免修改了包名，导致有两个配置
+            originApk?.let { apkConfigDao.removeConfig(it) }
             apkConfigDao.saveConfig(apkConfig)
             return true
         } catch (e: Exception) {

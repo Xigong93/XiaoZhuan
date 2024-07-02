@@ -1,8 +1,6 @@
 package apk.dispatcher.page.home
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import apk.dispatcher.AppPath
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
@@ -37,8 +35,15 @@ class ApkViewModel(
      */
     val selectedChannels = mutableStateListOf<String>()
 
+    /**
+     * 应用市场信息加载状态
+     */
+    var loadingMarkState by mutableStateOf(false)
 
     val taskLaunchers: List<TaskLauncher> = channels.map { TaskLauncher(apkConfig, it) }
+
+
+    var lastUpdateMarketStateTime = 0L
 
     init {
         selectedChannels.addAll(channels.map { it.channelName })
@@ -102,11 +107,15 @@ class ApkViewModel(
      * 获取应用市场状态
      */
     fun loadMarketState() {
+        lastUpdateMarketStateTime = System.currentTimeMillis()
         mainScope.launch {
-            delay(50)
-            taskLaunchers.forEach {
-                val deferred = async { it.loadMarketState(apkConfig.applicationId) }
+            loadingMarkState = true
+            supervisorScope {
+                taskLaunchers.forEach {
+                    async { it.loadMarketState(apkConfig.applicationId) }
+                }
             }
+            loadingMarkState = false
         }
     }
 

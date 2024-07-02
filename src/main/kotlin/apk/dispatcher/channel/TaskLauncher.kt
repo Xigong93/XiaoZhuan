@@ -21,10 +21,6 @@ class TaskLauncher(
 
     private val marketState: MutableState<Result<MarketState>?> = mutableStateOf(null)
 
-    /**
-     * 正在请求应用状态
-     */
-    private val marketStateProcessing = mutableStateOf(false)
 
     fun selectFile(apkDir: File) {
         val apkFile = if (apkDir.isDirectory) findApkFile(apkDir) else apkDir
@@ -44,7 +40,6 @@ class TaskLauncher(
 
     suspend fun loadMarketState(applicationId: String) {
         task.init(getParams())
-        marketStateProcessing.value = true
         marketState.value = runCatching {
             task.getMarketState(applicationId)
         }.onSuccess {
@@ -52,7 +47,6 @@ class TaskLauncher(
         }.onFailure {
             AppLogger.error(name, "获取应用市场状态失败", it)
         }
-        marketStateProcessing.value = false
     }
 
 
@@ -61,8 +55,6 @@ class TaskLauncher(
     fun getSubmitState(): State<SubmitState?> = submitState
 
     fun getMarketState(): State<Result<MarketState>?> = marketState
-
-    fun getMarketStateProcessing(): State<Boolean> = marketStateProcessing
 
     private fun getParams(): Map<ChannelTask.Param, String?> {
         val channelParams = apkConfig.channels.associateBy { it.name }

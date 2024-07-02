@@ -3,6 +3,8 @@ package apk.dispatcher.page.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -10,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.config.ApkConfig
@@ -32,26 +35,30 @@ fun ApkPage(apkConfig: ApkConfig) {
 @Composable
 private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
     val dividerHeight = 30.dp
-    Section("操作") {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedButton(onClick = {
+    Section("Apk信息") {
+        ApkInfoBox(viewModel)
+    }
+    Spacer(Modifier.height(dividerHeight))
+    Section("选择文件") {
+        Button(
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = AppColors.primary,
+            ),
+            onClick = {
                 if (viewModel.apkConfig.enableChannel) {
                     showSelectedDirDialog(viewModel)
                 } else {
                     showSelectedApkDialog(viewModel)
                 }
             }) {
-                val text = if (viewModel.apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
-                Text(text, color = AppColors.fontGray)
-            }
-            Spacer(Modifier.width(10.dp))
-            val apkPath = viewModel.getApkDirState().value?.path ?: ""
+            val text = if (viewModel.apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
+            Text(text, color = Color.White, fontSize = 14.sp)
+        }
+        val apkPath = viewModel.getApkDirState().value?.path ?: ""
+        if (apkPath.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
             Text(apkPath, color = AppColors.fontGray, fontSize = 12.sp)
         }
-    }
-    Spacer(Modifier.height(dividerHeight))
-    Section("Apk信息") {
-        ApkInfoBox(viewModel)
     }
     Spacer(Modifier.height(dividerHeight))
     Section("更新描述") {

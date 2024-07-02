@@ -241,6 +241,10 @@ class ApkViewModel(
             Toast.show("请输入更新描述")
             return false
         }
+        if (updateDesc.value.length > 300) {
+            Toast.show("更新描述不可超过300字")
+            return false
+        }
         if (selectedChannels.isEmpty()) {
             Toast.show("请选择渠道")
             return false

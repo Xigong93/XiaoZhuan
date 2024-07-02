@@ -53,8 +53,8 @@ fun UpdateDescView(updateDesc: MutableState<String>) {
             ),
             modifier = Modifier
                 .focusRequester(focusRequester)
-                .width(300.dp)
-                .height(120.dp)
+                .width(360.dp)
+                .height(160.dp)
         )
 
 

@@ -1,6 +1,7 @@
 package apk.dispatcher.page.home
 
 import androidx.compose.runtime.*
+import androidx.lifecycle.AtomicReference
 import apk.dispatcher.AppPath
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
@@ -49,7 +50,6 @@ class ApkViewModel(
     var submitJob: Job? = null
 
     init {
-        selectedChannels.addAll(channels.map { it.channelName })
         loadMarketState()
     }
 
@@ -61,10 +61,10 @@ class ApkViewModel(
     fun selectedApkDir(dir: File): Boolean {
         return try {
             val apkFile = if (dir.isDirectory) AppPath.listApk(dir).first() else dir
-            val launchers = selectedLaunchers()
-            launchers.forEach { it.selectFile(dir) }
+            taskLaunchers.forEach { it.selectFile(dir) }
             apkInfoState.value = runBlocking { getApkInfo(apkFile) }
             apkDirState.value = dir
+            updateSelectChannel()
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -124,6 +124,20 @@ class ApkViewModel(
                 }
             }
             loadingMarkState = false
+            updateSelectChannel()
+        }
+    }
+
+    private fun updateSelectChannel() {
+        if (selectedChannels.isEmpty()) {
+            selectAll(true)
+        } else {
+            // 删除失效的
+            selectedChannels
+                .filterNot { checkChannelEnableSubmit(it) }
+                .forEach {
+                    selectChannel(it, false)
+                }
         }
     }
 
@@ -168,10 +182,35 @@ class ApkViewModel(
     fun selectAll(selectedAll: Boolean) {
         if (selectedAll) {
             selectedChannels.clear()
-            selectedChannels.addAll(channels.map { it.channelName })
+            selectedChannels.addAll(getEnableSubmitChannel())
         } else {
             selectedChannels.clear()
         }
+    }
+
+    /**
+     * 获取可以上传的渠道
+     */
+    private fun getEnableSubmitChannel(): List<String> {
+        return taskLaunchers.filter { checkChannelEnableSubmit(it.name) }.map { it.name }
+    }
+
+    /**
+     * 检查当前渠道是否支持提交
+     */
+    private fun checkChannelEnableSubmit(channelName: String, message: AtomicReference<String>? = null): Boolean {
+        val task = taskLaunchers.firstOrNull { it.name == channelName } ?: return false
+        val marketState = task.getMarketState().value?.getOrNull()
+        val apkInfo = getApkInfoState().value
+        if (marketState != null && !marketState.enableSubmit) {
+            message?.set("应用市场审核中，或状态异常，无法上传新版本")
+            return false
+        }
+        if (apkInfo != null && marketState != null && apkInfo.versionCode <= marketState.lastVersionCode) {
+            message?.set("要提交的Apk版本号需大于线上最新版本号")
+            return false
+        }
+        return true
     }
 
     /**
@@ -179,8 +218,13 @@ class ApkViewModel(
      */
     fun selectChannel(name: String, selected: Boolean) {
         if (selected) {
-            selectedChannels.remove(name)
-            selectedChannels.add(name)
+            val message = AtomicReference<String>()
+            if (!checkChannelEnableSubmit(name, message)) {
+                message.get()?.let { Toast.show(it) }
+            } else {
+                selectedChannels.remove(name)
+                selectedChannels.add(name)
+            }
         } else {
             selectedChannels.remove(name)
         }

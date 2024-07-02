@@ -11,32 +11,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.ChannelTask.Param
+import apk.dispatcher.channel.ChannelTask.ParmaType
 import apk.dispatcher.config.ApkConfig
 
 
 @Composable
 fun ChannelConfigPage(
     enableChannel: Boolean,
+    params: List<Param>,
     config: ApkConfig.Channel,
     onConfigChange: (newConfig: ApkConfig.Channel) -> Unit
 ) {
-    Column {
+    Column(
+        modifier =
+        Modifier.verticalScroll(rememberScrollState())
+    ) {
         CheckboxRow(modifier = Modifier.padding(vertical = 8.dp), name = "是否启用", check = config.enable) {
             onConfigChange(config.copy(enable = it))
         }
         Column(
             modifier = Modifier
                 .padding(start = 10.dp)
-                .verticalScroll(rememberScrollState())
                 .alpha(if (config.enable) 1.0f else 0.5f)
         ) {
-            for (param in config.params) {
+            for (param in params) {
                 // 未启用渠道包时，不显示这个选项
                 if (param.name == ChannelTask.FILE_NAME_IDENTIFY && !enableChannel) {
                     continue
                 }
-                InputRaw(param.name, "", param.value) { newValue ->
-                    onConfigChange(createNewChannel(config, param, newValue))
+                val paramValue = config.getParam(param.name) ?: ApkConfig.Param(param.name, "")
+                when (param.type) {
+                    is ParmaType.Text -> {
+                        TextRaw(param.name, param.desc ?: "", paramValue.value) { newValue ->
+                            onConfigChange(createNewChannel(config, paramValue, newValue))
+                        }
+                    }
+
+                    is ParmaType.TextFile -> {
+                        TextFileRaw(param.name, param.desc ?: "", paramValue.value, param.type) { newValue ->
+                            onConfigChange(createNewChannel(config, paramValue, newValue))
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }

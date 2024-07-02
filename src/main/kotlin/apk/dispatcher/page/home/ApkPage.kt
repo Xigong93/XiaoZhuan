@@ -18,8 +18,12 @@ import androidx.compose.ui.unit.sp
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.Section
+import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.TwoPage
 import apk.dispatcher.widget.UpdateDescView
+import javax.swing.JFileChooser
+import javax.swing.JFileChooser.*
+import javax.swing.filechooser.FileNameExtensionFilter
 
 
 @Composable
@@ -46,9 +50,9 @@ private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
             ),
             onClick = {
                 if (viewModel.apkConfig.enableChannel) {
-                    showSelectedDirDialog(viewModel)
+                    viewModel.selectedApkDir()
                 } else {
-                    showSelectedApkDialog(viewModel)
+                    viewModel.selectApkFile()
                 }
             }) {
             val text = if (viewModel.apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
@@ -109,8 +113,6 @@ private fun item(title: String, desc: String) {
         )
     }
 }
-
-
 
 
 

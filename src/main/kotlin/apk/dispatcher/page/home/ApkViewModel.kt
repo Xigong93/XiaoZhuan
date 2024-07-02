@@ -11,6 +11,7 @@ import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
+import apk.dispatcher.util.FileSelector
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.getApkInfo
 import apk.dispatcher.widget.Toast
@@ -58,11 +59,11 @@ class ApkViewModel(
 
     fun getApkInfoState(): State<ApkInfo?> = apkInfoState
 
-    fun selectedApkDir(dir: File): Boolean {
+    private suspend fun parseApkFile(dir: File): Boolean {
         return try {
             val apkFile = if (dir.isDirectory) AppPath.listApk(dir).first() else dir
             taskLaunchers.forEach { it.selectFile(dir) }
-            apkInfoState.value = runBlocking { getApkInfo(apkFile) }
+            apkInfoState.value = getApkInfo(apkFile)
             apkDirState.value = dir
             updateSelectChannel()
             true
@@ -256,6 +257,26 @@ class ApkViewModel(
         val apkInfo = getApkInfoState().value ?: return ""
         val file = File(apkInfo.path)
         return FileUtil.getFileSize(file)
+    }
+
+
+    fun selectedApkDir() {
+        mainScope.launch {
+            val dir = FileSelector.selectedDir(getLastApkDir())
+            if (dir != null && !parseApkFile(dir)) {
+                Toast.show("无效目录,未包含有效的Apk文件")
+            }
+        }
+    }
+
+
+    fun selectApkFile() {
+        mainScope.launch {
+            val file = FileSelector.selectedFile(getLastApkDir(), "*.apk", listOf("apk"))
+            if (file != null && !parseApkFile(file)) {
+                Toast.show("无效的Apk文件")
+            }
+        }
     }
 
     companion object {

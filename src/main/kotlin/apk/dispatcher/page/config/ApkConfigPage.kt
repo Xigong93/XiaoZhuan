@@ -1,6 +1,5 @@
 package apk.dispatcher.page.config
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
@@ -56,8 +55,9 @@ fun ApkConfigPage(
                     }
                 }
                 VerticalPager(
-                    pageState, modifier =
-                    Modifier.fillMaxSize().padding(20.dp)
+                    pageState,
+                    userScrollEnabled = false,
+                    modifier = Modifier.fillMaxSize().padding(20.dp)
                 ) { page ->
                     ConfigList(page, viewModel)
                 }
@@ -85,7 +85,8 @@ private fun ConfigList(tabIndex: Int, viewModel: ApkConfigVM) {
         }
     } else {
         val channel = viewModel.apkConfigState.channels[tabIndex - 1]
-        ChannelConfigPage(viewModel.apkConfigState.enableChannel, channel) {
+        val params = requireNotNull(ChannelRegistry.getChannel(channel.name)).getParams()
+        ChannelConfigPage(viewModel.apkConfigState.enableChannel, params, channel) {
             viewModel.updateChannel(it)
         }
     }
@@ -127,11 +128,11 @@ private fun BottomButtons(onSaveClick: () -> Unit, onCloseClick: () -> Unit) {
 private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> Unit) {
     Column {
         val spaceHeight = Modifier.height(12.dp)
-        InputRaw("App名称", "", apkConfig.name) {
+        TextRaw("App名称", "", apkConfig.name) {
             onValueChange(apkConfig.copy(name = it))
         }
         Spacer(modifier = spaceHeight)
-        InputRaw("ApplicationId", "", apkConfig.applicationId) {
+        TextRaw("ApplicationId", "应用包名", apkConfig.applicationId) {
             onValueChange(apkConfig.copy(applicationId = it))
 
         }

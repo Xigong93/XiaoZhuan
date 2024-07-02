@@ -37,7 +37,7 @@ abstract class ChannelTask {
     }
 
     fun getParams(): List<Param> {
-        val fileName = Param(FILE_NAME_IDENTIFY, fileNameIdentify, "文件名标识,不区分大小写", 10)
+        val fileName = Param(FILE_NAME_IDENTIFY, fileNameIdentify, "文件名标识,不区分大小写")
         return paramDefine + fileName
     }
 
@@ -81,26 +81,35 @@ abstract class ChannelTask {
      */
     data class Param(
 
-        /**
-         * 参数名称，如api_key
-         */
+        /** 参数名称，如api_key */
         val name: String,
 
-        /**
-         * 默认参数
-         */
+        /** 默认参数 */
         val defaultValue: String? = null,
 
-        /**
-         * 参数的描述，可为空
-         */
+        /** 参数的描述，可为空 */
         val desc: String? = null,
+        /**
+         * 参数类型
+         */
+        val type: ParmaType = ParmaType.Text
+    )
+
+    /**
+     * 参数类型
+     */
+    sealed class ParmaType {
+        /**
+         * 文本类型
+         */
+        data object Text : ParmaType()
 
         /**
-         * 期望行数，默认1行
+         * 纯文字类型的文件
+         * @param fileExtension 允许的文件扩展名
          */
-        val exceptLines: Int = 1
-    )
+        data class TextFile(val fileExtension: String) : ParmaType()
+    }
 
 
     interface SubmitStateListener {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -12,15 +13,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import apk.dispatcher.util.FileSelector
 import apk.dispatcher.widget.Section
+import kotlinx.coroutines.launch
 
 /**
- * 参数输入框
+ * 文本参数输入框
  */
 @Composable
-fun InputRaw(
+fun TextRaw(
     name: String,
     desc: String,
     value: String?,
@@ -43,7 +47,55 @@ fun InputRaw(
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
 
+
+/**
+ * 文本文件参数输入框
+ */
+@Composable
+fun TextFileRaw(
+    name: String,
+    desc: String,
+    value: String?,
+    textFile: ChannelTask.ParmaType.TextFile,
+    onValueChange: (String) -> Unit
+) {
+    Section(name) {
+        if (desc.isNotEmpty()) {
+            Text(desc, color = AppColors.fontGray)
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+        val textSize = 14.sp
+
+        OutlinedTextField(
+            value = value ?: "",
+            onValueChange = { },
+            textStyle = TextStyle(fontSize = textSize),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = AppColors.fontGray,
+                backgroundColor = Color.White
+            ),
+            maxLines = 4,
+            readOnly = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        val scope = rememberCoroutineScope()
+        Button(onClick = {
+            scope.launch {
+                val file = FileSelector.selectedFile(
+                    null,
+                    "*.${textFile.fileExtension}",
+                    listOf(textFile.fileExtension)
+                )
+                if (file != null) {
+                    onValueChange(file.readText())
+                }
+            }
+        }, colors = ButtonDefaults.buttonColors(backgroundColor = AppColors.primary)) {
+            Text("选择文件", color = Color.White)
+        }
+    }
 }
 
 
@@ -68,7 +120,7 @@ fun CheckboxRow(modifier: Modifier = Modifier, name: String, check: Boolean, onC
 @Composable
 private fun ParamInputPreview() {
     Column {
-        InputRaw("AppKey", "", null, {})
+        TextRaw("AppKey", "", null, {})
         CheckboxRow(name = "急速模式", check = true) {}
     }
 }

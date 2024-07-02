@@ -44,7 +44,7 @@ class MiChannelTask : ChannelTask() {
 
     companion object {
         private val ACCOUNT_PARAM = Param("account", desc = "账号(邮箱)")
-        private val PUBLIC_KEY_PARAM = Param("publicKey", desc = "公钥", exceptLines = 6)
+        private val PUBLIC_KEY_PARAM = Param("publicKey", desc = "公钥", type = ParmaType.TextFile("cer"))
         private val PRIVATE_KEY_PARAM = Param("privateKey", desc = "私钥")
     }
 }

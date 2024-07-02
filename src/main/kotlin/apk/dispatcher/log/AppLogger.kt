@@ -68,9 +68,10 @@ private class AppLoggerImpl : AppLogger {
     override fun log(level: AppLogger.Level, tag: String, message: String, throwable: Throwable?) {
         if (loggerExecutor.isShutdown) return
         val thread = Thread.currentThread().name
+        val date = Date()
         loggerExecutor.execute {
             try {
-                val time = dateFormatter.format(Date())
+                val time = dateFormatter.format(date)
                 // 输出到控制台
                 if (level == AppLogger.Level.Error) {
                     errorConsole.writeLog(level, thread, time, tag, message, throwable)

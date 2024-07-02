@@ -8,6 +8,7 @@ import apk.dispatcher.channel.SubmitState
 import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
+import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.getApkInfo
@@ -45,6 +46,8 @@ class ApkViewModel(
 
     var lastUpdateMarketStateTime = 0L
 
+    var submitJob: Job? = null
+
     init {
         selectedChannels.addAll(channels.map { it.channelName })
         loadMarketState()
@@ -73,7 +76,9 @@ class ApkViewModel(
      * 开始分发
      */
     fun startDispatch() {
-        mainScope.launch {
+        AppLogger.info(LOG_TAG, "开始分发")
+        submitJob?.takeIf { it.isActive }?.cancel()
+        submitJob = mainScope.launch {
             val launchers = selectedLaunchers()
             val updateDesc = requireNotNull(updateDesc.value).trim()
             launchers.forEach {
@@ -90,7 +95,9 @@ class ApkViewModel(
      * 重试
      */
     fun retryDispatch() {
-        mainScope.launch {
+        AppLogger.info(LOG_TAG, "重试")
+        submitJob?.takeIf { it.isActive }?.cancel()
+        submitJob = mainScope.launch {
             val launchers = selectedLaunchers().filter { it.getSubmitState().value is SubmitState.Error }
             val updateDesc = requireNotNull(updateDesc.value).trim()
             launchers.forEach {
@@ -107,6 +114,7 @@ class ApkViewModel(
      * 获取应用市场状态
      */
     fun loadMarketState() {
+        AppLogger.info(LOG_TAG, "更新应用市场审核状态")
         lastUpdateMarketStateTime = System.currentTimeMillis()
         mainScope.launch {
             loadingMarkState = true
@@ -123,7 +131,8 @@ class ApkViewModel(
      * 取消分发
      */
     fun cancelDispatch() {
-        mainScope.cancel("用户取消")
+        AppLogger.info(LOG_TAG, "取消分发")
+        submitJob?.takeIf { it.isActive }?.cancel("用户取消")
     }
 
 
@@ -199,5 +208,9 @@ class ApkViewModel(
         val apkInfo = getApkInfoState().value ?: return ""
         val file = File(apkInfo.path)
         return FileUtil.getFileSize(file)
+    }
+
+    companion object {
+        private const val LOG_TAG = "应用市场提交"
     }
 }

@@ -18,21 +18,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
-import kotlin.coroutines.EmptyCoroutineContext
 
 object Toast {
 
     private var job: Job? = null
 
+    private val mainScope = MainScope()
+
     private var message by mutableStateOf("")
 
     private var show by mutableStateOf(false)
 
-    private val mainScope = CoroutineScope(EmptyCoroutineContext)
-
 
     @Composable
-    fun install() {
+    fun UI() {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             AnimatedVisibility(
                 visible = show,
@@ -40,12 +39,12 @@ object Toast {
                 exit = fadeOut()
             ) {
                 Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .clip(RoundedCornerShape(4.dp))
                         .background(Color(0xC0000000))
                         .sizeIn(minWidth = 80.dp, maxWidth = 300.dp)
-                        .padding(horizontal = 18.dp, vertical = 10.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(horizontal = 18.dp, vertical = 10.dp)
                 ) {
                     Text(
                         message,
@@ -61,14 +60,11 @@ object Toast {
 
     }
 
-    fun show(message: String) {
-        this.message = message
-        show = true
-        if (job?.isActive == true) {
-            job?.cancel()
-        }
-        job = null
+    fun show(msg: String) {
+        job?.takeIf { it.isActive }?.cancel()
         job = mainScope.launch {
+            message = msg
+            show = true
             delay(2000)
             show = false
         }

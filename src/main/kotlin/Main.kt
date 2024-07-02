@@ -39,5 +39,5 @@ fun main() {
 @Composable
 fun RootWindow() {
     AppNavigation()
-    Toast.install()
+    Toast.UI()
 }

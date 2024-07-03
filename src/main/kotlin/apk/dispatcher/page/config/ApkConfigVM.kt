@@ -7,6 +7,7 @@ import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
+import apk.dispatcher.log.AppLogger
 import apk.dispatcher.widget.Toast
 
 class ApkConfigVM(
@@ -49,7 +50,8 @@ class ApkConfigVM(
             Toast.show("请至少启用一个渠道")
             return false
         }
-
+        AppLogger.info(LOG_TAG, "保存配置:${apkConfig.applicationId}")
+        AppLogger.debug(LOG_TAG, "保存配置:${apkConfig}")
         try {
             // 先删除原来的，避免修改了包名，导致有两个配置
             originApk?.let { apkConfigDao.removeConfig(it) }
@@ -92,5 +94,9 @@ class ApkConfigVM(
             enable = oldChannel?.enable ?: true,
             params = params ?: emptyList()
         )
+    }
+
+    companion object {
+        private const val LOG_TAG = "Apk配置"
     }
 }

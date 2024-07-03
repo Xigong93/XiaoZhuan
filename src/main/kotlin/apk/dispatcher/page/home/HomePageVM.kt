@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
+import apk.dispatcher.log.AppLogger
 
 class HomePageVM {
 
@@ -29,9 +30,14 @@ class HomePageVM {
     fun deleteCurrent() {
         val apk = currentApk
         if (apk != null) {
+            AppLogger.info(LOG_TAG, "删除Apk配置:${apk.applicationId}")
             apkConfigDao.removeConfig(apk)
             loadData()
         }
+    }
+
+    companion object {
+        private const val LOG_TAG = "首页"
     }
 
 }

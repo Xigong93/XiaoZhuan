@@ -14,11 +14,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.log.AppLogger
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 import apk.dispatcher.util.FileSelector
 import apk.dispatcher.widget.Section
+import apk.dispatcher.widget.Toast
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 文本参数输入框
@@ -83,17 +87,33 @@ fun TextFileRaw(
         val scope = rememberCoroutineScope()
         Button(onClick = {
             scope.launch {
-                val file = FileSelector.selectedFile(
-                    null,
-                    "*.${textFile.fileExtension}",
-                    listOf(textFile.fileExtension)
-                )
-                if (file != null) {
-                    onValueChange(file.readText())
-                }
+                selectedTextFile(textFile, onValueChange)
             }
         }, colors = ButtonDefaults.buttonColors(backgroundColor = AppColors.primary)) {
             Text("选择文件", color = Color.White)
+        }
+    }
+}
+
+private suspend fun selectedTextFile(
+    textFile: ChannelTask.ParmaType.TextFile,
+    onValueChange: (String) -> Unit
+) {
+    val file = FileSelector.selectedFile(
+        null,
+        "*.${textFile.fileExtension}",
+        listOf(textFile.fileExtension)
+    )
+    if (file != null) {
+        try {
+            val content = withContext(Dispatchers.IO) {
+                file.readText()
+            }
+            check(content.isNotEmpty())
+            onValueChange(content)
+        } catch (e: Exception) {
+            AppLogger.error("选择文件", "文件读取失败", e)
+            Toast.show("文件读取失败")
         }
     }
 }

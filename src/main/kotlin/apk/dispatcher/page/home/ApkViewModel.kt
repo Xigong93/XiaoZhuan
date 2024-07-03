@@ -68,6 +68,7 @@ class ApkViewModel(
             updateSelectChannel()
             true
         } catch (e: Exception) {
+            AppLogger.error(LOG_TAG, "解析选择Apk失败", e)
             e.printStackTrace()
             false
         }
@@ -159,7 +160,11 @@ class ApkViewModel(
             updateDesc = updateDesc
         )
         val configDao = ApkConfigDao()
-        configDao.saveConfig(apkConfig.copy(extension = newExtension))
+        try {
+            configDao.saveConfig(apkConfig.copy(extension = newExtension))
+        } catch (e: Exception) {
+            AppLogger.error(LOG_TAG, "更新Apk配置失败",e)
+        }
     }
 
     /**

@@ -43,22 +43,28 @@ abstract class ChannelTask {
 
     @kotlin.jvm.Throws
     suspend fun startUpload(apkFile: File, updateDesc: String) {
-        AppLogger.info(LOG_TAG, "开始上传")
-        submitStateListener?.onProcessing("请求中")
+        AppLogger.info(channelName, "开始提交新版本")
+        val listener = submitStateListener
         try {
-            submitStateListener?.onStart()
-            performUpload(apkFile, getApkInfo(apkFile), updateDesc) {
-                if (it == 100) {
-                    submitStateListener?.onProcessing("提交中")
-                } else {
-                    submitStateListener?.onProgress(it)
-                }
-            }
-            submitStateListener?.onSuccess()
-            AppLogger.info(LOG_TAG, "上传成功")
+            val apkInfo = getApkInfo(apkFile)
+            AppLogger.info(channelName, "准备提交Apk信息:$apkInfo")
+            listener?.onStart()
+            listener?.onProcessing("请求中")
+            performUpload(apkFile, apkInfo, updateDesc, ::notifyProgress)
+            listener?.onSuccess()
+            AppLogger.info(channelName, "提交新版本成功,$apkInfo")
         } catch (e: Exception) {
-            AppLogger.error(LOG_TAG, "上传失败", e)
-            submitStateListener?.onError(e)
+            AppLogger.error(channelName, "提交新版本失败", e)
+            listener?.onError(e)
+        }
+    }
+
+    private fun notifyProgress(progress: Int) {
+        val listener = submitStateListener
+        if (progress == 100) {
+            listener?.onProcessing("提交中")
+        } else {
+            listener?.onProgress(progress)
         }
     }
 
@@ -131,6 +137,5 @@ abstract class ChannelTask {
     companion object {
         const val FILE_NAME_IDENTIFY = "fileNameIdentify"
 
-        private const val LOG_TAG = "渠道上传"
     }
 }

@@ -35,9 +35,9 @@ public class ApkParser {
                 }
             }
         }
-        Objects.requireNonNull(versionName, "解析失败");
-        Objects.requireNonNull(applicationId, "解析失败");
-        if (versionCode == 0) throw new RuntimeException("解析失败");
+        Objects.requireNonNull(versionName, "解析Apk失败," + apkFile);
+        Objects.requireNonNull(applicationId, "解析Apk失败," + apkFile);
+        if (versionCode == 0) throw new RuntimeException("解析Apk失败," + apkFile);
         return new ApkInfo(apkFile.getAbsolutePath(), applicationId, versionCode, versionName);
     }
 
@@ -51,7 +51,7 @@ public class ApkParser {
             Objects.requireNonNull(xml);
             return xml;
         } catch (IOException e) {
-            throw new RuntimeException("解析版本号失败", e);
+            throw new RuntimeException("解析版本号失败,"+apkFile, e);
         }
     }
 

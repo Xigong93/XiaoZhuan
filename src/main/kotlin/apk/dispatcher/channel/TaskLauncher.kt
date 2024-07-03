@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.AppPath
 import apk.dispatcher.log.AppLogger
+import apk.dispatcher.log.action
 import java.io.File
 
 class TaskLauncher(
@@ -43,11 +44,9 @@ class TaskLauncher(
         AppLogger.debug(task.channelName, "参数:${getParams()}")
         task.init(getParams())
         marketState.value = runCatching {
-            task.getMarketState(applicationId)
-        }.onSuccess {
-            AppLogger.info(name, "获取应用市场状态成功:$it")
-        }.onFailure {
-            AppLogger.error(name, "获取应用市场状态失败", it)
+            AppLogger.action(task.channelName, "获取应用市场状态:$applicationId") {
+                task.getMarketState(applicationId)
+            }
         }
     }
 

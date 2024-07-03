@@ -58,10 +58,8 @@ class ApkConfigVM(
             apkConfigDao.saveConfig(apkConfig)
             return true
         } catch (e: Exception) {
-            e.printStackTrace()
-            if (appName.isEmpty()) {
-                Toast.show("保持失败")
-            }
+            AppLogger.error(LOG_TAG, "保存Apk配置失败", e)
+            Toast.show("保存失败")
         }
         return false
 

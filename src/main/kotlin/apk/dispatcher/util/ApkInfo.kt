@@ -4,6 +4,7 @@ import apk.dispatcher.android.ApkParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 
 data class ApkInfo(
     val path: String,
@@ -25,6 +26,13 @@ data class ApkInfo(
  * 获取Apk文件信息
  */
 @kotlin.jvm.Throws
-suspend fun getApkInfo(file: File): ApkInfo {
-    return withContext(Dispatchers.IO) { ApkParser.parse(file) }
+suspend fun getApkInfo(
+    file: File
+): ApkInfo = withContext(Dispatchers.IO) {
+    try {
+        require(file.exists())
+        ApkParser.parse(file)
+    } catch (e: Exception) {
+        throw IOException("解析Apk文件失败,${file.absolutePath}", e)
+    }
 }

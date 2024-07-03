@@ -2,6 +2,8 @@ package apk.dispatcher.channel.mi
 
 import apk.dispatcher.OkHttpFactory
 import apk.dispatcher.util.*
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -53,6 +55,8 @@ class MiMarketApi(
                 .build()
             val request = Request.Builder().url(QUERY).post(body).build()
             val response = httpClient.getTextResult(request)
+            val jsonResult = JsonParser.parseString(response).asJsonObject
+            jsonResult.checkSuccess("获取App信息")
             val infoResp = MiAppInfoResp.adapter.fromJson(response)
             checkNotNull(infoResp)
             infoResp
@@ -102,10 +106,14 @@ class MiMarketApi(
             .build()
         val request = Request.Builder().url(PUSH).post(body).build()
         val result = httpClient.getJsonResult(request)
-        check(result.get("result").asInt == 0) {
-            "上传失败，$result"
-        }
+        result.checkSuccess("上传Apk")
     }
+
+    private fun JsonObject.checkSuccess(what: String) {
+        val code = get("result").asInt
+        check(code == 0) { "${what}失败,${this}" }
+    }
+
 
     private companion object {
         /**

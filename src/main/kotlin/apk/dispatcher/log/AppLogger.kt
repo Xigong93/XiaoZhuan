@@ -10,7 +10,31 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-private val DefaultLogger: AppLogger by lazy { AppLoggerImpl() }
+suspend fun <R> AppLogger.action(tag: String, action: String, black: suspend () -> R): R {
+    try {
+        info(tag, "$action 开始")
+        val result = black()
+        info(tag, "$action 成功")
+        debug(tag, "$action 结果:$result")
+        return result
+    } catch (e: Exception) {
+        error(tag, "$action 失败", e)
+        throw e
+    }
+}
+
+fun <R> AppLogger.actionSync(tag: String, action: String, black: () -> R): R {
+    try {
+        info(tag, "$action 开始")
+        val result = black()
+        info(tag, "$action 成功")
+        debug(tag, "$action 结果:$result")
+        return result
+    } catch (e: Exception) {
+        error(tag, "$action 失败", e)
+        throw e
+    }
+}
 
 interface AppLogger {
 
@@ -24,17 +48,13 @@ interface AppLogger {
 
     fun awaitTermination(timeout: Duration)
 
-    enum class Level {
-        Debug,
-        Info,
-        Error
-    }
+    enum class Level { Debug, Info, Error }
 
     companion object : AppLogger by DefaultLogger
 }
 
 
-private class AppLoggerImpl : AppLogger {
+private object DefaultLogger : AppLogger {
 
     private val fileWriter: Writer
 
@@ -73,13 +93,10 @@ private class AppLoggerImpl : AppLogger {
             try {
                 val time = dateFormatter.format(date)
                 // 输出到控制台
-                if (level == AppLogger.Level.Error) {
-                    errorConsole.writeLog(level, thread, time, tag, message, throwable)
-                } else {
-                    infoConsole.writeLog(level, thread, time, tag, message, throwable)
-                }
+                val console = if (level == AppLogger.Level.Error) errorConsole else infoConsole
+                console.writeLog(level, thread, time, tag, message, throwable)
                 // 写入文件
-                if (loggable(level)) {
+                if (printable(level)) {
                     fileWriter.writeLog(level, thread, time, tag, message, throwable)
                 }
             } catch (e: Exception) {
@@ -124,7 +141,7 @@ private class AppLoggerImpl : AppLogger {
         flush()
     }
 
-    private fun loggable(level: AppLogger.Level): Boolean {
+    private fun printable(level: AppLogger.Level): Boolean {
         return if (BuildConfig.DEBUG) {
             true
         } else {

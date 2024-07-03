@@ -4,7 +4,7 @@ import apk.dispatcher.channel.MarketState
 import apk.dispatcher.channel.ReviewState
 import com.google.gson.JsonObject
 
-class OPPOAppInfo(obj: JsonObject) {
+data class OPPOAppInfo(val obj: JsonObject) {
 
     /**
      * 一句话介绍

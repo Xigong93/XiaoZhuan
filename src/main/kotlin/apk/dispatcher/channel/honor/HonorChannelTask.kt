@@ -24,7 +24,6 @@ class HonorChannelTask : ChannelTask() {
     private val connectClient = HonorConnectClient()
 
     override fun init(params: Map<Param, String?>) {
-        AppLogger.debug(channelName, "参数:$params")
         clientId = params[CLIENT_ID] ?: ""
         clientSecret = params[CLIENT_SECRET] ?: ""
     }

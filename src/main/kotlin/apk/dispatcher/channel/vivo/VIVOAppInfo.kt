@@ -4,7 +4,7 @@ import apk.dispatcher.channel.MarketState
 import apk.dispatcher.channel.ReviewState
 import com.google.gson.JsonObject
 
-class VIVOAppInfo(obj: JsonObject) {
+data class VIVOAppInfo(val obj: JsonObject) {
     /**
      * 应用分类（appClassify
      * https://dev.vivo.com.cn/documentCenter/doc/344

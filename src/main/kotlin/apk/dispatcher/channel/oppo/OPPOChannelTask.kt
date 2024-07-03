@@ -5,7 +5,6 @@ import apk.dispatcher.channel.MarketState
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
-import kotlin.math.roundToInt
 
 class OPPOChannelTask : ChannelTask() {
 
@@ -15,37 +14,20 @@ class OPPOChannelTask : ChannelTask() {
 
     override val paramDefine: List<Param> = listOf(CLIENT_ID_PARAM, CLIENT_SECRET_PARAM)
 
-    private var clientId = ""
-
-    private var clientSecret = ""
+    private var marketClient: OPPOMarketClient? = null
 
     override fun init(params: Map<Param, String?>) {
-        AppLogger.debug(channelName, "参数:$params")
-        clientId = params[CLIENT_ID_PARAM] ?: ""
-        clientSecret = params[CLIENT_SECRET_PARAM] ?: ""
+        val clientId = params[CLIENT_ID_PARAM] ?: ""
+        val clientSecret = params[CLIENT_SECRET_PARAM] ?: ""
+        marketClient = OPPOMarketClient(clientId, clientSecret)
     }
 
     override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
-
-        val maretApi = OPPOMaretApi(clientId, clientSecret)
-        val token = maretApi.getToken()
-        AppLogger.info(channelName, "token=$token")
-        val appInfo = maretApi.getAppInfo(token, apkInfo.applicationId)
-        val uploadUrl = maretApi.getUploadUrl(token)
-        AppLogger.info(channelName, "uploadUrl=$uploadUrl")
-        val apkResult = maretApi.uploadApk(uploadUrl, token, file) {
-            progress((it * 100).roundToInt())
-        }
-        AppLogger.info(channelName, "apkResult=$apkResult")
-        maretApi.submit(token, apkInfo, appInfo, updateDesc, apkResult)
+        requireNotNull(marketClient).submit(file, apkInfo, updateDesc, progress)
     }
 
     override suspend fun getMarketState(applicationId: String): MarketState {
-        val maretApi = OPPOMaretApi(clientId, clientSecret)
-        val token = maretApi.getToken()
-        AppLogger.info(channelName, "token=$token")
-        val appInfo = maretApi.getAppInfo(token, applicationId)
-        AppLogger.info(channelName, "appInfo=$appInfo")
+        val appInfo = requireNotNull(marketClient).getAppInfo(applicationId)
         return appInfo.toMarketState()
     }
 

@@ -33,12 +33,14 @@ class TaskLauncher(
 
     suspend fun startSubmit(updateDesc: String) {
         val apkFile = requireNotNull(apkFileState.value)
+        AppLogger.debug(task.channelName, "参数:${getParams()}")
         task.init(getParams())
         task.setSubmitStateListener(stateListener)
         task.startUpload(apkFile, updateDesc)
     }
 
     suspend fun loadMarketState(applicationId: String) {
+        AppLogger.debug(task.channelName, "参数:${getParams()}")
         task.init(getParams())
         marketState.value = runCatching {
             task.getMarketState(applicationId)

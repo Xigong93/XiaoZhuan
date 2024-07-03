@@ -2,10 +2,8 @@ package apk.dispatcher.channel.mi
 
 import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.channel.MarketState
-import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
-import kotlin.math.roundToInt
 
 class MiChannelTask : ChannelTask() {
 
@@ -13,32 +11,23 @@ class MiChannelTask : ChannelTask() {
 
     override val fileNameIdentify: String = "MI"
 
-    private var account = ""
-    private var publicKey = ""
-    private var privateKey = ""
+    private var marketClient: MiMarketClient? = null
 
     override val paramDefine: List<Param> = listOf(ACCOUNT_PARAM, PUBLIC_KEY_PARAM, PRIVATE_KEY_PARAM)
 
     override fun init(params: Map<Param, String?>) {
-        AppLogger.debug(channelName, "参数:$params")
-        account = params[ACCOUNT_PARAM] ?: ""
-        publicKey = params[PUBLIC_KEY_PARAM] ?: ""
-        privateKey = params[PRIVATE_KEY_PARAM] ?: ""
+        val account = params[ACCOUNT_PARAM] ?: ""
+        val publicKey = params[PUBLIC_KEY_PARAM] ?: ""
+        val privateKey = params[PRIVATE_KEY_PARAM] ?: ""
+        marketClient = MiMarketClient(account, publicKey, privateKey)
     }
 
     override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
-        val miMarketApi = MiMarketApi(account, publicKey, privateKey)
-        val appInfo = miMarketApi.getAppInfo(apkInfo.applicationId)
-        AppLogger.info(channelName, "AppInfo:$appInfo")
-        miMarketApi.uploadApk(file, appInfo.packageInfo, updateDesc) {
-            progress((it * 100).roundToInt())
-        }
+        requireNotNull(marketClient).submit(file, apkInfo, updateDesc, progress)
     }
 
     override suspend fun getMarketState(applicationId: String): MarketState {
-        val miMarketApi = MiMarketApi(account, publicKey, privateKey)
-        val appInfo = miMarketApi.getAppInfo(applicationId)
-        AppLogger.info(channelName, "AppInfo:$appInfo")
+        val appInfo = requireNotNull(marketClient).getAppInfo(applicationId)
         return appInfo.toMarketState()
     }
 

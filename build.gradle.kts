@@ -5,9 +5,9 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-group = "xigong"
-version = "1.0-SNAPSHOT"
 
+val appVersion = AppVersion(1, 0, 0)
+println(appVersion)
 repositories {
 //    maven("https://maven.aliyun.com/repository/public")
     google()
@@ -43,16 +43,47 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         buildTypes {
-            jvmArgs("-DbuildType=debug")
             release {
                 proguard.isEnabled = false
-                jvmArgs("-DbuildType=release")
             }
         }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ApkDispatcher"
-            packageVersion = "1.0.0"
+            packageVersion = appVersion.versionName
         }
     }
+}
+
+
+
+gradle.projectsEvaluated {
+    tasks.named("jar") {
+        outputs.file(getBuildConfigFile())
+        doFirst {
+            val tasks = gradle.taskGraph.allTasks
+            val release = tasks.any { it.name.startsWith("package") }
+            writeBuildConfig(release)
+        }
+    }
+}
+
+fun getBuildConfigFile(): File {
+    val dir = File(buildDir, "classes/kotlin/main/META-INF")
+    val file = File(dir, "BuildConfig.json")
+    file.parentFile.mkdirs()
+    return file
+}
+
+/**
+ * 生成BuildConfig配置文件
+ */
+fun writeBuildConfig(release: Boolean) {
+    val file = getBuildConfigFile()
+    val type = if (release) "release" else "debug"
+    println("Write $type BuildConfig.json to  ${file.absolutePath}")
+    val buildConfig = BuildConfig(
+        appVersion.versionCode.toLong(), appVersion.versionName, release
+    )
+    file.writeText(buildConfig.toJson())
 }

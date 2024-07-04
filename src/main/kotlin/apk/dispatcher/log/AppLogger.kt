@@ -142,7 +142,7 @@ private object DefaultLogger : AppLogger {
     }
 
     private fun printable(level: AppLogger.Level): Boolean {
-        return if (BuildConfig.DEBUG) {
+        return if (BuildConfig.debug) {
             true
         } else {
             level >= AppLogger.Level.Info

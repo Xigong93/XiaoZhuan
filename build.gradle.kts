@@ -56,34 +56,27 @@ compose.desktop {
 }
 
 
-
-gradle.projectsEvaluated {
-    tasks.named("jar") {
-        outputs.file(getBuildConfigFile())
-        doFirst {
-            val tasks = gradle.taskGraph.allTasks
-            val release = tasks.any { it.name.startsWith("package") }
-            writeBuildConfig(release)
-        }
+tasks.named("processResources") {
+    doLast {
+        val dir = outputs.files.first()
+        val file = File(dir, "BuildConfig.json")
+        val tasks = gradle.taskGraph.allTasks
+        val release = tasks.any { it.name.startsWith("package") }
+        writeBuildConfig(file, release)
     }
 }
 
-fun getBuildConfigFile(): File {
-    val dir = File(buildDir, "classes/kotlin/main/META-INF")
-    val file = File(dir, "BuildConfig.json")
-    file.parentFile.mkdirs()
-    return file
-}
 
 /**
  * 生成BuildConfig配置文件
  */
-fun writeBuildConfig(release: Boolean) {
-    val file = getBuildConfigFile()
+fun writeBuildConfig(file: File, release: Boolean) {
     val type = if (release) "release" else "debug"
     println("Write $type BuildConfig.json to  ${file.absolutePath}")
     val buildConfig = BuildConfig(
-        appVersion.versionCode.toLong(), appVersion.versionName, release
+        appVersion.versionCode.toLong(),
+        appVersion.versionName,
+        release
     )
     file.writeText(buildConfig.toJson())
 }

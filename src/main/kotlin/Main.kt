@@ -23,7 +23,7 @@ fun main() {
             position = WindowPosition(Alignment.Center)
         )
         Window(
-            title = "软件版本更新",
+            title = "戈",
             resizable = false,
             state = windowState,
             onCloseRequest = {

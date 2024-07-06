@@ -49,7 +49,7 @@ compose.desktop {
         }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "ApkDispatcher"
+            packageName = "com.xigong.apkdispatcher"
             packageVersion = appVersion.versionName
         }
     }

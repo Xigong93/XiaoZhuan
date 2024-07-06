@@ -128,27 +128,10 @@ private fun Content(
             )
         }
         Divider()
-
-        val subNavController = rememberNavController()
-        NavHost(subNavController, startDestination = "default") {
-            composable("default") {
-
-            }
-            composable("apk?id={id}") {
-                val appId = it.arguments?.getString("id") ?: ""
-                ApkPage(appId) {
-                    navController.showUploadPage(it)
-                }
-            }
-        }
-
-        if (currentApk != null) {
-            DisposableEffect(currentApk) {
-                AppLogger.info("首页", "切换到App子页面:${currentApk}")
-                subNavController.navigate("apk?id=${currentApk.applicationId}") {
-                    popUpTo("apk") { inclusive = true }
-                }
-                onDispose { }
+        val apkVM = viewModel.getApkVM()
+        if (apkVM != null) {
+            ApkPage(apkVM) {
+                navController.showUploadPage(it)
             }
         }
     }

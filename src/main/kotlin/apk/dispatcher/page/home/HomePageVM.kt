@@ -4,24 +4,20 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
-import apk.dispatcher.config.ApkDesc
 import apk.dispatcher.log.AppLogger
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class HomePageVM : ViewModel() {
 
+    private var apkPageState: ApkPageState? = null
+
     private val configDao = ApkConfigDao()
 
+    private val currentApk = mutableStateOf<ApkConfig?>(null)
 
-    private val currentApk = mutableStateOf<ApkDesc?>(null)
-
-
-    private val apkList = mutableStateOf<List<ApkDesc>>(emptyList())
-
-
-    val currentAppFlow = MutableStateFlow<String?>(null)
+    private val apkList = mutableStateOf<List<ApkConfig>>(emptyList())
 
     init {
         AppLogger.info(LOG_TAG, "init")
@@ -36,20 +32,28 @@ class HomePageVM : ViewModel() {
             val old = currentApk.value
             // 当前Apk为空时，或已被删除时，重新指定
             val new = configList.find { it == old } ?: configList.firstOrNull()
-            if (new != old && new != null) {
-                currentApk.value = new
-                currentAppFlow.tryEmit(new.applicationId)
+            if (new != null) {
+                updateCurrent(new)
             }
         }
     }
 
-    fun getCurrentApk(): State<ApkDesc?> = currentApk
+    fun getApkVM(): ApkPageState? = apkPageState
 
-    fun getApkList(): State<List<ApkDesc>> = apkList
+    fun getCurrentApk(): State<ApkConfig?> = currentApk
 
-    fun updateCurrent(apkDesc: ApkDesc) {
-        currentApk.value = apkDesc
+    fun getApkList(): State<List<ApkConfig>> = apkList
+
+    fun updateCurrent(apkDesc: ApkConfig) {
+        val old = currentApk.value
+        if (old != apkDesc) {
+            currentApk.value = apkDesc
+            apkPageState?.clear()
+            apkPageState = ApkPageState(apkDesc)
+        }
     }
+
+
 
 
     fun deleteCurrent(finish: suspend () -> Unit) {
@@ -66,6 +70,7 @@ class HomePageVM : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        apkPageState?.clear()
         AppLogger.info(LOG_TAG, "clear")
 
     }

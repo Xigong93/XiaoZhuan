@@ -2,8 +2,6 @@ package apk.dispatcher.page.home
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.AtomicReference
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import apk.dispatcher.AppPath
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
@@ -17,22 +15,19 @@ import apk.dispatcher.util.FileSelector
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.getApkInfo
 import apk.dispatcher.widget.Toast
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.*
 import java.io.File
 
-class ApkVM : ViewModel() {
+class ApkPageState(val apkConfig: ApkConfig) {
 
-    val updateDesc = mutableStateOf("")
-
-    private val configDao = ApkConfigDao()
+    private val scope = MainScope()
 
     private val apkDirState = mutableStateOf<File?>(null)
 
     private val apkInfoState = mutableStateOf<ApkInfo?>(null)
 
-    val apkConfigState = mutableStateOf<ApkConfig?>(null)
+    val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
+
 
     val channels: List<ChannelTask> = ChannelRegistry.channels
 
@@ -51,21 +46,12 @@ class ApkVM : ViewModel() {
 
     var lastUpdateMarketStateTime = 0L
 
-    private var apkConfig: ApkConfig? = null
-
 
     init {
         AppLogger.info(LOG_TAG, "init")
+        loadMarketState()
     }
 
-    fun loadApkConfig(appId: String) {
-        viewModelScope.launch {
-            apkConfig = configDao.getConfig(appId)
-            apkConfigState.value = apkConfig
-            updateDesc.value = apkConfig?.extension?.updateDesc ?: ""
-            loadMarketState()
-        }
-    }
 
     fun getApkDirState(): State<File?> = apkDirState
 
@@ -75,7 +61,7 @@ class ApkVM : ViewModel() {
         return try {
             val apkFile = if (dir.isDirectory) AppPath.listApk(dir).first() else dir
             taskLaunchers.forEach {
-                it.setChannelParam(apkConfig?.channels ?: emptyList())
+                it.setChannelParam(apkConfig.channels)
                 it.selectFile(dir)
             }
             apkInfoState.value = getApkInfo(apkFile)
@@ -97,7 +83,7 @@ class ApkVM : ViewModel() {
         AppLogger.info(LOG_TAG, "更新应用市场审核状态")
         lastUpdateMarketStateTime = System.currentTimeMillis()
         val apkConfig = requireNotNull(apkConfig)
-        viewModelScope.launch {
+        scope.launch {
             loadingMarkState = true
             supervisorScope {
                 taskLaunchers.forEach {
@@ -125,14 +111,13 @@ class ApkVM : ViewModel() {
 
 
     private fun updateApkConfig() {
-        val updateDesc = requireNotNull(updateDesc.value).trim()
-        val apkDir = requireNotNull(apkDirState.value)
-        val apkConfig = requireNotNull(apkConfig)
+        val updateDesc = updateDesc.value.trim()
+        val apkDir = apkDirState.value ?: return
         val newExtension = apkConfig.extension.copy(
             apkDir = apkDir.absolutePath,
             updateDesc = updateDesc
         )
-        viewModelScope.launch {
+        scope.launch {
             val configDao = ApkConfigDao()
             try {
                 configDao.saveConfig(apkConfig.copy(extension = newExtension))
@@ -146,7 +131,7 @@ class ApkVM : ViewModel() {
      * 获取上一次选择的Apk文件或目录
      */
     private fun getLastApkDir(): File? {
-        val apkFile = apkConfig?.extension?.apkDir ?: return null
+        val apkFile = apkConfig.extension.apkDir ?: return null
         return File(apkFile).takeIf { it.exists() }
     }
 
@@ -235,7 +220,7 @@ class ApkVM : ViewModel() {
         }
         updateApkConfig()
         return UploadParam(
-            appId = apkConfig?.applicationId ?: "",
+            appId = apkConfig.applicationId,
             updateDesc = updateDesc,
             channels = channels,
             apkFile = file.absolutePath
@@ -250,7 +235,7 @@ class ApkVM : ViewModel() {
 
 
     fun selectedApkDir() {
-        viewModelScope.launch {
+        scope.launch {
             val dir = FileSelector.selectedDir(getLastApkDir())
             if (dir != null && !parseApkFile(dir)) {
                 Toast.show("无效目录,未包含有效的Apk文件")
@@ -260,7 +245,7 @@ class ApkVM : ViewModel() {
 
 
     fun selectApkFile() {
-        viewModelScope.launch {
+        scope.launch {
             val file = FileSelector.selectedFile(getLastApkDir(), "*.apk", listOf("apk"))
             if (file != null && !parseApkFile(file)) {
                 Toast.show("无效的Apk文件")
@@ -268,10 +253,12 @@ class ApkVM : ViewModel() {
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        AppLogger.info(LOG_TAG, "clear ${apkConfig?.applicationId}")
+
+    fun clear() {
+        if (scope.isActive) scope.cancel()
+        AppLogger.info(LOG_TAG, "clear ${apkConfig.applicationId}")
     }
+
 
     companion object {
         private const val LOG_TAG = "应用界面"

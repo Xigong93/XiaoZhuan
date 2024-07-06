@@ -11,7 +11,7 @@ fun ApkConfigDao(): ApkConfigDao {
 }
 
 interface ApkConfigDao {
-    suspend fun getApkList(): List<ApkDesc>
+    suspend fun getApkList(): List<ApkConfig>
 
     suspend fun getConfig(id: String): ApkConfig?
 
@@ -27,10 +27,10 @@ private class ApkConfigDaoImpl : ApkConfigDao {
 
     private val jsonAdapter by lazy { ApkConfig.adapter }
 
-    override suspend fun getApkList(): List<ApkDesc> = withContext(Dispatchers.IO) {
+    override suspend fun getApkList(): List<ApkConfig> = withContext(Dispatchers.IO) {
         val files = AppPath.getApkDir().listFiles() ?: emptyArray()
         files.filter { it.name.endsWith(FILE_SUFFIX) }
-            .mapNotNull(::readApkDesc)
+            .mapNotNull(::readApkConfig)
             .sortedBy { it.createTime }
     }
 
@@ -61,7 +61,7 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     override suspend fun isEmpty(): Boolean = withContext(Dispatchers.IO) {
         val files = AppPath.getApkDir().listFiles() ?: emptyArray()
         val file = files.firstOrNull { it.name.endsWith(FILE_SUFFIX) }
-        file == null || readApkDesc(file) === null
+        file == null || readApkConfig(file) === null
     }
 
     private fun readApkConfig(file: File): ApkConfig? {
@@ -74,15 +74,6 @@ private class ApkConfigDaoImpl : ApkConfigDao {
         }
     }
 
-    private fun readApkDesc(file: File): ApkDesc? {
-        return try {
-            val json = file.readText(charset = Charsets.UTF_8)
-            ApkDesc.adapter.fromJson(json)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
 
     private fun writeApkConfig(file: File, apkConfig: ApkConfig) {
         val json = jsonAdapter.toJson(apkConfig)

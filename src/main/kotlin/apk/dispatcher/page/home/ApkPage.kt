@@ -7,13 +7,11 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.page.upload.UploadParam
 import apk.dispatcher.style.AppColors
@@ -23,23 +21,17 @@ import apk.dispatcher.widget.UpdateDescView
 
 
 @Composable
-fun ApkPage(appId: String, startUpload:(UploadParam)->Unit) {
-    val apkVM = viewModel { ApkVM() }
-    LaunchedEffect(true) {
-        apkVM.loadApkConfig(appId)
-    }
-    val apkConfig = apkVM.apkConfigState.value
-    if (apkConfig != null) {
-        TwoPage(
-            leftPage = { LeftPage(apkConfig, apkVM) },
-            rightPage = { ChannelGroup(apkVM, startUpload) },
-        )
-    }
+fun ApkPage(apkVM: ApkPageState, startUpload: (UploadParam) -> Unit) {
+    val apkConfig = apkVM.apkConfig
+    TwoPage(
+        leftPage = { LeftPage(apkConfig, apkVM) },
+        rightPage = { ChannelGroup(apkVM, startUpload) },
+    )
 }
 
 
 @Composable
-private fun ColumnScope.LeftPage(apkConfig: ApkConfig, viewModel: ApkVM) {
+private fun ColumnScope.LeftPage(apkConfig: ApkConfig, viewModel: ApkPageState) {
     val dividerHeight = 30.dp
     Section("Apk信息") {
         ApkInfoBox(apkConfig)

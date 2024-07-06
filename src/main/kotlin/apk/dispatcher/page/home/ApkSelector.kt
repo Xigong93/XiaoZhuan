@@ -16,13 +16,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import apk.dispatcher.config.ApkDesc
+import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 
 
 @Composable
-fun ApkSelector(apks: List<ApkDesc>, current: ApkDesc, onSelected: (ApkDesc) -> Unit) {
+fun ApkSelector(apks: List<ApkConfig>, current: ApkConfig, onSelected: (ApkConfig) -> Unit) {
     var showApkMenu by remember { mutableStateOf(false) }
     Column {
         val width = 180.dp

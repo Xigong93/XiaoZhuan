@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
  * 渠道页面
  */
 @Composable
-fun ChannelGroup(viewModel: ApkVM, startUpload:(UploadParam)->Unit) {
+fun ChannelGroup(viewModel: ApkPageState, startUpload:(UploadParam)->Unit) {
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(20.dp)
@@ -155,7 +155,7 @@ fun ChannelGroup(viewModel: ApkVM, startUpload:(UploadParam)->Unit) {
     }
 }
 
-private fun tryReloadMarketState(viewModel: ApkVM) {
+private fun tryReloadMarketState(viewModel: ApkPageState) {
     // 控制刷新频率，防止应用市场接口限流
     val diff =
         (System.currentTimeMillis() - viewModel.lastUpdateMarketStateTime).milliseconds
@@ -170,7 +170,7 @@ private fun tryReloadMarketState(viewModel: ApkVM) {
 
 
 @Composable
-private fun showConfirmDialog(viewModel: ApkVM, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+private fun showConfirmDialog(viewModel: ApkPageState, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     val apkInfo = viewModel.getApkInfoState().value ?: return
     val selectedChannels = viewModel.selectedChannels
     val message = buildString {

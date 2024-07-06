@@ -17,7 +17,7 @@ suspend fun <R> AppLogger.action(tag: String, action: String, black: suspend () 
         info(tag, "$action 成功")
         debug(tag, "$action 结果:$result")
         return result
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         error(tag, "$action 失败", e)
         throw e
     }
@@ -30,7 +30,7 @@ fun <R> AppLogger.actionSync(tag: String, action: String, black: () -> R): R {
         info(tag, "$action 成功")
         debug(tag, "$action 结果:$result")
         return result
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         error(tag, "$action 失败", e)
         throw e
     }

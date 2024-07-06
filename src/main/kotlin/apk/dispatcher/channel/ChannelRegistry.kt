@@ -18,13 +18,9 @@ object ChannelRegistry {
 
     private val mockChannels: List<ChannelTask> = listOf(
         MockChannelTask("华为", "HUAWEI"),
-//        MockChannelTask("小米1", "MI1"),
-//        MockChannelTask("小米2", "MI2"),
-//        MockChannelTask("小米3", "MI3"),
-//        MockChannelTask("小米4", "MI4"),
-//        MockChannelTask("小米5", "MI5"),
-//        MockChannelTask("小米6", "MI6"),
-//        MockChannelTask("小米7", "MI7"),
+        MockChannelTask("小米", "MI"),
+        MockChannelTask("OPPO", "OPPO"),
+        MockChannelTask("VIVO", "VIVO"),
     )
 
     val channels: List<ChannelTask> = realChannels

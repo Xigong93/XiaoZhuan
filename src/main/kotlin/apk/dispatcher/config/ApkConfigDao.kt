@@ -1,8 +1,8 @@
 package apk.dispatcher.config
 
 import apk.dispatcher.AppPath
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 private val instance by lazy { ApkConfigDaoImpl() }
@@ -11,33 +11,32 @@ fun ApkConfigDao(): ApkConfigDao {
 }
 
 interface ApkConfigDao {
-    fun getConfigList(): List<ApkConfig>
+    suspend fun getApkList(): List<ApkDesc>
 
-    fun getConfig(id: String): ApkConfig?
+    suspend fun getConfig(id: String): ApkConfig?
 
     @Throws
-    fun saveConfig(apkConfig: ApkConfig)
+    suspend fun saveConfig(apkConfig: ApkConfig)
 
-    fun removeConfig(apkConfig: ApkConfig)
+    suspend fun removeConfig(appId: String)
+
+    suspend fun isEmpty(): Boolean
 }
 
 private class ApkConfigDaoImpl : ApkConfigDao {
 
-    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val jsonAdapter by lazy { ApkConfig.adapter }
 
-    private val jsonAdapter by lazy { moshi.adapter(ApkConfig::class.java) }
-
-    override fun getConfigList(): List<ApkConfig> {
+    override suspend fun getApkList(): List<ApkDesc> = withContext(Dispatchers.IO) {
         val files = AppPath.getApkDir().listFiles() ?: emptyArray()
-        return files
-            .filter { it.name.endsWith(FILE_SUFFIX) }
-            .mapNotNull(::readApkConfig)
+        files.filter { it.name.endsWith(FILE_SUFFIX) }
+            .mapNotNull(::readApkDesc)
             .sortedBy { it.createTime }
     }
 
-    override fun getConfig(id: String): ApkConfig? {
+    override suspend fun getConfig(id: String): ApkConfig? = withContext(Dispatchers.IO) {
         val file = File(AppPath.getApkDir(), "${id}$FILE_SUFFIX")
-        return if (file.exists()) {
+        if (file.exists()) {
             readApkConfig(file)
         } else {
             null
@@ -45,20 +44,40 @@ private class ApkConfigDaoImpl : ApkConfigDao {
     }
 
     @Throws
-    override fun saveConfig(apkConfig: ApkConfig) {
+    override suspend fun saveConfig(apkConfig: ApkConfig) = withContext(Dispatchers.IO) {
         writeApkConfig(apkConfig.file, apkConfig)
     }
 
-    override fun removeConfig(apkConfig: ApkConfig) {
-        val bakFile = File(apkConfig.file.absolutePath + ".bak")
-        if (bakFile.exists()) bakFile.delete()
-        apkConfig.file.renameTo(bakFile)
+    override suspend fun removeConfig(appId: String) = withContext(Dispatchers.IO) {
+        val file = File(AppPath.getApkDir(), "${appId}$FILE_SUFFIX")
+        if (file.exists()) {
+            val bakFile = File(file.absolutePath + ".bak")
+            if (bakFile.exists()) bakFile.delete()
+            file.renameTo(bakFile)
+        }
+        Unit
+    }
+
+    override suspend fun isEmpty(): Boolean = withContext(Dispatchers.IO) {
+        val files = AppPath.getApkDir().listFiles() ?: emptyArray()
+        val file = files.firstOrNull { it.name.endsWith(FILE_SUFFIX) }
+        file == null || readApkDesc(file) === null
     }
 
     private fun readApkConfig(file: File): ApkConfig? {
         return try {
             val json = file.readText(charset = Charsets.UTF_8)
             jsonAdapter.fromJson(json)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun readApkDesc(file: File): ApkDesc? {
+        return try {
+            val json = file.readText(charset = Charsets.UTF_8)
+            ApkDesc.adapter.fromJson(json)
         } catch (e: Exception) {
             e.printStackTrace()
             null

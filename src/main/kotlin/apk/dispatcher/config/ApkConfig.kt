@@ -1,5 +1,6 @@
 package apk.dispatcher.config
 
+import apk.dispatcher.MoshiFactory
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -29,6 +30,13 @@ data class ApkConfig(
 
     fun getChannel(name: String): Channel? {
         return channels.firstOrNull { it.name == name }
+    }
+
+    /**
+     * 渠道是否启用
+     */
+    fun channelEnable(name: String): Boolean {
+        return getChannel(name)?.enable == true
     }
 
     /**
@@ -68,4 +76,8 @@ data class ApkConfig(
         @Json(name = "apkDir")
         val apkDir: String? = null
     )
+
+    companion object {
+        val adapter = MoshiFactory.getAdapter<ApkConfig>()
+    }
 }

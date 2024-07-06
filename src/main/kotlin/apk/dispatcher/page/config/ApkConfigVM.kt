@@ -3,19 +3,32 @@ package apk.dispatcher.page.config
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.widget.Toast
+import kotlinx.coroutines.launch
 
 class ApkConfigVM(
-    private val originApk: ApkConfig?,
+    private val appId: String?
+) : ViewModel() {
+
+    private val configDao = ApkConfigDao()
+
     private val channels: List<ChannelTask> = ChannelRegistry.channels
 
-) {
-    var apkConfigState by mutableStateOf(createApkConfig(originApk))
+
+    var apkConfigState by mutableStateOf(createApkConfig(null))
+
+    init {
+        viewModelScope.launch {
+            apkConfigState = createApkConfig(configDao.getConfig(appId ?: ""))
+        }
+    }
 
     fun updateChannel(channel: ApkConfig.Channel) {
         apkConfigState = apkConfigState.copy(channels = apkConfigState.channels.map {
@@ -26,9 +39,8 @@ class ApkConfigVM(
     /**
      * 保存配置
      */
-    fun saveApkConfig(): Boolean {
+    suspend fun saveApkConfig(): Boolean {
         val apkConfig = apkConfigState
-        val apkConfigDao = ApkConfigDao()
         val appName = apkConfig.name.trim()
         if (appName.isEmpty()) {
             Toast.show("请输入App名称")
@@ -54,8 +66,8 @@ class ApkConfigVM(
         AppLogger.debug(LOG_TAG, "保存配置:${apkConfig}")
         try {
             // 先删除原来的，避免修改了包名，导致有两个配置
-            originApk?.let { apkConfigDao.removeConfig(it) }
-            apkConfigDao.saveConfig(apkConfig)
+            configDao.removeConfig(appId ?: "")
+            configDao.saveConfig(apkConfig)
             return true
         } catch (e: Exception) {
             AppLogger.error(LOG_TAG, "保存Apk配置失败", e)
@@ -97,4 +109,6 @@ class ApkConfigVM(
     companion object {
         private const val LOG_TAG = "Apk配置"
     }
+
+
 }

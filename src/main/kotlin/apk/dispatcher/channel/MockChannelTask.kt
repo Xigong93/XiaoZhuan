@@ -22,14 +22,15 @@ class MockChannelTask(
     override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
         AppLogger.info(LOG_TAG, "Mock ${channelName},开始上传")
         repeat(100) {
-            delay(100)
+            delay(30)
             progress(it)
         }
         AppLogger.info(LOG_TAG, "Mock ${channelName},上传完成")
     }
 
     override suspend fun getMarketState(applicationId: String): MarketState {
-        TODO("Not yet implemented")
+        delay(1000)
+        return MarketState(ReviewState.Online, lastVersionCode = 100, lastVersionName = "1.1.0")
     }
 
     companion object {

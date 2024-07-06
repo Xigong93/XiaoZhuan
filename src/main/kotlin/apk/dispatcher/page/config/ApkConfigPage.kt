@@ -7,12 +7,17 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
@@ -20,6 +25,19 @@ import apk.dispatcher.page.Page
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.VerticalTabBar
 import kotlinx.coroutines.launch
+
+fun NavController.showApkConfigPage(appId: String?) {
+    navigate("edit?id=${appId ?: ""}")
+}
+
+//@ExperimentalFoundationApi
+//@Composable
+//fun NavGraphBuilder.ApkConfigPage(navController: NavController) {
+//    composable(route = "edit?id={id}") {
+//        val id = it.arguments?.getString("id")
+//        ApkConfigPage(navController, id)
+//    }
+//}
 
 /**
  * 配置页面
@@ -30,11 +48,7 @@ fun ApkConfigPage(
     navController: NavController,
     appId: String? = null,
 ) {
-    val viewModel = remember {
-        val apkConfig = appId?.let { ApkConfigDao().getConfig(it) }
-        ApkConfigVM(apkConfig)
-    }
-
+    val viewModel = viewModel { ApkConfigVM(appId) }
     val channels = ChannelRegistry.channels
     val titles = remember { listOf("基本信息") + channels.map { it.channelName } }
     val pageState = rememberPagerState(pageCount = { titles.size })
@@ -64,8 +78,10 @@ fun ApkConfigPage(
             }
             BottomButtons(
                 onSaveClick = {
-                    if (viewModel.saveApkConfig()) {
-                        navController.popBackStack()
+                    scope.launch {
+                        if (viewModel.saveApkConfig()) {
+                            navController.popBackStack()
+                        }
                     }
                 }, onCloseClick = {
                     navController.popBackStack()

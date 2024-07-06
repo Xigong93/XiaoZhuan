@@ -8,7 +8,6 @@ import apk.dispatcher.log.action
 import java.io.File
 
 class TaskLauncher(
-    private val apkConfig: ApkConfig,
     private val task: ChannelTask
 ) {
 
@@ -16,12 +15,19 @@ class TaskLauncher(
 
     private val stateListener = SubmitStateAdapter(::updateState)
 
+    private var channelParams: List<ApkConfig.Channel> = emptyList()
+
     private val apkFileState: MutableState<File?> = mutableStateOf(null)
 
     private val submitState: MutableState<SubmitState?> = mutableStateOf(null)
 
+
     private val marketState: MutableState<Result<MarketState>?> = mutableStateOf(null)
 
+    fun setChannelParam(channelParams: List<ApkConfig.Channel>) {
+        this.channelParams = channelParams
+
+    }
 
     fun selectFile(apkDir: File) {
         val apkFile = if (apkDir.isDirectory) findApkFile(apkDir) else apkDir
@@ -34,14 +40,14 @@ class TaskLauncher(
 
     suspend fun startSubmit(updateDesc: String) {
         val apkFile = requireNotNull(apkFileState.value)
-        AppLogger.debug(task.channelName, "参数:${getParams()}")
+//        AppLogger.debug(task.channelName, "参数:${getParams()}")
         task.init(getParams())
         task.setSubmitStateListener(stateListener)
         task.startUpload(apkFile, updateDesc)
     }
 
     suspend fun loadMarketState(applicationId: String) {
-        AppLogger.debug(task.channelName, "参数:${getParams()}")
+//        AppLogger.debug(task.channelName, "参数:${getParams()}")
         task.init(getParams())
         marketState.value = runCatching {
             AppLogger.action(task.channelName, "获取应用市场状态:$applicationId") {
@@ -58,7 +64,7 @@ class TaskLauncher(
     fun getMarketState(): State<Result<MarketState>?> = marketState
 
     private fun getParams(): Map<ChannelTask.Param, String?> {
-        val channelParams = apkConfig.channels.associateBy { it.name }
+        val channelParams = channelParams.associateBy { it.name }
         val saveParams = channelParams[task.channelName]?.params
         val getParam = { p: ChannelTask.Param -> saveParams?.firstOrNull { it.name == p.name }?.value }
         return task.getParams().associateWith { p -> getParam(p) }
@@ -66,7 +72,7 @@ class TaskLauncher(
 
     private fun findApkFile(apkDir: File): File {
         val apks = AppPath.listApk(apkDir)
-        val fileId = apkConfig.getChannel(name)
+        val fileId = channelParams.firstOrNull() { it.name == name }
             ?.getParam(ChannelTask.FILE_NAME_IDENTIFY)
             ?.value
             ?: task.fileNameIdentify

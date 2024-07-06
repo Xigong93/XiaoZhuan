@@ -5,64 +5,80 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import apk.dispatcher.config.ApkConfig
+import apk.dispatcher.page.upload.UploadParam
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.widget.Section
-import apk.dispatcher.widget.Toast
 import apk.dispatcher.widget.TwoPage
 import apk.dispatcher.widget.UpdateDescView
-import javax.swing.JFileChooser
-import javax.swing.JFileChooser.*
-import javax.swing.filechooser.FileNameExtensionFilter
 
 
 @Composable
-fun ApkPage(apkConfig: ApkConfig) {
-    val apkViewModel = remember(apkConfig) { ApkViewModel(apkConfig) }
-    TwoPage(
-        leftPage = { LeftPage(apkViewModel) },
-        rightPage = { ChannelGroupPage(apkViewModel) },
-    )
+fun ApkPage(appId: String, startUpload:(UploadParam)->Unit) {
+    val apkVM = viewModel { ApkVM() }
+    LaunchedEffect(true) {
+        apkVM.loadApkConfig(appId)
+    }
+    val apkConfig = apkVM.apkConfigState.value
+    if (apkConfig != null) {
+        TwoPage(
+            leftPage = { LeftPage(apkConfig, apkVM) },
+            rightPage = { ChannelGroup(apkVM, startUpload) },
+        )
+    }
 }
 
 
 @Composable
-private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
+private fun ColumnScope.LeftPage(apkConfig: ApkConfig, viewModel: ApkVM) {
     val dividerHeight = 30.dp
     Section("Apk信息") {
-        ApkInfoBox(viewModel)
+        ApkInfoBox(apkConfig)
     }
     Spacer(Modifier.height(dividerHeight))
     Section("选择文件") {
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(AppColors.cardBackground)
+                .padding(16.dp)
+        ) {
+            val apkInfo = viewModel.getApkInfoState().value
+            val version = apkInfo?.versionName?.let { "v${it}" }
+            val apkPath = viewModel.getApkDirState().value?.path ?: ""
+            item("文件:", apkPath ?: "")
+            Spacer(Modifier.height(12.dp))
+            item("版本:", version ?: "")
+
+            Spacer(Modifier.height(12.dp))
+            item("大小:", viewModel.getFileSize())
+        }
+        Spacer(Modifier.height(12.dp))
         Button(
             colors = ButtonDefaults.outlinedButtonColors(
                 backgroundColor = AppColors.primary,
             ),
             onClick = {
-                if (viewModel.apkConfig.enableChannel) {
+                if (apkConfig.enableChannel) {
                     viewModel.selectedApkDir()
                 } else {
                     viewModel.selectApkFile()
                 }
             }) {
-            val text = if (viewModel.apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
+            val text = if (apkConfig.enableChannel) "选择Apk文件夹" else "选择Apk文件"
             Text(text, color = Color.White, fontSize = 14.sp)
         }
-        val apkPath = viewModel.getApkDirState().value?.path ?: ""
-        if (apkPath.isNotEmpty()) {
-            Spacer(Modifier.height(10.dp))
-            Text(apkPath, color = AppColors.fontGray, fontSize = 12.sp)
-        }
+
     }
     Spacer(Modifier.height(dividerHeight))
     Section("更新描述") {
@@ -72,28 +88,19 @@ private fun ColumnScope.LeftPage(viewModel: ApkViewModel) {
 
 
 @Composable
-private fun ApkInfoBox(apkViewModel: ApkViewModel) {
+private fun ApkInfoBox(apkConfig: ApkConfig) {
     Column(
-        modifier = Modifier.width(300.dp)
+        modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(AppColors.cardBackground)
             .padding(16.dp)
     ) {
-        val apkInfo = apkViewModel.getApkInfoState().value
-        val version = apkInfo?.versionName?.let { "v${it}" }
-        val applicationId = apkInfo?.applicationId ?: ""
-        item("名称:", apkViewModel.apkConfig.name)
+
+        item("名称:", apkConfig.name)
         Spacer(Modifier.height(12.dp))
-
-        item("包名:", applicationId)
-
+        item("包名:", apkConfig.applicationId)
         Spacer(Modifier.height(12.dp))
-
-        item("版本:", version ?: "")
-
-        Spacer(Modifier.height(12.dp))
-        item("大小:", apkViewModel.getFileSize())
-
+        item("渠道包:", if (apkConfig.enableChannel) "是" else "否")
     }
 }
 

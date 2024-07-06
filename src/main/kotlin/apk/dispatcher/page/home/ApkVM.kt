@@ -2,36 +2,39 @@ package apk.dispatcher.page.home
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.AtomicReference
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import apk.dispatcher.AppPath
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.channel.SubmitState
 import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.log.AppLogger
+import apk.dispatcher.page.upload.UploadParam
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.FileSelector
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.getApkInfo
 import apk.dispatcher.widget.Toast
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import java.io.File
 
-class ApkViewModel(
-    val apkConfig: ApkConfig
-) {
+class ApkVM : ViewModel() {
 
-    private val mainScope = MainScope()
+    val updateDesc = mutableStateOf("")
 
-    val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
+    private val configDao = ApkConfigDao()
 
     private val apkDirState = mutableStateOf<File?>(null)
 
     private val apkInfoState = mutableStateOf<ApkInfo?>(null)
 
-    val channels: List<ChannelTask> =
-        ChannelRegistry.channels.filter { apkConfig.getChannel(it.channelName)?.enable == true }
+    val apkConfigState = mutableStateOf<ApkConfig?>(null)
+
+    val channels: List<ChannelTask> = ChannelRegistry.channels
 
     /**
      * 选中的Channel
@@ -43,17 +46,26 @@ class ApkViewModel(
      */
     var loadingMarkState by mutableStateOf(false)
 
-    val taskLaunchers: List<TaskLauncher> = channels.map { TaskLauncher(apkConfig, it) }
+    val taskLaunchers: List<TaskLauncher> = channels.map(::TaskLauncher)
 
 
     var lastUpdateMarketStateTime = 0L
 
-    var submitJob: Job? = null
+    private var apkConfig: ApkConfig? = null
+
 
     init {
-        loadMarketState()
+        AppLogger.info(LOG_TAG, "init")
     }
 
+    fun loadApkConfig(appId: String) {
+        viewModelScope.launch {
+            apkConfig = configDao.getConfig(appId)
+            apkConfigState.value = apkConfig
+            updateDesc.value = apkConfig?.extension?.updateDesc ?: ""
+            loadMarketState()
+        }
+    }
 
     fun getApkDirState(): State<File?> = apkDirState
 
@@ -62,7 +74,10 @@ class ApkViewModel(
     private suspend fun parseApkFile(dir: File): Boolean {
         return try {
             val apkFile = if (dir.isDirectory) AppPath.listApk(dir).first() else dir
-            taskLaunchers.forEach { it.selectFile(dir) }
+            taskLaunchers.forEach {
+                it.setChannelParam(apkConfig?.channels ?: emptyList())
+                it.selectFile(dir)
+            }
             apkInfoState.value = getApkInfo(apkFile)
             apkDirState.value = dir
             updateSelectChannel()
@@ -74,43 +89,6 @@ class ApkViewModel(
         }
     }
 
-    /**
-     * 开始分发
-     */
-    fun startDispatch() {
-        AppLogger.info(LOG_TAG, "开始分发")
-        submitJob?.takeIf { it.isActive }?.cancel()
-        submitJob = mainScope.launch {
-            val launchers = selectedLaunchers()
-            val updateDesc = requireNotNull(updateDesc.value).trim()
-            launchers.forEach {
-                it.prepare()
-            }
-            updateApkConfig()
-            launchers.forEach {
-                it.startSubmit(updateDesc)
-            }
-        }
-    }
-
-    /**
-     * 重试
-     */
-    fun retryDispatch() {
-        AppLogger.info(LOG_TAG, "重试")
-        submitJob?.takeIf { it.isActive }?.cancel()
-        submitJob = mainScope.launch {
-            val launchers = selectedLaunchers().filter { it.getSubmitState().value is SubmitState.Error }
-            val updateDesc = requireNotNull(updateDesc.value).trim()
-            launchers.forEach {
-                it.prepare()
-            }
-            updateApkConfig()
-            launchers.forEach {
-                it.startSubmit(updateDesc)
-            }
-        }
-    }
 
     /**
      * 获取应用市场状态
@@ -118,10 +96,12 @@ class ApkViewModel(
     fun loadMarketState() {
         AppLogger.info(LOG_TAG, "更新应用市场审核状态")
         lastUpdateMarketStateTime = System.currentTimeMillis()
-        mainScope.launch {
+        val apkConfig = requireNotNull(apkConfig)
+        viewModelScope.launch {
             loadingMarkState = true
             supervisorScope {
                 taskLaunchers.forEach {
+                    it.setChannelParam(apkConfig.channels)
                     async { it.loadMarketState(apkConfig.applicationId) }
                 }
             }
@@ -143,35 +123,31 @@ class ApkViewModel(
         }
     }
 
-    /**
-     * 取消分发
-     */
-    fun cancelDispatch() {
-        AppLogger.info(LOG_TAG, "取消分发")
-        submitJob?.takeIf { it.isActive }?.cancel("用户取消")
-    }
-
 
     private fun updateApkConfig() {
         val updateDesc = requireNotNull(updateDesc.value).trim()
         val apkDir = requireNotNull(apkDirState.value)
+        val apkConfig = requireNotNull(apkConfig)
         val newExtension = apkConfig.extension.copy(
             apkDir = apkDir.absolutePath,
             updateDesc = updateDesc
         )
-        val configDao = ApkConfigDao()
-        try {
-            configDao.saveConfig(apkConfig.copy(extension = newExtension))
-        } catch (e: Exception) {
-            AppLogger.error(LOG_TAG, "更新Apk配置失败",e)
+        viewModelScope.launch {
+            val configDao = ApkConfigDao()
+            try {
+                configDao.saveConfig(apkConfig.copy(extension = newExtension))
+            } catch (e: Exception) {
+                AppLogger.error(LOG_TAG, "更新Apk配置失败", e)
+            }
         }
     }
 
     /**
      * 获取上一次选择的Apk文件或目录
      */
-    fun getLastApkDir(): File? {
-        return apkConfig.extension.apkDir?.let { File(it) }?.takeIf { it.exists() }
+    private fun getLastApkDir(): File? {
+        val apkFile = apkConfig?.extension?.apkDir ?: return null
+        return File(apkFile).takeIf { it.exists() }
     }
 
 
@@ -236,26 +212,34 @@ class ApkViewModel(
         }
     }
 
-    fun selectedLaunchers() = taskLaunchers.filter { selectedChannels.contains(it.name) }
-
-    fun checkForm(): Boolean {
-        if (getApkDirState().value == null) {
+    fun startDispatch(): UploadParam? {
+        val file = getApkDirState().value
+        if (file == null) {
             Toast.show("请选择Apk文件")
-            return false
+            return null
         }
-        if (updateDesc.value.isEmpty()) {
+        val updateDesc = updateDesc.value.trim()
+        if (updateDesc.isEmpty()) {
             Toast.show("请输入更新描述")
-            return false
+            return null
         }
-        if (updateDesc.value.length > 300) {
+        if (updateDesc.length > 300) {
             Toast.show("更新描述不可超过300字")
-            return false
+            return null
+
         }
-        if (selectedChannels.isEmpty()) {
+        val channels = selectedChannels
+        if (channels.isEmpty()) {
             Toast.show("请选择渠道")
-            return false
+            return null
         }
-        return true
+        updateApkConfig()
+        return UploadParam(
+            appId = apkConfig?.applicationId ?: "",
+            updateDesc = updateDesc,
+            channels = channels,
+            apkFile = file.absolutePath
+        )
     }
 
     fun getFileSize(): String {
@@ -266,7 +250,7 @@ class ApkViewModel(
 
 
     fun selectedApkDir() {
-        mainScope.launch {
+        viewModelScope.launch {
             val dir = FileSelector.selectedDir(getLastApkDir())
             if (dir != null && !parseApkFile(dir)) {
                 Toast.show("无效目录,未包含有效的Apk文件")
@@ -276,7 +260,7 @@ class ApkViewModel(
 
 
     fun selectApkFile() {
-        mainScope.launch {
+        viewModelScope.launch {
             val file = FileSelector.selectedFile(getLastApkDir(), "*.apk", listOf("apk"))
             if (file != null && !parseApkFile(file)) {
                 Toast.show("无效的Apk文件")
@@ -284,7 +268,14 @@ class ApkViewModel(
         }
     }
 
-    companion object {
-        private const val LOG_TAG = "应用市场提交"
+    override fun onCleared() {
+        super.onCleared()
+        AppLogger.info(LOG_TAG, "clear ${apkConfig?.applicationId}")
     }
+
+    companion object {
+        private const val LOG_TAG = "应用界面"
+    }
+
+
 }

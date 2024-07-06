@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -14,25 +16,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.page.upload.UploadParam
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
-import apk.dispatcher.page.upload.UploadDialog
 import apk.dispatcher.widget.ConfirmDialog
-import apk.dispatcher.widget.Section
 import apk.dispatcher.widget.Toast
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
  * 渠道页面
  */
 @Composable
-fun ChannelGroupPage(viewModel: ApkViewModel) {
+fun ChannelGroup(viewModel: ApkVM, startUpload:(UploadParam)->Unit) {
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(20.dp)
@@ -126,19 +124,16 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
                 )
                 Text("全选")
             }
-            var showUploading by remember { mutableStateOf(false) }
-            if (showUploading) {
-                UploadDialog(viewModel) { showUploading = false }
-            }
-            var showAlert by remember { mutableStateOf(false) }
-            if (showAlert) {
+
+            val uploadState = remember { mutableStateOf<UploadParam?>(null) }
+            val uploadParam = uploadState.value
+            if (uploadParam != null) {
                 showConfirmDialog(viewModel,
                     onConfirm = {
-                        showAlert = false
-                        showUploading = true
+                        startUpload(uploadParam)
+                        uploadState.value = null
                     }, onDismiss = {
-                        showAlert = false
-
+                        uploadState.value = null
                     }
                 )
             }
@@ -146,9 +141,7 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
                 colors = ButtonDefaults.buttonColors(AppColors.primary),
                 modifier = Modifier.align(Alignment.Center),
                 onClick = {
-                    if (viewModel.checkForm()) {
-                        showAlert = true
-                    }
+                    uploadState.value = viewModel.startDispatch()
                 }
             ) {
 
@@ -162,7 +155,7 @@ fun ChannelGroupPage(viewModel: ApkViewModel) {
     }
 }
 
-private fun tryReloadMarketState(viewModel: ApkViewModel) {
+private fun tryReloadMarketState(viewModel: ApkVM) {
     // 控制刷新频率，防止应用市场接口限流
     val diff =
         (System.currentTimeMillis() - viewModel.lastUpdateMarketStateTime).milliseconds
@@ -177,7 +170,7 @@ private fun tryReloadMarketState(viewModel: ApkViewModel) {
 
 
 @Composable
-private fun showConfirmDialog(viewModel: ApkViewModel, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+private fun showConfirmDialog(viewModel: ApkVM, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     val apkInfo = viewModel.getApkInfoState().value ?: return
     val selectedChannels = viewModel.selectedChannels
     val message = buildString {

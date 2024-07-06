@@ -16,12 +16,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.dispatcher.config.ApkDesc
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 
 
 @Composable
-fun ApkSelector(viewModel: HomePageVM) {
+fun ApkSelector(apks: List<ApkDesc>, current: ApkDesc, onSelected: (ApkDesc) -> Unit) {
     var showApkMenu by remember { mutableStateOf(false) }
     Column {
         val width = 180.dp
@@ -40,7 +41,7 @@ fun ApkSelector(viewModel: HomePageVM) {
                 }
                 .padding(12.dp)
         ) {
-            Text(viewModel.currentApk?.name ?: "", fontSize = 14.sp, color = textColor)
+            Text(current.name, fontSize = 14.sp, color = textColor)
             Spacer(Modifier.weight(1f))
             Image(
                 painterResource("arrow_down.png"),
@@ -59,12 +60,19 @@ fun ApkSelector(viewModel: HomePageVM) {
                     .padding(horizontal = 8.dp)
                     .heightIn(max = 400.dp)
             ) {
-                viewModel.apkList.forEach { apk ->
-                    val background = if (apk == viewModel.currentApk) AppColors.auxiliary else Color.Transparent
-                    item(apk.name, modifier = Modifier.background(background)) {
-                        viewModel.currentApk = apk
-                        showApkMenu = false
+                apks.forEach { apk ->
+                    key(apk.applicationId) {
+                        val background = if (apk.applicationId == current.applicationId) {
+                            AppColors.auxiliary
+                        } else {
+                            Color.Transparent
+                        }
+                        item(apk.name, modifier = Modifier.background(background)) {
+                            onSelected(apk)
+                            showApkMenu = false
+                        }
                     }
+
                 }
             }
         }

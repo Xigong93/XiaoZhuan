@@ -23,7 +23,7 @@ import apk.dispatcher.channel.SubmitState
 @Composable
 fun ChannelUploadState(name: String, state: SubmitState, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier.height(100.dp)
+        modifier = Modifier.height(160.dp)
             .clip(RoundedCornerShape(6))
             .background(AppColors.cardBackground)
             .padding(horizontal = 14.dp)

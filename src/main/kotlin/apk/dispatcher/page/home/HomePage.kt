@@ -32,35 +32,8 @@ import apk.dispatcher.widget.Toast
 fun HomePage(navController: NavController) {
     Page {
         val viewModel = viewModel { HomePageVM() }
-        var showConfirmDialog by remember { mutableStateOf(false) }
-        var showMenu by remember { mutableStateOf(false) }
 
-        Content(viewModel, navController) { showMenu = true }
-        if (showMenu) {
-            Menu(navController, viewModel, onClose = {
-                showMenu = false
-            }, onDelete = {
-                showConfirmDialog = true
-            })
-        }
-
-
-        if (showConfirmDialog) {
-            val name = viewModel.getCurrentApk().value?.name
-            ConfirmDialog("确定删除\"${name}\"吗？", onConfirm = {
-                viewModel.deleteCurrent {
-                    if (ApkConfigDao().isEmpty()) {
-                        navController.navigate("start") {
-                            popUpTo("splash")
-                        }
-                    }
-                }
-                Toast.show("${name}已删除")
-                showConfirmDialog = false
-            }, onDismiss = {
-                showConfirmDialog = false
-            })
-        }
+        Content(viewModel, navController)
 
 
         // 这个方法相当于onResume
@@ -89,6 +62,10 @@ private fun Menu(navController: NavController, viewModel: HomePageVM, onClose: (
             override fun onDeleteClick() {
                 onDelete()
             }
+
+            override fun onAboutSoftClick() {
+                navController.navigate("about")
+            }
         }
     }, onDismiss = onClose)
 }
@@ -97,10 +74,29 @@ private fun Menu(navController: NavController, viewModel: HomePageVM, onClose: (
 @Composable
 private fun Content(
     viewModel: HomePageVM,
-    navController: NavController,
-    showMenuClick: () -> Unit
+    navController: NavController
 ) {
     val currentApk = viewModel.getCurrentApk().value
+    var showMenu by remember { mutableStateOf(false) }
+
+    var showConfirmDialog by remember { mutableStateOf(false) }
+
+    if (showConfirmDialog) {
+        val name = viewModel.getCurrentApk().value?.name
+        ConfirmDialog("确定删除\"${name}\"吗？", onConfirm = {
+            viewModel.deleteCurrent {
+                if (ApkConfigDao().isEmpty()) {
+                    navController.navigate("start") {
+                        popUpTo("splash")
+                    }
+                }
+            }
+            Toast.show("${name}已删除")
+            showConfirmDialog = false
+        }, onDismiss = {
+            showConfirmDialog = false
+        })
+    }
 
     Column(Modifier.fillMaxSize()) {
         Row(
@@ -117,15 +113,24 @@ private fun Content(
                 }
             }
             Spacer(Modifier.weight(1f))
-            Image(
-                painterResource("menu.png"),
-                contentDescription = "菜单",
-                modifier = Modifier.size(32.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        showMenuClick()
-                    }
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painterResource("menu.png"),
+                    contentDescription = "菜单",
+                    modifier = Modifier.size(32.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            showMenu = true
+                        }
+                )
+                if (showMenu) {
+                    Menu(navController, viewModel, onClose = {
+                        showMenu = false
+                    }, onDelete = {
+                        showConfirmDialog = true
+                    })
+                }
+            }
         }
         Divider()
         val apkVM = viewModel.getApkVM()

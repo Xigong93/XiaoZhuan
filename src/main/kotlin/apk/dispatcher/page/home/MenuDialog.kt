@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +22,7 @@ import java.io.IOException
 
 @Composable
 fun MenuDialog(listener: MenuDialogListener, onDismiss: () -> Unit) {
-    CursorDropdownMenu(true, onDismissRequest = onDismiss, modifier = Modifier.padding(0.dp)) {
+    DropdownMenu(true, onDismissRequest = onDismiss, modifier = Modifier.padding(0.dp)) {
         Column(modifier = Modifier.width(200.dp)) {
             item("新增") {
                 onDismiss()
@@ -33,14 +34,19 @@ fun MenuDialog(listener: MenuDialogListener, onDismiss: () -> Unit) {
                 listener.onEditClick()
             }
             Divider()
-            item("打开配置") {
+            item("配置文件夹") {
                 onDismiss()
                 openApkDispatchDir()
             }
             Divider()
-            item("删除", color = Color.Red) {
+            item("删除") {
                 onDismiss()
                 listener.onDeleteClick()
+            }
+            Divider()
+            item("关于软件") {
+                onDismiss()
+                listener.onAboutSoftClick()
             }
         }
     }
@@ -65,6 +71,7 @@ interface MenuDialogListener {
     fun onAddClick();
     fun onEditClick()
     fun onDeleteClick()
+    fun onAboutSoftClick()
 }
 
 @Composable

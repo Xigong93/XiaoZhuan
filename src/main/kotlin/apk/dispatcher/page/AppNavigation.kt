@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import apk.dispatcher.page.about.AboutSoftDialog
 import apk.dispatcher.page.config.ApkConfigPage
 import apk.dispatcher.page.home.HomePage
 import apk.dispatcher.page.splash.SplashPage
@@ -48,6 +50,11 @@ fun AppNavigation() {
             val param = it.arguments?.getString("param") ?: ""
             val uploadParam = requireNotNull(UploadParam.adapter.fromJson(param))
             UploadPage(uploadParam) {
+                navController.popBackStack()
+            }
+        }
+        dialog("about") {
+            AboutSoftDialog {
                 navController.popBackStack()
             }
         }

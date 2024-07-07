@@ -1,8 +1,7 @@
 package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.channel.MarketState
-import apk.dispatcher.log.AppLogger
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.util.ApkInfo
 import java.io.File
 
@@ -26,7 +25,7 @@ class OPPOChannelTask : ChannelTask() {
         requireNotNull(marketClient).submit(file, apkInfo, updateDesc, progress)
     }
 
-    override suspend fun getMarketState(applicationId: String): MarketState {
+    override suspend fun getMarketState(applicationId: String): MarketInfo {
         val appInfo = requireNotNull(marketClient).getAppInfo(applicationId)
         return appInfo.toMarketState()
     }

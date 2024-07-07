@@ -1,10 +1,13 @@
 package apk.dispatcher.channel
 
+import apk.dispatcher.BuildConfig
 import apk.dispatcher.channel.honor.HonorChannelTask
 import apk.dispatcher.channel.huawei.HuaweiChannelTask
 import apk.dispatcher.channel.mi.MiChannelTask
 import apk.dispatcher.channel.oppo.OPPOChannelTask
 import apk.dispatcher.channel.vivo.VIVOChannelTask
+
+private const val DEBUG_TASK = false
 
 object ChannelRegistry {
 
@@ -23,7 +26,7 @@ object ChannelRegistry {
         MockChannelTask("VIVO", "VIVO"),
     )
 
-    val channels: List<ChannelTask> = mockChannels
+    val channels: List<ChannelTask> = if (DEBUG_TASK && BuildConfig.debug) mockChannels else realChannels
 
 
     fun getChannel(name: String): ChannelTask? {

@@ -1,7 +1,5 @@
 package apk.dispatcher.channel.honor
 
-import apk.dispatcher.channel.MarketState
-import apk.dispatcher.channel.ReviewState
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

@@ -1,15 +1,14 @@
 package apk.dispatcher.channel
 
-import androidx.compose.runtime.*
-import apk.dispatcher.config.ApkConfig
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import apk.dispatcher.AppPath
+import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.log.AppLogger
-import apk.dispatcher.log.action
 import java.io.File
 
-class TaskLauncher(
-    private val task: ChannelTask
-) {
+class TaskLauncher(private val task: ChannelTask) {
 
     val name = task.channelName
 
@@ -21,8 +20,7 @@ class TaskLauncher(
 
     private val submitState: MutableState<SubmitState?> = mutableStateOf(null)
 
-
-    private val marketState: MutableState<Result<MarketState>?> = mutableStateOf(null)
+    private val marketState: MutableState<MarketState?> = mutableStateOf(null)
 
     fun setChannelParam(channelParams: List<ApkConfig.Channel>) {
         this.channelParams = channelParams
@@ -40,20 +38,32 @@ class TaskLauncher(
 
     suspend fun startSubmit(updateDesc: String) {
         val apkFile = requireNotNull(apkFileState.value)
-//        AppLogger.debug(task.channelName, "参数:${getParams()}")
-        task.init(getParams())
+        initParams()
         task.setSubmitStateListener(stateListener)
         task.startUpload(apkFile, updateDesc)
     }
 
     suspend fun loadMarketState(applicationId: String) {
-//        AppLogger.debug(task.channelName, "参数:${getParams()}")
-        task.init(getParams())
-        marketState.value = runCatching {
-            AppLogger.action(task.channelName, "获取应用市场状态:$applicationId") {
-                task.getMarketState(applicationId)
-            }
+        initParams()
+        val tag = task.channelName
+        val action = "获取应用市场状态:$applicationId"
+        AppLogger.info(tag, "${action}开始")
+        marketState.value = MarketState.Loading
+        marketState.value = try {
+            val info = task.getMarketState(applicationId)
+            AppLogger.info(tag, "${action}成功,${info}")
+            AppLogger.debug(tag, "${action}成功")
+            MarketState.Success(info)
+        } catch (e: Throwable) {
+            AppLogger.error(tag, "${action}失败")
+            MarketState.Error(e)
         }
+    }
+
+    private fun initParams() {
+        val params = getParams()
+//        AppLogger.debug(task.channelName, "参数:${params}")
+        task.init(params)
     }
 
 
@@ -61,7 +71,7 @@ class TaskLauncher(
 
     fun getSubmitState(): State<SubmitState?> = submitState
 
-    fun getMarketState(): State<Result<MarketState>?> = marketState
+    fun getMarketState(): State<MarketState?> = marketState
 
     private fun getParams(): Map<ChannelTask.Param, String?> {
         val channelParams = channelParams.associateBy { it.name }
@@ -103,7 +113,7 @@ private class SubmitStateAdapter(private val updateState: (SubmitState) -> Unit)
         updateState(SubmitState.Success)
     }
 
-    override fun onError(exception: Exception) {
-        updateState(SubmitState.Error("上传失败，请重试"))
+    override fun onError(exception: Throwable) {
+        updateState(SubmitState.Error(exception))
     }
 }

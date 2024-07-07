@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.huawei
 
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.channel.ReviewState
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -43,14 +43,14 @@ data class HWAppInfoResp(
         @Json(name = "onShelfVersionNumber")
         val onShelfVersionNumber: String,
     ) {
-        fun toAppState(): MarketState {
+        fun toAppState(): MarketInfo {
             val reviewState = when (releaseState) {
                 0 -> ReviewState.Online
                 4, 5 -> ReviewState.UnderReview
                 8 -> ReviewState.Rejected
                 else -> ReviewState.Unknown
             }
-            return MarketState(
+            return MarketInfo(
                 reviewState = reviewState,
                 lastVersionName = versionNumber,
                 lastVersionCode = versionCode

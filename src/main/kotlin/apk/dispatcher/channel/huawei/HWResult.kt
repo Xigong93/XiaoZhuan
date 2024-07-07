@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.huawei
 
-import apk.dispatcher.channel.ApiException
+import apk.dispatcher.channel.checkApiSuccess
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -18,12 +18,7 @@ data class HWResult(
     val msg: String
 ) {
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    val isSuccess get() = code == 0
-
-    fun throwOnFail() {
-        if (!isSuccess) {
-            throw ApiException(code, msg)
-        }
+    fun throwOnFail(action: String) {
+        checkApiSuccess(code, 0, action, msg)
     }
 }

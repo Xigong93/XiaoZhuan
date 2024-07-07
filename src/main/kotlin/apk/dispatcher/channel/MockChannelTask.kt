@@ -25,12 +25,14 @@ class MockChannelTask(
             delay(30)
             progress(it)
         }
+        throw ApiException(400, "获取token", "请检测api key")
         AppLogger.info(LOG_TAG, "Mock ${channelName},上传完成")
     }
 
-    override suspend fun getMarketState(applicationId: String): MarketState {
+    override suspend fun getMarketState(applicationId: String): MarketInfo {
         delay(1000)
-        return MarketState(ReviewState.Online, lastVersionCode = 100, lastVersionName = "1.1.0")
+        throw ApiException(400, "获取token", "请检测api key")
+        return MarketInfo(ReviewState.Online, lastVersionCode = 100, lastVersionName = "1.1.0")
     }
 
     companion object {

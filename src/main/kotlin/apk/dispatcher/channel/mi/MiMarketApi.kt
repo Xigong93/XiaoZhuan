@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.mi
 
 import apk.dispatcher.OkHttpFactory
+import apk.dispatcher.channel.checkApiSuccess
 import apk.dispatcher.util.*
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -109,9 +110,10 @@ class MiMarketApi(
         result.checkSuccess("上传Apk")
     }
 
-    private fun JsonObject.checkSuccess(what: String) {
+    private fun JsonObject.checkSuccess(action: String) {
         val code = get("result").asInt
-        check(code == 0) { "${what}失败,${this}" }
+        val message = get("message").asString
+        checkApiSuccess(code, 0, action, message)
     }
 
 

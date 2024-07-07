@@ -5,6 +5,7 @@ import androidx.lifecycle.AtomicReference
 import apk.dispatcher.AppPath
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.channel.ChannelTask
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.config.ApkConfig
 import apk.dispatcher.config.ApkConfigDao
@@ -29,7 +30,7 @@ class ApkPageState(val apkConfig: ApkConfig) {
     val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
 
 
-    val channels: List<ChannelTask> = ChannelRegistry.channels
+    val channels: List<ChannelTask> = ChannelRegistry.channels.filter { apkConfig.channelEnable(it.channelName) }
 
     /**
      * 选中的Channel
@@ -167,13 +168,13 @@ class ApkPageState(val apkConfig: ApkConfig) {
      */
     private fun checkChannelEnableSubmit(channelName: String, message: AtomicReference<String>? = null): Boolean {
         val task = taskLaunchers.firstOrNull { it.name == channelName } ?: return false
-        val marketState = task.getMarketState().value?.getOrNull()
+        val marketInfo = (task.getMarketState().value as? MarketState.Success)?.info
         val apkInfo = getApkInfoState().value
-        if (marketState != null && !marketState.enableSubmit) {
+        if (marketInfo != null && !marketInfo.enableSubmit) {
             message?.set("应用市场审核中，或状态异常，无法上传新版本")
             return false
         }
-        if (apkInfo != null && marketState != null && apkInfo.versionCode <= marketState.lastVersionCode) {
+        if (apkInfo != null && marketInfo != null && apkInfo.versionCode <= marketInfo.lastVersionCode) {
             message?.set("要提交的Apk版本号需大于线上最新版本号")
             return false
         }

@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.honor
 
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.channel.ReviewState
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -27,14 +27,14 @@ data class HonorReviewState(
     val versionName: String,
 ) {
 
-    fun toMarketState(): MarketState {
+    fun toMarketState(): MarketInfo {
         val state = when (auditResult) {
             0 -> ReviewState.UnderReview
             1 -> ReviewState.Online
             2 -> ReviewState.Rejected
             else -> ReviewState.Unknown
         }
-        return MarketState(
+        return MarketInfo(
             state,
             lastVersionCode = versionCode,
             lastVersionName = versionName

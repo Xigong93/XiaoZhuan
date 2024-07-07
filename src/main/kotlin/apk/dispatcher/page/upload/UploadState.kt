@@ -3,11 +3,12 @@ package apk.dispatcher.page.upload
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,8 +18,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.channel.SubmitState
+import apk.dispatcher.widget.ErrorPopup
 
 @Composable
 fun ChannelUploadState(name: String, state: SubmitState, modifier: Modifier = Modifier) {
@@ -40,7 +43,32 @@ fun ChannelUploadState(name: String, state: SubmitState, modifier: Modifier = Mo
                 is SubmitState.Error -> "上传失败"
             }
             Spacer(Modifier.weight(1f))
-            Text(stateDesc, color = AppColors.fontGray, fontSize = 12.sp)
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                Text(stateDesc, color = AppColors.fontGray, fontSize = 12.sp)
+                if (state is SubmitState.Error) {
+                    Row {
+                        var showError by remember { mutableStateOf(false) }
+                        if (showError) {
+                            ErrorPopup(state.exception) {
+                                showError = false
+                            }
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Image(
+                            painterResource("error_info.png"),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(Color.Red),
+                            modifier = Modifier.size(22.dp)
+                                .clickable {
+                                    showError = true
+                                }
+                        )
+                    }
+                }
+            }
+
             Spacer(Modifier.height(10.dp))
         }
         Spacer(Modifier.weight(1f))
@@ -158,6 +186,6 @@ fun UploadStatePreview() {
         UploadState(SubmitState.Processing("处理中"))
         UploadState(SubmitState.Uploading(35))
         UploadState(SubmitState.Success)
-        UploadState(SubmitState.Error("参数错误"))
+        UploadState(SubmitState.Error(RuntimeException("参数错误")))
     }
 }

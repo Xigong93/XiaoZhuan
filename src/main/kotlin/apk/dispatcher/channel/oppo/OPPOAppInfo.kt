@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.oppo
 
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.channel.ReviewState
 import com.google.gson.JsonObject
 
@@ -63,9 +63,9 @@ data class OPPOAppInfo(val obj: JsonObject) {
     val copyrightUrl: String = obj.get("copyright_url")?.asString ?: ""
 
 
-    fun toMarketState(): MarketState {
+    fun toMarketState(): MarketInfo {
         val state = if (reviewStatus == 111) ReviewState.Online else ReviewState.UnderReview
-        return MarketState(
+        return MarketInfo(
             state, true, versionCode, versionName
         )
     }

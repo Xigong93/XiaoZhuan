@@ -26,7 +26,7 @@ object OkHttpFactory {
         .writeTimeout(timeout)
         .build()
 
-    fun default() = if (DEBUG_NETWORK) debugClient() else okHttpClient
+    fun default() = if (DEBUG_NETWORK && BuildConfig.debug) debugClient() else okHttpClient
 }
 
 private fun debugClient(): OkHttpClient {

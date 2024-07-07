@@ -1,7 +1,7 @@
 package apk.dispatcher.channel.mi
 
 import apk.dispatcher.MoshiFactory
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.channel.ReviewState
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
@@ -33,9 +33,9 @@ data class MiAppInfoResp(
         val adapter: JsonAdapter<MiAppInfoResp> = MoshiFactory.getAdapter()
     }
 
-    fun toMarketState(): MarketState {
+    fun toMarketState(): MarketInfo {
         val state = if (updateVersion) ReviewState.Online else ReviewState.UnderReview
-        return MarketState(
+        return MarketInfo(
             reviewState = state,
             enableSubmit = updateVersion,
             lastVersionCode = packageInfo.versionCode,

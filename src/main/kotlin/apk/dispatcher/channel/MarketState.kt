@@ -1,20 +1,8 @@
 package apk.dispatcher.channel
 
-/**
- * APP在应用市场的状态
- */
-data class MarketState(
+sealed class MarketState {
 
-    /** 审核状态 */
-    val reviewState: ReviewState,
-    /** 是否允许提交新版本 */
-    val enableSubmit: Boolean = reviewState == ReviewState.Online || reviewState == ReviewState.Rejected,
-    /**
-     * 最新版本号
-     */
-    val lastVersionCode: Long,
-    /**
-     * 最新版本名称
-     */
-    val lastVersionName: String
-)
+    data object Loading : MarketState()
+    data class Success(val info: MarketInfo) : MarketState()
+    data class Error(val exception: Throwable) : MarketState()
+}

@@ -1,8 +1,7 @@
 package apk.dispatcher.channel.vivo
 
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.channel.MarketState
-import apk.dispatcher.log.AppLogger
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.util.ApkInfo
 import java.io.File
 
@@ -27,7 +26,7 @@ class VIVOChannelTask : ChannelTask() {
 
     }
 
-    override suspend fun getMarketState(applicationId: String): MarketState {
+    override suspend fun getMarketState(applicationId: String): MarketInfo {
         val appDetail = requireNotNull(marketClient).getAppInfo(applicationId)
         return appDetail.toMarketState()
     }

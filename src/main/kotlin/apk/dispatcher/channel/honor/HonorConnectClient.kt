@@ -48,7 +48,7 @@ class HonorConnectClient {
         val token = "Bearer $rawToken"
         val appId = getAppId(token, applicationId)
         val result = connectApi.getReviewState(token, appId)
-        result.throwOnFail()
+        result.throwOnFail("获取审核状态")
         checkNotNull(result.data)
     }
 
@@ -70,7 +70,7 @@ class HonorConnectClient {
         token: String, applicationId: String
     ): String = AppLogger.action(LOG_TAG, "获取AppId") {
         val result = connectApi.getAppId(token, applicationId)
-        result.throwOnFail()
+        result.throwOnFail("获取AppId")
         val appIds = result.data ?: emptyList()
         check(appIds.isNotEmpty())
         appIds.first().appId
@@ -83,7 +83,7 @@ class HonorConnectClient {
         token: String, appId: String
     ): HonorAppInfo = AppLogger.action(LOG_TAG, "获取App信息") {
         val result = connectApi.getAppInfo(token, appId)
-        result.throwOnFail()
+        result.throwOnFail("获取App信息")
         checkNotNull(result.data)
     }
 
@@ -100,7 +100,7 @@ class HonorConnectClient {
             file.name, 100, file.length(), FileUtil.getFileSha256(file)
         )
         val result = connectApi.getUploadUrl(token, appId, listOf(uploadFile))
-        result.throwOnFail()
+        result.throwOnFail("获取Apk上传地址")
         checkNotNull(result.data).first()
     }
 
@@ -126,7 +126,7 @@ class HonorConnectClient {
     ): Unit = AppLogger.action(LOG_TAG, "绑定已上传的apk文件") {
         val fileInfo = HonorBindApkFile(listOf(HonorBindApkFile.Item(url.objectId)))
         val result = connectApi.bindApkFile(token, appId, fileInfo)
-        result.throwOnFail()
+        result.throwOnFail("绑定已上传的apk文件")
     }
 
     /**
@@ -146,7 +146,7 @@ class HonorConnectClient {
         )
         val desc = HonorVersionDesc(listOf(newInfo))
         val result = connectApi.updateVersionDesc(token, appId, desc)
-        result.throwOnFail()
+        result.throwOnFail("修改新版本更新描述")
     }
 
     /**
@@ -157,7 +157,7 @@ class HonorConnectClient {
         appId: String,
     ): Unit = AppLogger.action(LOG_TAG, "提交审核") {
         val result = connectApi.submit(token, appId)
-        result.throwOnFail()
+        result.throwOnFail("提交审核")
     }
 
     companion object {

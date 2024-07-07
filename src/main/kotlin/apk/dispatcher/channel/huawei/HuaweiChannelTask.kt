@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.huawei
 
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.channel.ChannelTask
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
@@ -32,7 +32,7 @@ class HuaweiChannelTask : ChannelTask() {
         }
     }
 
-    override suspend fun getMarketState(applicationId: String): MarketState {
+    override suspend fun getMarketState(applicationId: String): MarketInfo {
         val appInfo = connectClient.getAppInfo(clientId, clientSecret, applicationId)
         AppLogger.info(channelName, "应用市场状态:${appInfo}")
         return appInfo.toAppState()

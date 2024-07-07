@@ -53,11 +53,12 @@ abstract class ChannelTask {
             performUpload(apkFile, apkInfo, updateDesc, ::notifyProgress)
             listener?.onSuccess()
             AppLogger.info(channelName, "提交新版本成功,$apkInfo")
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             AppLogger.error(channelName, "提交新版本失败", e)
             listener?.onError(e)
         }
     }
+
 
     private fun notifyProgress(progress: Int) {
         val listener = submitStateListener
@@ -80,7 +81,7 @@ abstract class ChannelTask {
      * @param applicationId 包名
      */
     @Throws
-    abstract suspend fun getMarketState(applicationId: String): MarketState
+    abstract suspend fun getMarketState(applicationId: String): MarketInfo
 
     /**
      * 声明需要的参数
@@ -131,7 +132,7 @@ abstract class ChannelTask {
 
         fun onSuccess()
 
-        fun onError(exception: Exception)
+        fun onError(exception: Throwable)
     }
 
     companion object {

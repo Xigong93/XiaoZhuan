@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.oppo
 
 import apk.dispatcher.OkHttpFactory
+import apk.dispatcher.channel.checkApiSuccess
 import apk.dispatcher.util.ApkInfo
 import apk.dispatcher.util.ProgressBody
 import apk.dispatcher.util.ProgressChange
@@ -173,9 +174,11 @@ class OPPOMaretApi(
             .build()
     }
 
-    private fun JsonObject.checkSuccess(what: String) {
+    private fun JsonObject.checkSuccess(action: String) {
+        @Suppress("SpellCheckingInspection")
         val code = get("errno").asInt
-        check(code == 0) { "${what}失败,${this}" }
+        val message = get("data")?.asJsonObject?.get("message")?.asString ?: ""
+        checkApiSuccess(code, 0, action, message)
     }
 
 

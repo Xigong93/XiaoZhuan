@@ -1,6 +1,6 @@
 package apk.dispatcher.channel.vivo
 
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.channel.ReviewState
 import com.google.gson.JsonObject
 
@@ -25,14 +25,14 @@ data class VIVOAppInfo(val obj: JsonObject) {
         return "VIVOAppInfo(onlineType=$onlineType)"
     }
 
-    fun toMarketState(): MarketState {
+    fun toMarketState(): MarketInfo {
         val state = when (reviewStatus) {
             2 -> ReviewState.UnderReview
             3 -> ReviewState.Online
             4 -> ReviewState.Rejected
             else -> ReviewState.Unknown
         }
-        return MarketState(reviewState = state, lastVersionCode = versionCode, lastVersionName = versionName)
+        return MarketInfo(reviewState = state, lastVersionCode = versionCode, lastVersionName = versionName)
     }
 
 }

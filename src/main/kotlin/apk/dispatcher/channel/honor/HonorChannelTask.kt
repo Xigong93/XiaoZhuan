@@ -1,7 +1,7 @@
 package apk.dispatcher.channel.honor
 
 import apk.dispatcher.channel.ChannelTask
-import apk.dispatcher.channel.MarketState
+import apk.dispatcher.channel.MarketInfo
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.util.ApkInfo
 import java.io.File
@@ -34,7 +34,7 @@ class HonorChannelTask : ChannelTask() {
         }
     }
 
-    override suspend fun getMarketState(applicationId: String): MarketState {
+    override suspend fun getMarketState(applicationId: String): MarketInfo {
         val appInfo = connectClient.getReviewState(clientId, clientSecret, applicationId)
         AppLogger.info(channelName, "appInfo:$appInfo")
         return appInfo.toMarketState()

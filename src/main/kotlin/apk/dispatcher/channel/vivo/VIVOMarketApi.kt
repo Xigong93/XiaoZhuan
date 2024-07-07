@@ -1,6 +1,7 @@
 package apk.dispatcher.channel.vivo
 
 import apk.dispatcher.OkHttpFactory
+import apk.dispatcher.channel.checkApiSuccess
 import apk.dispatcher.util.FileUtil
 import apk.dispatcher.util.ProgressBody
 import apk.dispatcher.util.ProgressChange
@@ -66,23 +67,24 @@ class VIVOMarketApi(
     /**
      * 提交更新
      */
-    suspend fun submit(apkResult: VIVOApkResult, updateDesc: String,appInfo: VIVOAppInfo) = withContext(Dispatchers.IO) {
-        val params = mapOf(
-            "packageName" to apkResult.packageName,
-            "versionCode" to apkResult.versionCode.toString(),
-            "apk" to apkResult.serialnumber,
-            "fileMd5" to apkResult.fileMd5,
-            "onlineType" to appInfo.onlineType.toString(),
-            "updateDesc" to updateDesc,
-        )
-        val requestUrl = getRequestUrl("app.sync.update.app", params)
-        val request = Request.Builder()
-            .url(requestUrl)
-            .get()
-            .build()
-        val result = okHttpClient.getJsonResult(request)
-        result.checkSuccess("提交更新")
-    }
+    suspend fun submit(apkResult: VIVOApkResult, updateDesc: String, appInfo: VIVOAppInfo) =
+        withContext(Dispatchers.IO) {
+            val params = mapOf(
+                "packageName" to apkResult.packageName,
+                "versionCode" to apkResult.versionCode.toString(),
+                "apk" to apkResult.serialnumber,
+                "fileMd5" to apkResult.fileMd5,
+                "onlineType" to appInfo.onlineType.toString(),
+                "updateDesc" to updateDesc,
+            )
+            val requestUrl = getRequestUrl("app.sync.update.app", params)
+            val request = Request.Builder()
+                .url(requestUrl)
+                .get()
+                .build()
+            val result = okHttpClient.getJsonResult(request)
+            result.checkSuccess("提交更新")
+        }
 
 
     private fun getRequestUrl(method: String, params: Map<String, String>): HttpUrl {
@@ -94,16 +96,19 @@ class VIVOMarketApi(
             .build()
     }
 
-    private fun JsonObject.checkSuccess(what: String) {
+    private fun JsonObject.checkSuccess(action: String) {
         val code = get("code").asInt
-        val subCode = get("subCode").asString
-        check(code == 0 && subCode == "0") { "${what}失败,${this}" }
+        val subCode = get("subCode").asString.toIntOrNull() ?: -1
+        // VIVO 的接口，并没有提供message的字段
+        val message = "请浏览 https://dev.vivo.com.cn/documentCenter/doc/330 对照code码查看信息"
+        checkApiSuccess(code, 0, action, message)
+        checkApiSuccess(subCode, 0, action, message)
     }
 
     private companion object {
         const val DEBUG_DOMAIN = "https://sandbox-developer-api.vivo.com.cn/router/rest"
         const val RELEASE_DOMAIN = "https://developer-api.vivo.com.cn/router/rest"
 
-        val DOMAIN = /*if (BuildConfig.DEBUG) DEBUG_DOMAIN else*/ RELEASE_DOMAIN
+        const val DOMAIN = RELEASE_DOMAIN
     }
 }

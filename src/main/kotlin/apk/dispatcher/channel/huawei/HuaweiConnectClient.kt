@@ -52,7 +52,7 @@ class HuaweiConnectClient {
         val token = "Bearer $rawToken"
         val appId = getAppId(clientId, token, applicationId)
         val appInfo = connectApi.getAppInfo(clientId, token, appId)
-        appInfo.result.throwOnFail()
+        appInfo.result.throwOnFail("获取App信息")
         appInfo.appInfo
     }
 
@@ -64,7 +64,7 @@ class HuaweiConnectClient {
         clientId: String, clientSecret: String
     ): String = AppLogger.action(LOG_TAG, "获取token") {
         val result = connectApi.getToken(HWTokenParams(clientId, clientSecret))
-        result.result?.throwOnFail()
+        result.result?.throwOnFail("获取token")
         checkNotNull(result.token)
     }
 
@@ -75,7 +75,7 @@ class HuaweiConnectClient {
         clientId: String, token: String, applicationId: String
     ): String = AppLogger.action(LOG_TAG, "获取AppId") {
         val result = connectApi.getAppId(clientId, token, applicationId)
-        result.result.throwOnFail()
+        result.result.throwOnFail("获取AppId")
         val appIds = result.list ?: emptyList()
         check(appIds.isNotEmpty())
         appIds.first().id
@@ -91,7 +91,7 @@ class HuaweiConnectClient {
         file: File,
     ): HWUploadUrlResp.UploadUrl = AppLogger.action(LOG_TAG, "获取Apk上传地址") {
         val result = connectApi.getUploadUrl(clientId, token, appId, file.name, file.length())
-        result.result.throwOnFail()
+        result.result.throwOnFail("获取Apk上传地址")
         checkNotNull(result.url)
     }
 
@@ -119,7 +119,7 @@ class HuaweiConnectClient {
         val fileInfo = HWRefreshApk.FileInfo(file.name, url.objectId)
         val params = HWRefreshApk(files = listOf(fileInfo))
         val result = connectApi.bindApkFile(clientId, token, appId, params)
-        result.result.throwOnFail()
+        result.result.throwOnFail("绑定Apk文件")
         check(result.pkgVersion.isNotEmpty())
         result
     }
@@ -141,7 +141,7 @@ class HuaweiConnectClient {
                 throw TimeoutException("检测apk状态超时")
             }
             val result = connectApi.getApkCompileState(clientId, token, appId, file.pkgId)
-            result.result.throwOnFail()
+            result.result.throwOnFail("检测Apk编译状态")
             if (result.pkgStateList.first().isSuccess()) {
                 break
             }
@@ -159,7 +159,7 @@ class HuaweiConnectClient {
     ): Unit = AppLogger.action(LOG_TAG, "修改新版本更新描述") {
         val desc = HWVersionDesc(updateDesc)
         val result = connectApi.updateVersionDesc(clientId, token, appId, desc)
-        result.result.throwOnFail()
+        result.result.throwOnFail("修改新版本更新描述")
     }
 
     /**
@@ -171,7 +171,7 @@ class HuaweiConnectClient {
         appId: String,
     ): Unit = AppLogger.action(LOG_TAG, "提交审核") {
         val result = connectApi.submit(clientId, token, appId)
-        result.result.throwOnFail()
+        result.result.throwOnFail("提交审核")
     }
 
     companion object {

@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,10 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.dispatcher.channel.MarketState
 import apk.dispatcher.page.upload.UploadParam
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 import apk.dispatcher.widget.ConfirmDialog
+import apk.dispatcher.widget.ErrorPopup
 import apk.dispatcher.widget.Toast
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
  * 渠道页面
  */
 @Composable
-fun ChannelGroup(viewModel: ApkPageState, startUpload:(UploadParam)->Unit) {
+fun ChannelGroup(viewModel: ApkPageState, startUpload: (UploadParam) -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(20.dp)
@@ -83,16 +83,7 @@ fun ChannelGroup(viewModel: ApkPageState, startUpload:(UploadParam)->Unit) {
                         val apkFileState = taskLauncher.getApkFileState()
                         val desc = apkFileState.value?.name
                         val marketState = taskLauncher.getMarketState().value
-                        val state = when {
-                            viewModel.loadingMarkState || marketState == null -> "加载中"
-                            marketState.isSuccess -> {
-                                val state = marketState.getOrThrow()
-                                "v${state.lastVersionName} ${state.reviewState.desc}"
-                            }
-
-                            else -> "获取状态失败"
-                        }
-                        ChannelView(selected, name, desc, state) { checked ->
+                        ChannelView(selected, name, desc, marketState) { checked ->
                             viewModel.selectChannel(name, checked)
                         }
                         Spacer(modifier = Modifier.height(15.dp))
@@ -201,7 +192,7 @@ private fun ChannelViewPreview() {
             true,
             name = "华为",
             desc = "星题库-v5.30.0-HUAWEI.apk",
-            state = "v5.2.1 审核中",
+            marketState = null,
             onCheckChange = {})
     }
 }
@@ -211,7 +202,7 @@ private fun ChannelView(
     selected: Boolean,
     name: String,
     desc: String?,
-    state: String,
+    marketState: MarketState?,
     onCheckChange: (Boolean) -> Unit
 ) {
     Row(
@@ -243,12 +234,43 @@ private fun ChannelView(
             color = AppColors.fontGray
         )
         Spacer(modifier = Modifier.weight(1.0f))
+        val state = when (marketState) {
+            null -> ""
+            is MarketState.Loading -> "加载中"
+            is MarketState.Success -> {
+                val info = marketState.info
+                "v${info.lastVersionName} ${info.reviewState.desc}"
+            }
 
+            is MarketState.Error -> {
+                "获取状态失败"
+            }
+        }
         Text(
             state,
             fontSize = 12.sp,
             color = AppColors.fontBlack
         )
+        if (marketState is MarketState.Error) {
+            Row {
+                var showError by remember { mutableStateOf(false) }
+                if (showError) {
+                    ErrorPopup(marketState.exception) {
+                        showError = false
+                    }
+                }
+                Spacer(Modifier.width(8.dp))
+                Image(
+                    painterResource("error_info.png"),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.Red),
+                    modifier = Modifier.size(22.dp)
+                        .clickable {
+                            showError = true
+                        }
+                )
+            }
+        }
     }
 }
 

@@ -12,7 +12,7 @@ sealed class SubmitState {
      */
     data class Uploading(val progress: Int) : SubmitState()
     data object Success : SubmitState()
-    data class Error(val message: String) : SubmitState()
+    data class Error(val exception:Throwable) : SubmitState()
 
     val finish: Boolean get() = this == Success || this is Error
     val success: Boolean get() = this == Success

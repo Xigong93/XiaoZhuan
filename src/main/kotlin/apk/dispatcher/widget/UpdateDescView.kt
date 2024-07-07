@@ -32,6 +32,7 @@ fun UpdateDescView(updateDesc: MutableState<String>) {
     val clearVisible by interactionSource.collectIsHoveredAsState()
     Box(
         modifier = Modifier
+            .fillMaxWidth()
             .hoverable(interactionSource)
 
     ) {
@@ -53,8 +54,8 @@ fun UpdateDescView(updateDesc: MutableState<String>) {
             ),
             modifier = Modifier
                 .focusRequester(focusRequester)
-                .width(360.dp)
-                .height(160.dp)
+                .fillMaxWidth()
+                .height(200.dp)
         )
 
 

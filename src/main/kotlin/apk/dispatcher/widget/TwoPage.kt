@@ -13,12 +13,12 @@ fun TwoPage(
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.fillMaxHeight().weight(1.0f)
+            modifier = Modifier.fillMaxHeight().weight(4.0f)
                 .padding(20.dp),
             content = leftPage
         )
         Column(
-            modifier = Modifier.fillMaxHeight().weight(1.0f)
+            modifier = Modifier.fillMaxHeight().weight(6.0f)
                 .padding(20.dp),
             content = rightPage
         )

@@ -1,5 +1,6 @@
 package apk.dispatcher
 
+import androidx.compose.ui.res.useResource
 import apk.dispatcher.log.AppLogger
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -20,8 +21,7 @@ object BuildConfig {
 }
 
 private fun loadBuildConfig(): JsonObject {
-    val loader = Thread.currentThread().contextClassLoader
-    val stream = loader.getResourceAsStream("BuildConfig.json")
-    requireNotNull(stream) { "找不到BuildConfig.json" }
-    return stream.reader().use { Gson().fromJson(it, JsonObject::class.java) }
+    return useResource("BuildConfig.json") {
+        Gson().fromJson(it.reader(), JsonObject::class.java)
+    }
 }

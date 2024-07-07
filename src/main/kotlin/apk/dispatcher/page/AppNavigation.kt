@@ -6,15 +6,16 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.page.about.AboutSoftDialog
 import apk.dispatcher.page.config.ApkConfigPage
 import apk.dispatcher.page.home.HomePage
-import apk.dispatcher.page.splash.SplashPage
 import apk.dispatcher.page.start.StartPage
 import apk.dispatcher.page.upload.UploadPage
 import apk.dispatcher.page.upload.UploadParam
@@ -26,16 +27,13 @@ fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "splash",
+        startDestination = "start",
         enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
         modifier = Modifier.fillMaxSize().background(AppColors.pageBackground),
     ) {
-        composable(route = "splash") {
-            SplashPage(navController)
-        }
         composable(route = "start") {
             StartPage(navController)
         }
@@ -59,5 +57,16 @@ fun AppNavigation() {
             }
         }
     }
+
+    LaunchedEffect(Unit) {
+        val start = getStartDestination()
+        navController.navigate(start)
+    }
 }
+
+private suspend fun getStartDestination(): String {
+    val isEmpty = ApkConfigDao().isEmpty()
+    return if (isEmpty) "start" else "home"
+}
+
 

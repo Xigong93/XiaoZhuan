@@ -9,6 +9,12 @@ import androidx.compose.ui.Modifier
 import apk.dispatcher.style.AppColors
 
 @Composable
-fun Page(content: @Composable BoxScope.() -> Unit) {
-    Box(modifier = Modifier.fillMaxSize().background(AppColors.pageBackground), content = content)
+fun Page(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+    Box(
+        content = content,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.pageBackground)
+            .then(modifier)
+    )
 }

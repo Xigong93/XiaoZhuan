@@ -8,9 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +23,7 @@ import apk.dispatcher.channel.TaskLauncher
 import apk.dispatcher.page.Page
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import apk.dispatcher.widget.ConfirmDialog
 
 
 fun NavController.showUploadPage(uploadParam: UploadParam) {
@@ -83,16 +82,15 @@ private fun ColumnScope.BottomButtons(viewModel: UploadVM, onDismiss: () -> Unit
     val uploadSuccess = launchers.all { it.getSubmitState().value?.success == true }
     val uploadFail = launchers.all { it.getSubmitState().value?.finish == true } && !uploadSuccess
     val uploading = !uploadFail && !uploadSuccess
+
+    var showExitDialog by remember { mutableStateOf(false) }
     Row(Modifier.align(Alignment.CenterHorizontally)) {
         when {
             uploading -> {
                 NegativeButton("取消") {
-                    viewModel.cancelDispatch()
-                    onDismiss()
+                    showExitDialog = true
                 }
-
             }
-
             uploadFail -> {
                 NegativeButton("取消", onDismiss)
                 Spacer(modifier = Modifier.width(20.dp))
@@ -106,6 +104,15 @@ private fun ColumnScope.BottomButtons(viewModel: UploadVM, onDismiss: () -> Unit
             }
         }
 
+    }
+    if (showExitDialog) {
+        ConfirmDialog("确定取消上传吗？", onDismiss = {
+            showExitDialog = false
+        }, onConfirm = {
+            showExitDialog = false
+            viewModel.cancelDispatch()
+            onDismiss()
+        })
     }
 }
 

@@ -23,7 +23,7 @@ object ChannelRegistry {
         MockChannelTask("VIVO", "VIVO"),
     )
 
-    val channels: List<ChannelTask> = realChannels
+    val channels: List<ChannelTask> = mockChannels
 
 
     fun getChannel(name: String): ChannelTask? {

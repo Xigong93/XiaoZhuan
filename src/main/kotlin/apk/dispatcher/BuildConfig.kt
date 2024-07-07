@@ -15,6 +15,22 @@ object BuildConfig {
 
     val versionName: String = config.get("versionName").asString
 
+    /**
+     * 包名
+     */
+    val packageId: String = config.get("packageId").asString
+
+    /**
+     * App名称
+     */
+    val appName: String = config.get("appName").asString
+
+    /**
+     * 启动图标
+     */
+    const val ICON = "icon.png"
+
+
     fun print() {
         AppLogger.info("BuildConfig", "构建配置:$config")
     }

@@ -19,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import apk.dispatcher.BuildConfig
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.style.AppColors
@@ -41,7 +40,7 @@ fun AboutSoftDialog(onDismiss: () -> Unit) {
         Spacer(Modifier.height(26.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             Image(
-                painter = painterResource("icon.png"),
+                painter = painterResource(BuildConfig.ICON),
                 contentDescription = null,
                 modifier = Modifier.size(80.dp)
             )
@@ -90,7 +89,7 @@ private const val GITHUB_URL = "https://github.com/xigong93/ApkDispatcher"
 @Composable
 private fun Content() {
     val dividerHeight = 18.dp
-    Text("小篆", color = AppColors.fontBlack, fontSize = 14.sp)
+    Text(BuildConfig.appName, color = AppColors.fontBlack, fontSize = 14.sp)
     Spacer(Modifier.height(dividerHeight))
 
     Text(

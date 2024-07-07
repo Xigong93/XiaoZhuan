@@ -25,6 +25,7 @@ import apk.dispatcher.log.AppLogger
 import apk.dispatcher.page.Page
 import apk.dispatcher.page.config.showApkConfigPage
 import apk.dispatcher.page.upload.showUploadPage
+import apk.dispatcher.style.AppShapes
 import apk.dispatcher.widget.ConfirmDialog
 import apk.dispatcher.widget.Toast
 
@@ -114,15 +115,20 @@ private fun Content(
             }
             Spacer(Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    painterResource("menu.png"),
-                    contentDescription = "菜单",
-                    modifier = Modifier.size(32.dp)
-                        .clip(CircleShape)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(36.dp)
+                        .clip(AppShapes.roundButton)
                         .clickable {
                             showMenu = true
                         }
-                )
+                ) {
+                    Image(
+                        painterResource("menu.png"),
+                        contentDescription = "菜单",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 if (showMenu) {
                     Menu(navController, viewModel, onClose = {
                         showMenu = false

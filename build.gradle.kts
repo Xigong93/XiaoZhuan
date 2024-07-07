@@ -5,8 +5,9 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-
+val packageId = "com.xigong.apkdispatcher"
 val appVersion = AppVersion(1, 0, 0)
+val appName = "小篆"
 println(appVersion)
 repositories {
 //    maven("https://maven.aliyun.com/repository/public")
@@ -49,7 +50,7 @@ compose.desktop {
         }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.xigong.apkdispatcher"
+            packageName = packageId
             packageVersion = appVersion.versionName
         }
     }
@@ -74,9 +75,11 @@ fun writeBuildConfig(file: File, release: Boolean) {
     val type = if (release) "release" else "debug"
     println("Write $type BuildConfig.json to  ${file.absolutePath}")
     val buildConfig = BuildConfig(
-        appVersion.versionCode.toLong(),
-        appVersion.versionName,
-        release
+        versionCode = appVersion.versionCode.toLong(),
+        versionName = appVersion.versionName,
+        packageId = packageId,
+        appName = appName,
+        release = release
     )
     file.writeText(buildConfig.toJson())
 }

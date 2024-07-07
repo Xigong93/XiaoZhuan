@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import apk.dispatcher.BuildConfig
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.page.splash.SplashPage
+import apk.dispatcher.page.version.NewVersionDialog
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 
@@ -48,6 +49,7 @@ fun RootWindow(
             content()
         }
         SplashPage()
+        NewVersionDialog()
         Toast.UI()
     }
 

@@ -11,7 +11,7 @@ fun GithubApi(): GithubApi {
 interface GithubApi {
 
     @GET("repos/{user}/{repo}/releases/latest")
-    fun getLastRelease(
+    suspend fun getLastRelease(
         @Path("user") user: String,
         @Path("repo") repo: String
     ): GithubRelease

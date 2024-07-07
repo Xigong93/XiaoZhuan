@@ -2,12 +2,16 @@ package apk.dispatcher.page.version
 
 data class AppVersion(
     val versionCode: Long,
-    val versionName: String
+    val versionName: String,
+    /**
+     * 更新描述
+     */
+    val desc: String
 ) : Comparable<AppVersion> {
     companion object {
 
         @Throws
-        fun from(versionName: String): AppVersion {
+        fun from(versionName: String, desc: String): AppVersion {
             val vName = versionName.lowercase().trim().trim('v')
             val pieces = vName.split('.')
             check(pieces.size == 3) { "无效的App版本,${versionName}" }
@@ -18,7 +22,7 @@ data class AppVersion(
             require(minor in 0..99) { "minor must in [0,99],but is $minor" }
             require(revision in 0..99) { "revision must in [0,99],but is $revision" }
             val vCode = major * 10000 + minor * 100 + revision
-            return AppVersion(vCode.toLong(), vName)
+            return AppVersion(vCode.toLong(), vName, desc)
         }
     }
 

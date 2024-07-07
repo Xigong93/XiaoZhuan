@@ -19,6 +19,6 @@ data class GithubRelease(
 ) {
     @Throws
     fun toAppVersion(): AppVersion {
-        return AppVersion.from(tagName)
+        return AppVersion.from(tagName,name)
     }
 }

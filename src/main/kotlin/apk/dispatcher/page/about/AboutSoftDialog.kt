@@ -19,10 +19,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import apk.dispatcher.Api.GITEE_URL
+import apk.dispatcher.Api.GITHUB_URL
 import apk.dispatcher.BuildConfig
 import apk.dispatcher.log.AppLogger
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import apk.dispatcher.util.browser
 import apk.dispatcher.widget.Toast
 import java.awt.Desktop
 import java.net.URI
@@ -81,11 +84,6 @@ fun AboutSoftDialogPreview() {
         AboutSoftDialog { }
     }
 }
-
-@Suppress("SpellCheckingInspection")
-private const val GITEE_URL = "https://gitee.com/xigong93/ApkDispatcher"
-private const val GITHUB_URL = "https://github.com/xigong93/ApkDispatcher"
-
 @Composable
 private fun Content() {
     val dividerHeight = 18.dp
@@ -127,11 +125,3 @@ private fun ClickText(text: String, url: String) {
     )
 }
 
-private fun browser(url: String) {
-    try {
-        Desktop.getDesktop().browse(URI(url))
-    } catch (e: Exception) {
-        AppLogger.error("打开链接", "打开链接失败", e)
-        Toast.show("打开链接失败")
-    }
-}

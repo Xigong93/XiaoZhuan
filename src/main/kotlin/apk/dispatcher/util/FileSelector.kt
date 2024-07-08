@@ -2,6 +2,7 @@ package apk.dispatcher.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.awt.Window
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JFileChooser.*
@@ -30,23 +31,28 @@ interface FileSelector {
 
 private object JFileSelector : FileSelector {
     override suspend fun selectedDir(defaultDir: File?): File? = withContext(Dispatchers.IO) {
-        val chooser = JFileChooser(defaultDir).apply {
+        JFileChooser(defaultDir).apply {
             fileSelectionMode = DIRECTORIES_ONLY
-        }
-        val result = chooser.showOpenDialog(null)
-        chooser.selectedFile?.takeIf { result == APPROVE_OPTION }
-
+        }.getUserSelectedFile()
     }
 
-    override suspend fun selectedFile(defaultFile: File?, desc: String?, extensions: List<String>): File? =
-        withContext(Dispatchers.IO) {
-            require(extensions.isNotEmpty()) { "文件扩展名不能为空" }
-            val chooser = JFileChooser(defaultFile).apply {
-                fileSelectionMode = FILES_ONLY
-                fileFilter = FileNameExtensionFilter(desc, * extensions.toTypedArray())
-            }
-            val result = chooser.showOpenDialog(null)
-            chooser.selectedFile?.takeIf { result == APPROVE_OPTION }
-        }
+    override suspend fun selectedFile(
+        defaultFile: File?, desc: String?, extensions: List<String>
+    ): File? = withContext(Dispatchers.IO) {
+        require(extensions.isNotEmpty()) { "文件扩展名不能为空" }
+        JFileChooser(defaultFile).apply {
+            fileSelectionMode = FILES_ONLY
+            fileFilter = FileNameExtensionFilter(desc, * extensions.toTypedArray())
+        }.getUserSelectedFile()
+    }
 
+    private fun JFileChooser.getUserSelectedFile(): File? {
+        val result = showOpenDialog(getWindow())
+        return selectedFile?.takeIf { result == APPROVE_OPTION }
+    }
+
+}
+
+private fun getWindow(): Window? {
+    return Window.getWindows().firstOrNull()
 }

@@ -100,6 +100,9 @@ private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, clos
     }
 }
 
+/**
+ * 获取鼠标在屏幕中的位置
+ */
 private fun getMousePosition(): Point {
     return MouseInfo.getPointerInfo().location
 }

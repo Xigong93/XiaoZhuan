@@ -52,6 +52,11 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = packageId
             packageVersion = appVersion.versionName
+
+            windows {
+                // 生成桌面快捷方式
+                shortcut = true
+            }
         }
     }
 }

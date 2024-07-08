@@ -28,6 +28,8 @@ import apk.dispatcher.page.splash.SplashPage
 import apk.dispatcher.page.version.NewVersionDialog
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import org.jetbrains.skia.Point
+import java.awt.MouseInfo
 
 @Composable
 fun RootWindow(
@@ -64,11 +66,25 @@ private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, clos
         modifier = Modifier.fillMaxWidth().height(50.dp)
             .background(AppColors.auxiliary)
             .pointerInput(Unit) {
-                detectDragGestures { change, offset ->
-                    change.consume()
-                    dragHolder.value(offset)
-                    AppLogger.info("拖动", "$offset")
-                }
+                val lastPosition = FloatArray(2)
+                detectDragGestures(onDragStart = {
+                    val l = MouseInfo.getPointerInfo().location
+                    lastPosition[0] = l.x.toFloat()
+                    lastPosition[1] = l.y.toFloat()
+//                    AppLogger.debug("鼠标", "按下,${l}")
+                }, onDrag = { _, _ ->
+                    val l = MouseInfo.getPointerInfo().location
+//                    AppLogger.debug("鼠标", "移动,${l}")
+                    dragHolder.value(Offset(l.x - lastPosition[0], l.y - lastPosition[1]))
+                    lastPosition[0] = l.x.toFloat()
+                    lastPosition[1] = l.y.toFloat()
+
+                }, onDragEnd = {
+//                    AppLogger.debug("鼠标", "抬起")
+
+                }, onDragCancel = {
+//                    AppLogger.debug("鼠标", "取消")
+                })
             }
     ) {
         Spacer(modifier = Modifier.width(20.dp))

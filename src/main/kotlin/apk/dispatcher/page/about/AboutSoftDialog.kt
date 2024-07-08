@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import apk.dispatcher.Api.GITEE_URL
@@ -102,24 +103,38 @@ private fun Content() {
     Spacer(Modifier.height(dividerHeight))
 
     @Suppress("SpellCheckingInspection")
-    ClickText("Gitee 地址：$GITEE_URL", GITEE_URL)
+    ClickText("Gitee 地址：", GITEE_URL)
     Spacer(Modifier.height(dividerHeight))
-    ClickText("Github 地址：$GITHUB_URL", GITHUB_URL)
+    ClickText("Github 地址：", GITHUB_URL)
 }
 
 @Composable
-private fun ClickText(text: String, url: String) {
-    val source = remember { MutableInteractionSource() }
-    val isHover = source.collectIsHoveredAsState().value
-    val color = if (isHover) AppColors.primary else AppColors.fontGray
-    Text(
-        text,
-        color = color,
-        fontSize = 14.sp,
-        modifier = Modifier
-            .hoverable(source)
-            .background(Color.Transparent)
-            .clickable { browser(url) }
-    )
+private fun ClickText(desc: String, url: String) {
+    Row {
+        Text(
+            desc,
+            color = AppColors.fontGray,
+            fontSize = 14.sp
+        )
+        val source = remember { MutableInteractionSource() }
+        val isHover = source.collectIsHoveredAsState().value
+
+        val textDecoration = if (isHover) TextDecoration.Underline else null
+        Text(
+            url,
+            color = AppColors.primary,
+            fontSize = 14.sp,
+            textDecoration = textDecoration,
+            modifier = Modifier
+                .hoverable(source)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    browser(url)
+                }
+        )
+    }
+
 }
 

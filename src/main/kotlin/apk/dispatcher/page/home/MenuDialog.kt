@@ -34,14 +34,14 @@ fun MenuDialog(listener: MenuDialogListener, onDismiss: () -> Unit) {
                 listener.onEditClick()
             }
             Divider()
-            item("配置文件夹") {
-                onDismiss()
-                openApkDispatchDir()
-            }
-            Divider()
             item("删除") {
                 onDismiss()
                 listener.onDeleteClick()
+            }
+            Divider()
+            item("配置文件夹") {
+                onDismiss()
+                openApkDispatchDir()
             }
             Divider()
             item("关于软件") {

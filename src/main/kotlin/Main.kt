@@ -45,7 +45,7 @@ fun main() {
                 val newX = windowState.position.x + with(density) { offset.x.toDp() }
                 val newY = windowState.position.y + with(density) { offset.y.toDp() }
                 windowState.position = WindowPosition(newX, newY)
-                AppLogger.info("RootWindow", "window position:${newX},$newY")
+                AppLogger.debug("RootWindow", "window position:${newX},$newY")
             }, miniClick = {
                 windowState.isMinimized = true
             }, closeClick = {

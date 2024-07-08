@@ -28,8 +28,8 @@ import apk.dispatcher.page.splash.SplashPage
 import apk.dispatcher.page.version.NewVersionDialog
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
-import org.jetbrains.skia.Point
 import java.awt.MouseInfo
+import java.awt.Point
 
 @Composable
 fun RootWindow(
@@ -66,18 +66,16 @@ private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, clos
         modifier = Modifier.fillMaxWidth().height(50.dp)
             .background(AppColors.auxiliary)
             .pointerInput(Unit) {
-                val lastPosition = FloatArray(2)
+                var last = Point()
                 detectDragGestures(onDragStart = {
-                    val l = MouseInfo.getPointerInfo().location
-                    lastPosition[0] = l.x.toFloat()
-                    lastPosition[1] = l.y.toFloat()
-//                    AppLogger.debug("鼠标", "按下,${l}")
+                    last = getMousePosition()
+                    AppLogger.debug("鼠标", "按下")
                 }, onDrag = { _, _ ->
-                    val l = MouseInfo.getPointerInfo().location
-//                    AppLogger.debug("鼠标", "移动,${l}")
-                    dragHolder.value(Offset(l.x - lastPosition[0], l.y - lastPosition[1]))
-                    lastPosition[0] = l.x.toFloat()
-                    lastPosition[1] = l.y.toFloat()
+                    val point = getMousePosition()
+                    val offset = Offset((point.x - last.x).toFloat(), (point.y - last.y).toFloat())
+                    AppLogger.debug("鼠标", "移动,${offset}")
+                    dragHolder.value(offset)
+                    last = point
 
                 }, onDragEnd = {
 //                    AppLogger.debug("鼠标", "抬起")
@@ -100,6 +98,10 @@ private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, clos
         ImageButton("window_mini.png", 22.dp, miniClick)
         ImageButton("window_close.png", 16.dp, closeClick)
     }
+}
+
+private fun getMousePosition(): Point {
+    return MouseInfo.getPointerInfo().location
 }
 
 @Preview

@@ -30,10 +30,10 @@ import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
 import java.awt.MouseInfo
 import java.awt.Point
+import java.awt.Window
 
 @Composable
 fun RootWindow(
-    onDrag: (offset: Offset) -> Unit,
     miniClick: () -> Unit,
     closeClick: () -> Unit,
     content: @Composable () -> Unit
@@ -47,7 +47,7 @@ fun RootWindow(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            TopBar(onDrag, miniClick, closeClick)
+            TopBar(miniClick, closeClick)
             content()
         }
         SplashPage()
@@ -58,9 +58,7 @@ fun RootWindow(
 }
 
 @Composable
-private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, closeClick: () -> Unit) {
-
-    val dragHolder = rememberUpdatedState(onDrag)
+private fun TopBar(miniClick: () -> Unit, closeClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().height(50.dp)
@@ -69,19 +67,13 @@ private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, clos
                 var last = Point()
                 detectDragGestures(onDragStart = {
                     last = getMousePosition()
-                    AppLogger.debug("鼠标", "按下")
                 }, onDrag = { _, _ ->
+                    // 直接使用Window 的Api实现偏移，性能更好，不漂移
                     val point = getMousePosition()
-                    val offset = Offset((point.x - last.x).toFloat(), (point.y - last.y).toFloat())
-                    AppLogger.debug("鼠标", "移动,${offset}")
-                    dragHolder.value(offset)
+                    val location = getWindow().location
+                    getWindow().setLocation(location.x + (point.x - last.x), location.y + (point.y - last.y))
                     last = point
 
-                }, onDragEnd = {
-//                    AppLogger.debug("鼠标", "抬起")
-
-                }, onDragCancel = {
-//                    AppLogger.debug("鼠标", "取消")
                 })
             }
     ) {
@@ -100,6 +92,10 @@ private fun TopBar(onDrag: (offset: Offset) -> Unit, miniClick: () -> Unit, clos
     }
 }
 
+private fun getWindow(): Window {
+    return Window.getWindows().first()
+}
+
 /**
  * 获取鼠标在屏幕中的位置
  */
@@ -110,7 +106,7 @@ private fun getMousePosition(): Point {
 @Preview
 @Composable
 private fun TopBarPreview() {
-    TopBar({ }, {}, {})
+    TopBar({}, {})
 }
 
 @Composable

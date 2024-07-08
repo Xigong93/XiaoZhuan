@@ -1,7 +1,9 @@
 // Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -14,7 +16,6 @@ import apk.dispatcher.log.CrashHandler
 import apk.dispatcher.page.AppNavigation
 import apk.dispatcher.widget.ConfirmDialog
 import apk.dispatcher.widget.RootWindow
-import apk.dispatcher.widget.Toast
 
 
 fun main() {
@@ -40,13 +41,7 @@ fun main() {
                 exitDialog = true
             }
         ) {
-            val density = LocalDensity.current
-            RootWindow(onDrag = { offset ->
-                val newX = windowState.position.x + with(density) { offset.x.toDp() }
-                val newY = windowState.position.y + with(density) { offset.y.toDp() }
-                windowState.position = WindowPosition(newX, newY)
-                AppLogger.debug("RootWindow", "window position:${newX},$newY")
-            }, miniClick = {
+            RootWindow(miniClick = {
                 windowState.isMinimized = true
             }, closeClick = {
                 exitDialog = true

@@ -20,6 +20,7 @@ import apk.dispatcher.BuildConfig
 import apk.dispatcher.page.Page
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import apk.dispatcher.style.AppStrings
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,7 +40,7 @@ fun SplashPage() {
                 )
                 Spacer(Modifier.height(40.dp))
                 Text(
-                    "一键上传Apk到多个应用市场，开源，免费",
+                    AppStrings.appDesc,
                     color = AppColors.fontBlack,
                     fontSize = 16.sp
                 )
@@ -47,7 +48,7 @@ fun SplashPage() {
         }
     }
     LaunchedEffect(Unit) {
-        delay(800)
+        delay(1000)
         visible = false
     }
 

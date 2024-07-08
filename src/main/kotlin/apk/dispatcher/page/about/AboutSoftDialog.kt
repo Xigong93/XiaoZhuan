@@ -22,13 +22,10 @@ import androidx.compose.ui.unit.sp
 import apk.dispatcher.Api.GITEE_URL
 import apk.dispatcher.Api.GITHUB_URL
 import apk.dispatcher.BuildConfig
-import apk.dispatcher.log.AppLogger
 import apk.dispatcher.style.AppColors
 import apk.dispatcher.style.AppShapes
+import apk.dispatcher.style.AppStrings
 import apk.dispatcher.util.browser
-import apk.dispatcher.widget.Toast
-import java.awt.Desktop
-import java.net.URI
 
 @Composable
 fun AboutSoftDialog(onDismiss: () -> Unit) {
@@ -84,6 +81,7 @@ fun AboutSoftDialogPreview() {
         AboutSoftDialog { }
     }
 }
+
 @Composable
 private fun Content() {
     val dividerHeight = 18.dp
@@ -97,7 +95,7 @@ private fun Content() {
     )
     Spacer(Modifier.height(dividerHeight))
     Text(
-        "一键上传Apk到多个应用市场，开源、免费",
+        AppStrings.appDesc,
         color = AppColors.fontGray,
         fontSize = 14.sp
     )

@@ -4,6 +4,8 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +30,10 @@ private fun Content(exception: Throwable) {
         modifier = Modifier.widthIn(min = 200.dp, max = 400.dp)
             .padding(horizontal = 14.dp)
     ) {
-        Text(text = getErrorMessage(exception), fontSize = 14.sp, color = Color.Red)
+        SelectionContainer {
+            val message = getErrorMessage(exception)
+            Text(text = message, fontSize = 14.sp, color = Color.Red)
+        }
     }
 }
 

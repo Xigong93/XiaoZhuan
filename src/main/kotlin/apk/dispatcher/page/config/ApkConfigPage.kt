@@ -16,13 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import apk.dispatcher.channel.ChannelRegistry
 import apk.dispatcher.config.ApkConfig
-import apk.dispatcher.config.ApkConfigDao
 import apk.dispatcher.page.Page
 import apk.dispatcher.style.AppColors
+import apk.dispatcher.widget.NegativeButton
+import apk.dispatcher.widget.PositiveButton
 import apk.dispatcher.widget.VerticalTabBar
 import kotlinx.coroutines.launch
 
@@ -30,14 +29,6 @@ fun NavController.showApkConfigPage(appId: String?) {
     navigate("edit?id=${appId ?: ""}")
 }
 
-//@ExperimentalFoundationApi
-//@Composable
-//fun NavGraphBuilder.ApkConfigPage(navController: NavController) {
-//    composable(route = "edit?id={id}") {
-//        val id = it.arguments?.getString("id")
-//        ApkConfigPage(navController, id)
-//    }
-//}
 
 /**
  * 配置页面
@@ -112,29 +103,13 @@ private fun ConfigList(tabIndex: Int, viewModel: ApkConfigVM) {
 
 @Composable
 private fun BottomButtons(onSaveClick: () -> Unit, onCloseClick: () -> Unit) {
-    Row {
-        Button(
-            colors = ButtonDefaults.buttonColors(AppColors.primary),
-            onClick = { onSaveClick() }
-        ) {
-            Text(
-                "保存",
-                color = Color.White,
-                modifier = Modifier.padding(horizontal = 40.dp)
-            )
+    Row(modifier = Modifier.padding(bottom = 20.dp)) {
+        NegativeButton("取消", modifier = Modifier.width(140.dp)) {
+            onCloseClick()
         }
-
         Spacer(modifier = Modifier.width(20.dp))
-
-        Button(
-            colors = ButtonDefaults.buttonColors(AppColors.fontGray),
-            onClick = { onCloseClick() }
-        ) {
-            Text(
-                "关闭",
-                color = Color.White,
-                modifier = Modifier.padding(horizontal = 40.dp)
-            )
+        PositiveButton("保存", modifier = Modifier.width(140.dp)) {
+            onSaveClick()
         }
     }
 }

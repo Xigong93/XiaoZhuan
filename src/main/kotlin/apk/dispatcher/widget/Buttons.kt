@@ -28,6 +28,7 @@ fun PositiveButton(text: String, fontSize: TextUnit = 14.sp, modifier: Modifier 
         modifier = Modifier
             .clip(AppShapes.roundButton)
             .background(AppColors.primary)
+            .then(modifier)
             .clickable { onClick() },
         horizontalArrangement = Arrangement.Center
     ) {

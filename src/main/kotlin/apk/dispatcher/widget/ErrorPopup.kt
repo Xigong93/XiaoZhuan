@@ -44,9 +44,5 @@ fun ErrorPopupPreview() {
 }
 
 private fun getErrorMessage(e: Throwable): String {
-    return if (e is ApiException) {
-        "${e.action}失败,code: ${e.code},message: ${e.message}"
-    } else {
-        "${e::class.jvmName}: ${e.message}"
-    }
+    return "${e::class.jvmName}: ${e.message}"
 }

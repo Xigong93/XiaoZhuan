@@ -3,10 +3,12 @@ package apk.dispatcher.channel
 import kotlin.jvm.Throws
 
 class ApiException(
-    val code: Int,
-    val action: String,
-    override val message: String
-) : RuntimeException("执行${action}失败，原因:${message}")
+    code: Int,
+    action: String,
+    message: String
+) : RuntimeException() {
+    override val message = "${action}失败，code:$code，message:$message"
+}
 
 
 @Throws(ApiException::class)

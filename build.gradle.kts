@@ -49,13 +49,22 @@ compose.desktop {
             }
         }
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = packageId
+            targetFormats(TargetFormat.Msi, TargetFormat.Dmg)
+            outputBaseDir.set(project.buildDir.resolve("packages"))
+            includeAllModules = true
+            packageName = appName
+//            description = "一键上传Apk到多个应用市场，开源，免费"
+            copyright = "© 2024 Xigong"
+            vendor = "Xigong"
             packageVersion = appVersion.versionName
-
             windows {
                 // 生成桌面快捷方式
                 shortcut = true
+                // 设置图标
+                iconFile.set(project.file("launcher/icon.ico"))
+                // Windows 这个用中文会乱码
+                packageName = "XiaoZhuan"
+                upgradeUuid = "c5dd9f2e-9e6b-4899-867e-a980924c8962"
             }
         }
     }
@@ -88,3 +97,4 @@ fun writeBuildConfig(file: File, release: Boolean) {
     )
     file.writeText(buildConfig.toJson())
 }
+

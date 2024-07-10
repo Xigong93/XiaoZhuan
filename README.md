@@ -1,4 +1,6 @@
-# 小篆 
+
+
+# 小篆 <img src="./img/icon.png" alt="图标" style="with:30px; height:30px"/>
 <a href="./doc/ENGLISH.md">English README</a>
 
 一键上传Apk到多个应用市场，开源，免费
@@ -28,6 +30,12 @@
 2. 渠道包功能
 3. 版本更新功能
 
+
+## 下载地址
+<a href="https://gitee.com/xigong93/ApkDispatcher/release">从Gitee下载(推荐)</a>
+
+<a href="https://github.com/xigong93/ApkDispatcher/release">从Github下载</a>
+
 ## 功能限制
 
 1. 仅支持华为、小米、OPPO、VIVO、荣耀 5个应用市场
@@ -40,3 +48,9 @@
 ## 常见问题的解决
 
 <a href="./doc/TroubleShotting.md">点击这里查看常见问题</a>
+
+
+## 已知问题
+1. 上传新版本后，然后获取应用市场审核状态，小米会显示上个版本正在审核中，OPPO会显示上个版本已上线
+a. 小米的传包Api提供的是不显示当前审核的版本，只返回线上的最新版本
+b. OPPO 提交新版本后，有几分钟的延迟，过几分钟后才会显示新版本正在审核中

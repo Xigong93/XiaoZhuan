@@ -66,7 +66,7 @@ data class OPPOAppInfo(val obj: JsonObject) {
     fun toMarketState(): MarketInfo {
         val state = if (reviewStatus == 111) ReviewState.Online else ReviewState.UnderReview
         return MarketInfo(
-            state, true, versionCode, versionName
+            state, lastVersionCode = versionCode, lastVersionName = versionName
         )
     }
 }

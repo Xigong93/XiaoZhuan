@@ -2,7 +2,6 @@ package apk.dispatcher.page.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -40,7 +39,7 @@ fun SplashPage() {
                 )
                 Spacer(Modifier.height(40.dp))
                 Text(
-                    AppStrings.appDesc,
+                    AppStrings.APP_DESC,
                     color = AppColors.fontBlack,
                     fontSize = 16.sp
                 )

@@ -96,16 +96,23 @@ private fun Content() {
     )
     Spacer(Modifier.height(dividerHeight))
     Text(
-        AppStrings.appDesc,
+        AppStrings.APP_DESC,
         color = AppColors.fontGray,
         fontSize = 14.sp
     )
+
     Spacer(Modifier.height(dividerHeight))
 
     @Suppress("SpellCheckingInspection")
     ClickText("Gitee 地址：", GITEE_URL)
     Spacer(Modifier.height(dividerHeight))
     ClickText("Github 地址：", GITHUB_URL)
+    Spacer(Modifier.height(dividerHeight))
+    Text(
+        "Copyright © 2024 ${AppStrings.AUTHOR}",
+        color = AppColors.fontGray,
+        fontSize = 14.sp
+    )
 }
 
 @Composable

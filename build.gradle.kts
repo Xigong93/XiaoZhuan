@@ -8,7 +8,7 @@ plugins {
 val packageId = "com.xigong.apkdispatcher"
 val appVersion = AppVersion(1, 0, 0)
 val appName = "小篆"
-println(appVersion)
+println("当前版本:v${appVersion.versionName} (${appVersion.versionCode})")
 repositories {
 //    maven("https://maven.aliyun.com/repository/public")
     google()
@@ -53,18 +53,20 @@ compose.desktop {
             outputBaseDir.set(project.buildDir.resolve("packages"))
             includeAllModules = true
             packageName = appName
-//            description = "一键上传Apk到多个应用市场，开源，免费"
+            description = "一键上传Apk到多个应用市场，开源，免费"
             copyright = "© 2024 Xigong"
             vendor = "Xigong"
             packageVersion = appVersion.versionName
+
             windows {
                 // 生成桌面快捷方式
                 shortcut = true
                 // 设置图标
                 iconFile.set(project.file("launcher/icon.ico"))
-                // Windows 这个用中文会乱码
-                packageName = "XiaoZhuan"
+
                 upgradeUuid = "c5dd9f2e-9e6b-4899-867e-a980924c8962"
+                // 自定义安装目录的名称，不设置的话，会使用中文
+                installationPath = "./XiaoZhuan"
             }
         }
     }

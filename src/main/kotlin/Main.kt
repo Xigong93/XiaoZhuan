@@ -10,12 +10,12 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import apk.dispatcher.BuildConfig
-import apk.dispatcher.log.AppLogger
-import apk.dispatcher.log.CrashHandler
-import apk.dispatcher.page.AppNavigation
-import apk.dispatcher.widget.ConfirmDialog
-import apk.dispatcher.widget.RootWindow
+import com.xigong.xiaozhuan.BuildConfig
+import com.xigong.xiaozhuan.log.AppLogger
+import com.xigong.xiaozhuan.log.CrashHandler
+import com.xigong.xiaozhuan.page.AppNavigation
+import com.xigong.xiaozhuan.widget.ConfirmDialog
+import com.xigong.xiaozhuan.widget.RootWindow
 
 
 fun main() {

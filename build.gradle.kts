@@ -68,6 +68,10 @@ compose.desktop {
                 // 自定义安装目录的名称，不设置的话，会使用中文
                 installationPath = "./XiaoZhuan"
             }
+            macOS {
+                iconFile.set(project.file("launcher/icon.icns"))
+                installationPath = "./XiaoZhuan"
+            }
         }
     }
 }

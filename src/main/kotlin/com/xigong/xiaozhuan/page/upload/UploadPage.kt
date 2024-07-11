@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.xigong.xiaozhuan.channel.SubmitState
 import com.xigong.xiaozhuan.channel.TaskLauncher
@@ -24,13 +25,21 @@ import com.xigong.xiaozhuan.page.Page
 import com.xigong.xiaozhuan.style.AppColors
 import com.xigong.xiaozhuan.style.AppShapes
 import com.xigong.xiaozhuan.widget.ConfirmDialog
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 
 fun NavController.showUploadPage(uploadParam: UploadParam) {
-    val param = UploadParam.adapter.toJson(uploadParam)
+    val json = UploadParam.adapter.toJson(uploadParam)
+    val param = URLEncoder.encode(json, Charsets.UTF_8)
     navigate("upload/${param}")
 }
 
+fun NavBackStackEntry.getUploadParam(): UploadParam {
+    val param = arguments?.getString("param") ?: ""
+    val jsonParam = URLDecoder.decode(param, Charsets.UTF_8)
+    return requireNotNull(UploadParam.adapter.fromJson(jsonParam))
+}
 
 @Composable
 fun UploadPage(uploadParam: UploadParam, onDismiss: () -> Unit) {
@@ -91,6 +100,7 @@ private fun ColumnScope.BottomButtons(viewModel: UploadVM, onDismiss: () -> Unit
                     showExitDialog = true
                 }
             }
+
             uploadFail -> {
                 NegativeButton("取消", onDismiss)
                 Spacer(modifier = Modifier.width(20.dp))

@@ -19,7 +19,9 @@ import com.xigong.xiaozhuan.page.home.HomePage
 import com.xigong.xiaozhuan.page.start.StartPage
 import com.xigong.xiaozhuan.page.upload.UploadPage
 import com.xigong.xiaozhuan.page.upload.UploadParam
+import com.xigong.xiaozhuan.page.upload.getUploadParam
 import com.xigong.xiaozhuan.style.AppColors
+import java.net.URLDecoder
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -45,9 +47,7 @@ fun AppNavigation() {
             ApkConfigPage(navController, id)
         }
         composable("upload/{param}") {
-            val param = it.arguments?.getString("param") ?: ""
-            val uploadParam = requireNotNull(UploadParam.adapter.fromJson(param))
-            UploadPage(uploadParam) {
+            UploadPage(it.getUploadParam()) {
                 navController.popBackStack()
             }
         }

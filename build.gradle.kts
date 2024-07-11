@@ -6,7 +6,7 @@ plugins {
 }
 
 val packageId = "com.xigong.xiaozhuan"
-val appVersion = AppVersion(1, 0, 0)
+val appVersion = AppVersion(1, 1, 0)
 val appName = "小篆传包"
 println("当前版本:v${appVersion.versionName} (${appVersion.versionCode})")
 repositories {
@@ -90,11 +90,12 @@ tasks.named("processResources") {
 fun writeBuildConfig(file: File, release: Boolean) {
     val type = if (release) "release" else "debug"
     println("Write $type BuildConfig.json to  ${file.absolutePath}")
+    val name = if (release) appName else "${appName}(测试)"
     val buildConfig = BuildConfig(
         versionCode = appVersion.versionCode.toLong(),
         versionName = appVersion.versionName,
         packageId = packageId,
-        appName = appName,
+        appName = name,
         release = release
     )
     file.writeText(buildConfig.toJson())

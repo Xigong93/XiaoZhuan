@@ -5,9 +5,9 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val packageId = "com.xigong.apkdispatcher"
+val packageId = "com.xigong.xiaozhuan"
 val appVersion = AppVersion(1, 0, 0)
-val appName = "小篆"
+val appName = "小篆传包"
 println("当前版本:v${appVersion.versionName} (${appVersion.versionCode})")
 repositories {
 //    maven("https://maven.aliyun.com/repository/public")

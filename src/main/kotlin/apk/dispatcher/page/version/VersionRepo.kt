@@ -9,7 +9,7 @@ interface VersionRepo {
 
 private object GitHubRepo : VersionRepo {
     override suspend fun getLastVersion(): AppVersion {
-        val release = GithubApi().getLastRelease("Xigong93", "ApkDispatcher")
+        val release = GithubApi().getLastRelease("Xigong93", "XiaoZhuan")
         return release.toAppVersion()
     }
 }

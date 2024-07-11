@@ -7,7 +7,12 @@ object AppPath {
 
     fun getRootDir(): File {
         val homeDir = File(requireNotNull(System.getProperty("user.home")))
-        return File(homeDir, ".apkDispatcher")
+        val rootDir = File(homeDir, ".XiaoZhuan")
+        return if (BuildConfig.debug) {
+            File(rootDir, "debug")
+        } else {
+            rootDir
+        }
     }
 
     fun getLogDir(): File {

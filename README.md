@@ -1,6 +1,6 @@
 
 
-# 小篆 <img src="./img/icon.png" alt="图标" style="with:30px; height:30px"/>
+# 小篆传包 <img src="./img/icon.png" alt="图标" style="with:30px; height:30px"/>
 <a href="./doc/ENGLISH.md">English README</a>
 
 一键上传Apk到多个应用市场，开源，免费
@@ -32,9 +32,9 @@
 
 
 ## 下载地址
-<a href="https://gitee.com/xigong93/ApkDispatcher/release">从Gitee下载(推荐)</a>
+<a href="https://gitee.com/xigong93/XiaoZhuan/release">从Gitee下载(推荐)</a>
 
-<a href="https://github.com/xigong93/ApkDispatcher/release">从Github下载</a>
+<a href="https://github.com/xigong93/XiaoZhuan/release">从Github下载</a>
 
 ## 功能限制
 

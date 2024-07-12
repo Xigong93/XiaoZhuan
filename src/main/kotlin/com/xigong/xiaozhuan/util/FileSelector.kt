@@ -12,6 +12,8 @@ import javax.swing.JFileChooser
 import javax.swing.JFileChooser.*
 import javax.swing.filechooser.FileNameExtensionFilter
 
+private val fileSelector = if (isWindows()) JFileSelector else FileKitSelector
+
 interface FileSelector {
 
 
@@ -29,12 +31,13 @@ interface FileSelector {
      */
     suspend fun selectedFile(defaultFile: File? = null, desc: String?, extensions: List<String>): File?
 
-    companion object : FileSelector by FileKitSelector
+    companion object : FileSelector by fileSelector
 
 }
 
 /**
  * 使用Swing内置的JFileChooser 实现的文件选择器
+ * 已知故障：Mac上会卡死，然后不能选择初始化文件
  */
 private object JFileSelector : FileSelector {
     override suspend fun selectedDir(defaultDir: File?): File? {

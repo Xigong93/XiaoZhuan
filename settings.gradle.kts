@@ -14,5 +14,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "ApkDispatcher"
+rootProject.name = "XiaoZhuan"
 

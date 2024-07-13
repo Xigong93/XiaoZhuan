@@ -31,7 +31,7 @@ class HomePageVM : ViewModel() {
             apkList.value = configList
             val old = currentApk.value
             // 当前Apk为空时，或已被删除时，重新指定
-            val new = configList.find { it == old } ?: configList.firstOrNull()
+            val new = configList.find { it.applicationId == old?.applicationId } ?: configList.firstOrNull()
             if (new != null) {
                 updateCurrent(new)
             }
@@ -52,8 +52,6 @@ class HomePageVM : ViewModel() {
             apkPageState = ApkPageState(apkDesc)
         }
     }
-
-
 
 
     fun deleteCurrent(finish: suspend () -> Unit) {

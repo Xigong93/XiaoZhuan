@@ -30,9 +30,9 @@
 
 
 ## 安装包下载
-<a href="https://gitee.com/xigong93/XiaoZhuan/release">从Gitee下载(推荐)</a>
+<a href="https://gitee.com/xigong93/XiaoZhuan/releases">从Gitee下载(推荐)</a>
 
-<a href="https://github.com/xigong93/XiaoZhuan/release">从Github下载</a>
+<a href="https://github.com/xigong93/XiaoZhuan/releases">从Github下载</a>
 
 ## 功能限制
 

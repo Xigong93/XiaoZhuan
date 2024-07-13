@@ -20,8 +20,8 @@ import com.xigong.xiaozhuan.config.ApkConfig
 fun ChannelConfigPage(
     enableChannel: Boolean,
     params: List<Param>,
-    config: com.xigong.xiaozhuan.config.ApkConfig.Channel,
-    onConfigChange: (newConfig: com.xigong.xiaozhuan.config.ApkConfig.Channel) -> Unit
+    config: ApkConfig.Channel,
+    onConfigChange: (newConfig: ApkConfig.Channel) -> Unit
 ) {
     Column(
         modifier =
@@ -40,7 +40,7 @@ fun ChannelConfigPage(
                 if (param.name == ChannelTask.FILE_NAME_IDENTIFY && !enableChannel) {
                     continue
                 }
-                val paramValue = config.getParam(param.name) ?: com.xigong.xiaozhuan.config.ApkConfig.Param(param.name, "")
+                val paramValue = config.getParam(param.name) ?: ApkConfig.Param(param.name, "")
                 when (param.type) {
                     is ParmaType.Text -> {
                         TextRaw(param.name, param.desc ?: "", paramValue.value) { newValue ->
@@ -62,10 +62,10 @@ fun ChannelConfigPage(
 }
 
 private fun createNewChannel(
-    oldChannel: com.xigong.xiaozhuan.config.ApkConfig.Channel,
-    param: com.xigong.xiaozhuan.config.ApkConfig.Param,
+    oldChannel: ApkConfig.Channel,
+    param: ApkConfig.Param,
     newValue: String
-): com.xigong.xiaozhuan.config.ApkConfig.Channel {
+): ApkConfig.Channel {
     val newParams = oldChannel.params.map { p ->
         if (p.name == param.name) {
             p.copy(value = newValue)

@@ -15,9 +15,9 @@ class HomePageVM : ViewModel() {
 
     private val configDao = ApkConfigDao()
 
-    private val currentApk = mutableStateOf<com.xigong.xiaozhuan.config.ApkConfig?>(null)
+    private val currentApk = mutableStateOf<ApkConfig?>(null)
 
-    private val apkList = mutableStateOf<List<com.xigong.xiaozhuan.config.ApkConfig>>(emptyList())
+    private val apkList = mutableStateOf<List<ApkConfig>>(emptyList())
 
     init {
         AppLogger.info(LOG_TAG, "init")
@@ -40,11 +40,11 @@ class HomePageVM : ViewModel() {
 
     fun getApkVM(): ApkPageState? = apkPageState
 
-    fun getCurrentApk(): State<com.xigong.xiaozhuan.config.ApkConfig?> = currentApk
+    fun getCurrentApk(): State<ApkConfig?> = currentApk
 
-    fun getApkList(): State<List<com.xigong.xiaozhuan.config.ApkConfig>> = apkList
+    fun getApkList(): State<List<ApkConfig>> = apkList
 
-    fun updateCurrent(apkDesc: com.xigong.xiaozhuan.config.ApkConfig) {
+    fun updateCurrent(apkDesc: ApkConfig) {
         val old = currentApk.value
         if (old != apkDesc) {
             currentApk.value = apkDesc

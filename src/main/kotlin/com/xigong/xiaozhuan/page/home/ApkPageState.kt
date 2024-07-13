@@ -19,7 +19,7 @@ import com.xigong.xiaozhuan.widget.Toast
 import kotlinx.coroutines.*
 import java.io.File
 
-class ApkPageState(val apkConfig: com.xigong.xiaozhuan.config.ApkConfig) {
+class ApkPageState(val apkConfig: ApkConfig) {
 
     private val scope = MainScope()
 

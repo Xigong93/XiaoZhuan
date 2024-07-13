@@ -31,7 +31,7 @@ fun ApkPage(apkVM: ApkPageState, startUpload: (UploadParam) -> Unit) {
 
 
 @Composable
-private fun ColumnScope.LeftPage(apkConfig: com.xigong.xiaozhuan.config.ApkConfig, viewModel: ApkPageState) {
+private fun ColumnScope.LeftPage(apkConfig: ApkConfig, viewModel: ApkPageState) {
     val dividerHeight = 30.dp
     Section("Apk信息") {
         ApkInfoBox(apkConfig)
@@ -80,7 +80,7 @@ private fun ColumnScope.LeftPage(apkConfig: com.xigong.xiaozhuan.config.ApkConfi
 
 
 @Composable
-private fun ApkInfoBox(apkConfig: com.xigong.xiaozhuan.config.ApkConfig) {
+private fun ApkInfoBox(apkConfig: ApkConfig) {
     Column(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))

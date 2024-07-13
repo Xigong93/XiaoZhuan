@@ -14,7 +14,7 @@ class TaskLauncher(private val task: ChannelTask) {
 
     private val stateListener = SubmitStateAdapter(::updateState)
 
-    private var channelParams: List<com.xigong.xiaozhuan.config.ApkConfig.Channel> = emptyList()
+    private var channelParams: List<ApkConfig.Channel> = emptyList()
 
     private val apkFileState: MutableState<File?> = mutableStateOf(null)
 
@@ -22,7 +22,7 @@ class TaskLauncher(private val task: ChannelTask) {
 
     private val marketState: MutableState<MarketState?> = mutableStateOf(null)
 
-    fun setChannelParam(channelParams: List<com.xigong.xiaozhuan.config.ApkConfig.Channel>) {
+    fun setChannelParam(channelParams: List<ApkConfig.Channel>) {
         this.channelParams = channelParams
 
     }

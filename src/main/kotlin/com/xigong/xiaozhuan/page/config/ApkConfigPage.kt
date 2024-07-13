@@ -116,7 +116,7 @@ private fun BottomButtons(onSaveClick: () -> Unit, onCloseClick: () -> Unit) {
 
 
 @Composable
-private fun BasicApkConfig(apkConfig: com.xigong.xiaozhuan.config.ApkConfig, onValueChange: (com.xigong.xiaozhuan.config.ApkConfig) -> Unit) {
+private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> Unit) {
     Column {
         val spaceHeight = Modifier.height(12.dp)
         TextRaw("App名称", "", apkConfig.name) {

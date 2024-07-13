@@ -30,7 +30,7 @@ class ApkConfigVM(
         }
     }
 
-    fun updateChannel(channel: com.xigong.xiaozhuan.config.ApkConfig.Channel) {
+    fun updateChannel(channel: ApkConfig.Channel) {
         apkConfigState = apkConfigState.copy(channels = apkConfigState.channels.map {
             if (it.name == channel.name) channel else it
         })
@@ -80,26 +80,26 @@ class ApkConfigVM(
     /**
      * 用老的配置和渠道配置，生成一个界面的配置对象
      */
-    private fun createApkConfig(oldApk: com.xigong.xiaozhuan.config.ApkConfig?): com.xigong.xiaozhuan.config.ApkConfig {
+    private fun createApkConfig(oldApk: ApkConfig?): ApkConfig {
         val channelConfigs = channels.map { chan ->
             val oldChan = oldApk?.getChannel(chan.channelName)
             createChannelConfig(chan.channelName, oldChan)
         }
-        return com.xigong.xiaozhuan.config.ApkConfig(
+        return ApkConfig(
             name = oldApk?.name ?: "",
             applicationId = oldApk?.applicationId ?: "",
             createTime = oldApk?.createTime ?: System.currentTimeMillis(),
             channels = channelConfigs,
-            extension = oldApk?.extension ?: com.xigong.xiaozhuan.config.ApkConfig.Extension()
+            extension = oldApk?.extension ?: ApkConfig.Extension()
         )
     }
 
-    private fun createChannelConfig(name: String, oldChannel: com.xigong.xiaozhuan.config.ApkConfig.Channel?): com.xigong.xiaozhuan.config.ApkConfig.Channel {
+    private fun createChannelConfig(name: String, oldChannel: ApkConfig.Channel?): ApkConfig.Channel {
         val params = ChannelRegistry.getChannel(name)?.getParams()?.map {
             val oldValue = oldChannel?.getParam(it.name)?.value
-            com.xigong.xiaozhuan.config.ApkConfig.Param(it.name, oldValue ?: it.defaultValue ?: "")
+            ApkConfig.Param(it.name, oldValue ?: it.defaultValue ?: "")
         }
-        return com.xigong.xiaozhuan.config.ApkConfig.Channel(
+        return ApkConfig.Channel(
             name = oldChannel?.name ?: name,
             enable = oldChannel?.enable ?: true,
             params = params ?: emptyList()

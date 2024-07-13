@@ -20,15 +20,15 @@ data class ApkConfig(
     @Json(name = "createTime")
     val createTime: Long,
     @Json(name = "channels")
-    val channels: List<com.xigong.xiaozhuan.config.ApkConfig.Channel>,
+    val channels: List<Channel>,
     /** 是否支持多渠道包 */
     @Json(name = "enableChannel")
     val enableChannel: Boolean = true,
     @Json(name = "extension")
-    val extension: com.xigong.xiaozhuan.config.ApkConfig.Extension
+    val extension: Extension
 ) {
 
-    fun getChannel(name: String): com.xigong.xiaozhuan.config.ApkConfig.Channel? {
+    fun getChannel(name: String): Channel? {
         return channels.firstOrNull { it.name == name }
     }
 
@@ -52,9 +52,9 @@ data class ApkConfig(
         val enable: Boolean,
         /** 参数 */
         @Json(name = "params")
-        val params: List<com.xigong.xiaozhuan.config.ApkConfig.Param>
+        val params: List<Param>
     ) {
-        fun getParam(name: String): com.xigong.xiaozhuan.config.ApkConfig.Param? {
+        fun getParam(name: String): Param? {
             return params.firstOrNull { it.name == name }
         }
     }
@@ -78,6 +78,6 @@ data class ApkConfig(
     )
 
     companion object {
-        val adapter = MoshiFactory.getAdapter<com.xigong.xiaozhuan.config.ApkConfig>()
+        val adapter = MoshiFactory.getAdapter<ApkConfig>()
     }
 }

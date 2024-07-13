@@ -22,7 +22,7 @@ import com.xigong.xiaozhuan.style.AppShapes
 
 
 @Composable
-fun ApkSelector(apks: List<com.xigong.xiaozhuan.config.ApkConfig>, current: com.xigong.xiaozhuan.config.ApkConfig, onSelected: (com.xigong.xiaozhuan.config.ApkConfig) -> Unit) {
+fun ApkSelector(apks: List<ApkConfig>, current: ApkConfig, onSelected: (ApkConfig) -> Unit) {
     var showApkMenu by remember { mutableStateOf(false) }
     Column {
         val width = 180.dp

@@ -65,7 +65,7 @@ class UploadVM(
     }
 
 
-    private suspend fun getApkConfig(): com.xigong.xiaozhuan.config.ApkConfig {
+    private suspend fun getApkConfig(): ApkConfig {
         return checkNotNull(configDao.getConfig(uploadParam.appId)) { "获取配置失败" }
     }
 

@@ -26,13 +26,10 @@
 
 
 ## 如何使用
-1. 新增APP
-
-2. 渠道包功能
-3. 版本更新功能
+<a href="./doc/Instructions.md">点击这里查看功能文档</a>
 
 
-## 下载地址
+## 安装包下载
 <a href="https://gitee.com/xigong93/XiaoZhuan/release">从Gitee下载(推荐)</a>
 
 <a href="https://github.com/xigong93/XiaoZhuan/release">从Github下载</a>

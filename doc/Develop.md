@@ -17,7 +17,7 @@
 ```
 
 
-## 项目使用的Api传包的文档
+## Api传包文档
 
 - 华为 https://developer.huawei.com/consumer/cn/doc/AppGallery-connect-Guides/agcapi-updateappinfo-0000001158245317
 - 小米 https://dev.mi.com/distribute/doc/details?pId=1134

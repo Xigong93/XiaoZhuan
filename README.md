@@ -1,21 +1,22 @@
 
 
-# 小篆传包 <img src="./img/icon.png" alt="图标" style="with:30px; height:30px"/>
-<a href="./doc/ENGLISH.md">English README</a>
+# 小篆传包 <img src="./img/icon.png" alt="图标" style="with:40px; height:40px"/>
 
 一键上传Apk到多个应用市场，开源，免费
+
+<a href="./doc/ENGLISH.md">English README</a>
 
 ## 应用界面截图
 
 ### 1. 首页
-<img src="./img/home.png" alt="首页"/>
+<img src="./img/home.png" style="border:2px solid #f4f4f4;border-radius:10px"/>
 
 ### 2. 提交新版本页面
-<img src="./img/submit.png" alt="提交新版本页面"/>
+<img src="./img/submit.png" style="border:2px solid #f4f4f4;border-radius:10px"/>
 
 ### 3. 新增APP页面
-<img src="./img/add.png" alt="新增APP页面"/>
-<img src="./img/huawei.png" alt="华为渠道配置"/>
+<img src="./img/add.png"  style="border:2px solid #f4f4f4;border-radius:10px"/>
+<img src="./img/huawei.png"  style="border:2px solid #f4f4f4;border-radius:10px"/>
 
 ## 特点：
 
@@ -51,7 +52,8 @@
 
 
 ## 已知问题
-1. 上传新版本后，立即获取应用市场审核状态，小米会显示上个版本正在审核中，OPPO会显示上个版本已上线
-a. 小米的传包Api提供的是不显示当前审核的版本，只返回线上的最新版本
-b. OPPO 提交新版本后，有几分钟的延迟，过几分钟后才会显示新版本正在审核中
-2. VIVO应用市场获取应用审核状态，有时候会报错，原因是此接口限制请求频率，每分钟不得超过3次
+1. 小米的传包Api不显示当前审核的版本，只返回线上的最新版本
+
+2. OPPO 提交新版本后，有几分钟的延迟，过几分钟后才会显示新版本正在审核中
+
+3. VIVO应用市场获取应用审核状态，有时候会报错，原因是此接口限制请求频率，每分钟不得超过3次

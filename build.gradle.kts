@@ -56,12 +56,13 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Dmg)
             outputBaseDir.set(project.buildDir.resolve("packages"))
-            includeAllModules = true
+//            includeAllModules = true
+            modules("java.instrument", "java.naming", "java.sql", "jdk.unsupported")
             packageName = appName
+            packageVersion = appVersion.versionName
             description = "一键上传Apk到多个应用市场，开源，免费"
             copyright = "© 2024 Xigong"
             vendor = "Xigong"
-            packageVersion = appVersion.versionName
 
             windows {
                 // 生成桌面快捷方式
@@ -74,6 +75,7 @@ compose.desktop {
                 installationPath = "./XiaoZhuan"
             }
             macOS {
+                bundleID = packageId
                 iconFile.set(project.file("launcher/icon.icns"))
                 installationPath = "./XiaoZhuan"
             }

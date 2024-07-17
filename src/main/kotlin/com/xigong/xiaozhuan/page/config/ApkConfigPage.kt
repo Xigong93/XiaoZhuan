@@ -1,6 +1,8 @@
 package com.xigong.xiaozhuan.page.config
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -12,14 +14,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.xigong.xiaozhuan.Api
 import com.xigong.xiaozhuan.channel.ChannelRegistry
 import com.xigong.xiaozhuan.config.ApkConfig
 import com.xigong.xiaozhuan.page.Page
 import com.xigong.xiaozhuan.style.AppColors
+import com.xigong.xiaozhuan.style.AppShapes
+import com.xigong.xiaozhuan.util.browser
 import com.xigong.xiaozhuan.widget.NegativeButton
 import com.xigong.xiaozhuan.widget.PositiveButton
 import com.xigong.xiaozhuan.widget.VerticalTabBar
@@ -130,6 +139,27 @@ private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> U
         Spacer(modifier = spaceHeight)
         CheckboxRow(Modifier, "开启渠道包", apkConfig.enableChannel) {
             onValueChange(apkConfig.copy(enableChannel = it))
+        }
+        Spacer(modifier = Modifier.height(60.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+                .clip(AppShapes.roundButton)
+                .clickable { browser(Api.INSTRUCTIONS_URL) }
+                .padding(8.dp)
+        ) {
+            Image(
+                painterResource("config_help.png"),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(AppColors.primary),
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "操作说明",
+                fontSize = 14.sp,
+                color = AppColors.primary,
+            )
         }
 
 

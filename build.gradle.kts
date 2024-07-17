@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.support.zipTo
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -6,8 +7,9 @@ plugins {
 }
 
 val packageId = "com.xigong.xiaozhuan"
-val appVersion = AppVersion(1, 1, 0)
+val appVersion = AppVersion(1, 1, 1)
 val appName = "小篆传包"
+val appNameEn = "XiaoZhuan"
 println("当前版本:v${appVersion.versionName} (${appVersion.versionCode})")
 repositories {
 //    maven("https://maven.aliyun.com/repository/public")
@@ -54,7 +56,7 @@ compose.desktop {
             }
         }
         nativeDistributions {
-            targetFormats(TargetFormat.Msi, TargetFormat.Dmg)
+            targetFormats(TargetFormat.AppImage, TargetFormat.Dmg)
             outputBaseDir.set(project.buildDir.resolve("packages"))
 //            includeAllModules = true
             modules("java.instrument", "java.naming", "java.sql", "jdk.unsupported")
@@ -91,6 +93,32 @@ tasks.named("processResources") {
         val tasks = gradle.taskGraph.allTasks
         val release = tasks.any { it.name.startsWith("package") }
         writeBuildConfig(file, release)
+    }
+}
+
+tasks.register("packageWindows") {
+    group = "compose desktop"
+    dependsOn("clean", "packageAppImage")
+    doLast {
+        val packageDir = project.buildDir.resolve("packages")
+        val dir = project.buildDir.resolve("packages/main/app")
+        val appDir = checkNotNull(dir.listFiles()).first()
+        val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-windows.zip")
+        zipTo(packageFile, appDir)
+        print("The distribution is written to ${packageFile.absolutePath}")
+    }
+}
+
+tasks.register("packageMac") {
+    group = "compose desktop"
+    dependsOn("clean", "packageDmg")
+    doLast {
+        val packageDir = project.buildDir.resolve("packages")
+        val dir = project.buildDir.resolve("packages/main/app")
+        val appDir = checkNotNull(dir.listFiles()).first()
+        val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-windows.zip")
+        zipTo(packageFile, appDir)
+        print("The distribution is written to ${packageFile.absolutePath}")
     }
 }
 

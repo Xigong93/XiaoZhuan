@@ -12,10 +12,16 @@
 
 不支持交叉编译，需要在Windows和Mac 分别构建对应的安装包
 
+### Windows
 ```shell
-./gradlew clean packageDistributionForCurrentOS
+./gradlew packageWindows
 ```
 
+### Mac
+```shell
+chmod +x ./gradlew 
+./gradlew packageMac
+```
 
 ## Api传包文档
 

@@ -49,7 +49,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "Main"
         buildTypes {
             release {
                 proguard.isEnabled = false

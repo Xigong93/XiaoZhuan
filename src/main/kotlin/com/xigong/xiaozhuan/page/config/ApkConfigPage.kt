@@ -140,28 +140,34 @@ private fun BasicApkConfig(apkConfig: ApkConfig, onValueChange: (ApkConfig) -> U
         CheckboxRow(Modifier, "开启渠道包", apkConfig.enableChannel) {
             onValueChange(apkConfig.copy(enableChannel = it))
         }
-        Spacer(modifier = Modifier.height(60.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-                .clip(AppShapes.roundButton)
-                .clickable { browser(Api.INSTRUCTIONS_URL) }
-                .padding(8.dp)
-        ) {
-            Image(
-                painterResource("config_help.png"),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(AppColors.primary),
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                "操作说明",
-                fontSize = 14.sp,
-                color = AppColors.primary,
-            )
-        }
+        Spacer(modifier = Modifier.height(30.dp))
+        InstructionsButton()
+    }
+}
 
-
+/**
+ * 操作说明按钮
+ */
+@Composable
+private fun InstructionsButton() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(AppShapes.roundButton)
+            .clickable { browser(Api.INSTRUCTIONS_URL) }
+            .padding(horizontal = 14.dp, vertical = 8.dp)
+    ) {
+        Image(
+            painterResource("config_help.png"),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(AppColors.primary),
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            "操作说明",
+            fontSize = 14.sp,
+            color = AppColors.primary,
+        )
     }
 }

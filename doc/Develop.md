@@ -22,6 +22,8 @@
 chmod +x ./gradlew && ./gradlew packageMac
 ```
 
+安装包在`build/packages`目录下
+
 ## Api传包文档
 
 - 华为 https://developer.huawei.com/consumer/cn/doc/AppGallery-connect-Guides/agcapi-updateappinfo-0000001158245317

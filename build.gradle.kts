@@ -1,16 +1,24 @@
 import org.gradle.kotlin.dsl.support.zipTo
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.*
 
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
 }
 
-val packageId = "com.xigong.xiaozhuan"
 val appVersion = AppVersion(1, 1, 1)
+
+@Suppress("SpellCheckingInspection")
+val packageId = "com.xigong.xiaozhuan"
+
 val appName = "小篆传包"
+
+@Suppress("SpellCheckingInspection")
 val appNameEn = "XiaoZhuan"
+
 println("当前版本:v${appVersion.versionName} (${appVersion.versionCode})")
+
 repositories {
 //    maven("https://maven.aliyun.com/repository/public")
     google()
@@ -56,7 +64,12 @@ compose.desktop {
             }
         }
         nativeDistributions {
-            targetFormats(TargetFormat.AppImage, TargetFormat.Dmg)
+            // 这么写，是因为在Mac上，如果存在AppImage类型会报错
+            if (isWindows()) {
+                targetFormats(TargetFormat.AppImage)
+            } else {
+                targetFormats(TargetFormat.Dmg)
+            }
             outputBaseDir.set(project.buildDir.resolve("packages"))
 //            includeAllModules = true
             modules("java.instrument", "java.naming", "java.sql", "jdk.unsupported")
@@ -103,7 +116,7 @@ tasks.register("packageWindows") {
         val packageDir = project.buildDir.resolve("packages")
         val dir = project.buildDir.resolve("packages/main/app")
         val appDir = checkNotNull(dir.listFiles()).first()
-        val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-windows.zip")
+        val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-Windows.zip")
         zipTo(packageFile, appDir)
         print("The distribution is written to ${packageFile.absolutePath}")
     }
@@ -114,10 +127,10 @@ tasks.register("packageMac") {
     dependsOn("clean", "packageDmg")
     doLast {
         val packageDir = project.buildDir.resolve("packages")
-        val dir = project.buildDir.resolve("packages/main/app")
-        val appDir = checkNotNull(dir.listFiles()).first()
-        val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-windows.zip")
-        zipTo(packageFile, appDir)
+        val dir = project.buildDir.resolve("packages/main/dmg")
+        val dmgFile = checkNotNull(dir.listFiles()).first()
+        val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-Mac.dmg")
+        dmgFile.copyTo(packageFile, true)
         print("The distribution is written to ${packageFile.absolutePath}")
     }
 }
@@ -140,3 +153,11 @@ fun writeBuildConfig(file: File, release: Boolean) {
     file.writeText(buildConfig.toJson())
 }
 
+/**
+ * 当前系统是不是windows
+ */
+fun isWindows(): Boolean {
+    return System.getProperty("os.name")
+        .lowercase(Locale.getDefault())
+        .contains("win")
+}

@@ -19,8 +19,7 @@
 
 ### Mac
 ```shell
-chmod +x ./gradlew 
-./gradlew packageMac
+chmod +x ./gradlew && ./gradlew packageMac
 ```
 
 ## Api传包文档

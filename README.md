@@ -1,6 +1,6 @@
 
 
-# 小篆传包 <img src="./img/icon.png" alt="图标" style="with:40px; height:40px"/>
+# 小篆传包  
 
 一键上传Apk到多个应用市场，开源，免费
 
@@ -16,7 +16,6 @@
 
 ### 3. 新增APP页面
 <img src="./img/add.png"  style="border:2px solid #f4f4f4;border-radius:10px"/>
-<img src="./img/huawei.png"  style="border:2px solid #f4f4f4;border-radius:10px"/>
 
 ## 特点：
 
@@ -30,6 +29,16 @@
 
 
 ## 安装包下载
+Windows 是绿色版，下载解压后，直接启动
+
+Mac 版本未签名，需要配置以后才可以打开
+
+1. 点击屏幕左上角的苹果图标，选择菜单：找到系统偏好设置
+2. 打开系统偏好设置界面，点击"安全性与隐私"-“通用”
+3. 窗口底部允许从以下位置下载的App会看到：已阻止使用“XXX”，因为来自身份不明的开发者。点击后面的"仍要打开"按钮
+4. 在弹出的确认弹窗中，点击"打开"按钮即可
+   <img src="./img/macOpenError.png"  style="border:2px solid #f4f4f4;border-radius:10px"/>
+
 <a href="https://gitee.com/xigong93/XiaoZhuan/releases">从Gitee下载(推荐)</a>
 
 <a href="https://github.com/xigong93/XiaoZhuan/releases">从Github下载</a>
@@ -54,3 +63,11 @@
 2. OPPO 提交新版本后，有几分钟的延迟，过几分钟后才会显示新版本正在审核中
 
 3. VIVO应用市场获取应用审核状态，有时候会报错，原因是此接口限制请求频率，每分钟不得超过3次
+
+
+## 问题反馈
+<a href="./issues">点击这里反馈问题</a>
+
+
+## 写在最后
+撸码不易，欢迎点赞对我进行鼓励，点赞越多，优化越快

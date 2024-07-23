@@ -10,24 +10,26 @@ import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.FrameWindowScope
+import com.sun.jna.Pointer
+import com.sun.jna.platform.win32.User32
+import com.sun.jna.platform.win32.WinDef
 import com.xigong.xiaozhuan.BuildConfig
 import com.xigong.xiaozhuan.page.splash.SplashPage
 import com.xigong.xiaozhuan.page.version.NewVersionDialog
 import com.xigong.xiaozhuan.style.AppColors
 import com.xigong.xiaozhuan.style.AppShapes
+import com.xigong.xiaozhuan.util.isWindows
 
 @Composable
 fun FrameWindowScope.RootWindow(
@@ -39,7 +41,7 @@ fun FrameWindowScope.RootWindow(
         shape = roundShape,
         modifier = Modifier
             .clip(roundShape)
-            .padding(4.dp)
+//            .padding(4.dp)
     ) {
 
         Box(
@@ -81,8 +83,9 @@ private fun FrameWindowScope.TopBar(closeClick: () -> Unit) {
             Spacer(modifier = Modifier.width(12.dp))
             Text(BuildConfig.appName, fontSize = 14.sp, color = AppColors.fontBlack)
             Spacer(modifier = Modifier.weight(1f))
+            configForWindows()
             ImageButton("window_mini.png", 20.dp) {
-                window.isMinimized = true
+                minimized()
             }
             ImageButton("window_close.png", 14.dp, closeClick)
         }
@@ -105,5 +108,33 @@ private fun ImageButton(image: String, size: Dp, onClick: () -> Unit) {
             colorFilter = ColorFilter.tint(Color.Black),
             modifier = Modifier.size(size)
         )
+    }
+}
+
+/**
+ * 调用这个方法，和下面的最小化方法，可以解决windows上窗口最小化没有动画的bug
+ */
+@Composable
+private fun FrameWindowScope.configForWindows() {
+    if (isWindows()) {
+        val windowHandle = remember(this.window) {
+            val windowPointer = Pointer(this.window.windowHandle)
+            WinDef.HWND(windowPointer)
+        }
+        remember(windowHandle) { CustomWindowProcedure(windowHandle) }
+    }
+
+}
+
+/**
+ * 窗口最小化
+ */
+private fun FrameWindowScope.minimized() {
+    if (isWindows()) {
+        // 修复windows窗口最小化没有动画的bug
+        val windowPointer = Pointer(this.window.windowHandle)
+        User32.INSTANCE.CloseWindow(WinDef.HWND(windowPointer))
+    } else {
+        window.isMinimized = true
     }
 }

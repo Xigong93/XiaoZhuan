@@ -44,6 +44,9 @@ dependencies {
     // Enables FileKit with Composable utilities
     implementation("io.github.vinceglb:filekit-compose:0.6.2")
 
+    implementation("net.java.dev.jna:jna-jpms:5.14.0")
+    implementation("net.java.dev.jna:jna-platform-jpms:5.14.0")
+
 }
 
 // 小米应用市场

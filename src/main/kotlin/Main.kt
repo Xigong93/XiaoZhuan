@@ -28,7 +28,7 @@ fun main() {
             title = BuildConfig.appName,
             icon = painterResource(BuildConfig.ICON),
             resizable = false,
-            transparent = true,
+            transparent = false,
             undecorated = true,
             state = rememberWindowState(
                 width = 1280.dp, height = 960.dp,

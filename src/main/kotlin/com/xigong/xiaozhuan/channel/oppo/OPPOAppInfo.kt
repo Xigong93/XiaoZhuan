@@ -70,7 +70,8 @@ data class OPPOAppInfo(val obj: JsonObject) {
             else -> ReviewState.UnderReview
         }
         return MarketInfo(
-            state, lastVersionCode = versionCode, lastVersionName = versionName
+            reviewState = state,
+            lastVersion = MarketInfo.Version(versionCode, versionName)
         )
     }
 }

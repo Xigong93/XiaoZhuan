@@ -34,12 +34,16 @@ data class MiAppInfoResp(
     }
 
     fun toMarketState(): MarketInfo {
-        val state = if (updateVersion) ReviewState.Online else ReviewState.UnderReview
-        return MarketInfo(
-            reviewState = state,
-            enableSubmit = updateVersion,
-            lastVersionCode = packageInfo.versionCode,
-            lastVersionName = packageInfo.versionName
-        )
+        return if (updateVersion) {
+            MarketInfo(
+                reviewState = ReviewState.Online,
+                lastVersion = MarketInfo.Version(packageInfo.versionCode, packageInfo.versionName)
+            )
+        } else {
+            MarketInfo(
+                reviewState = ReviewState.UnderReview,
+                lastVersion = null // 小米应用市场没有返回正在审核的版本号
+            )
+        }
     }
 }

@@ -174,7 +174,8 @@ class ApkPageState(val apkConfig: ApkConfig) {
             message?.set("应用市场审核中，或状态异常，无法上传新版本")
             return false
         }
-        if (apkInfo != null && marketInfo != null && apkInfo.versionCode <= marketInfo.lastVersionCode) {
+        val lastVersion = marketInfo?.lastVersion
+        if (apkInfo != null && lastVersion != null && apkInfo.versionCode <= lastVersion.code) {
             message?.set("要提交的Apk版本号需大于线上最新版本号")
             return false
         }

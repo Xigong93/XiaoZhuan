@@ -32,7 +32,10 @@ data class VIVOAppInfo(val obj: JsonObject) {
             4 -> ReviewState.Rejected
             else -> ReviewState.Unknown
         }
-        return MarketInfo(reviewState = state, lastVersionCode = versionCode, lastVersionName = versionName)
+        return MarketInfo(
+            reviewState = state,
+            lastVersion = MarketInfo.Version(versionCode, versionName)
+        )
     }
 
 }

@@ -239,7 +239,8 @@ private fun ChannelView(
             is MarketState.Loading -> "加载中"
             is MarketState.Success -> {
                 val info = marketState.info
-                "v${info.lastVersionName} ${info.reviewState.desc}"
+                val version = info.lastVersion?.name?.let { "v$it" } ?: "未知版本"
+                "$version ${info.reviewState.desc}"
             }
 
             is MarketState.Error -> {

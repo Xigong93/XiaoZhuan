@@ -63,7 +63,12 @@ compose.desktop {
         mainClass = "Main"
         buildTypes {
             release {
-                proguard.isEnabled = false
+                proguard {
+                    isEnabled.set(true)
+                    optimize.set(true)
+                    obfuscate.set(false)
+                    configurationFiles.from("./proguard/app.pro", "./proguard/jna.pro")
+                }
             }
         }
         nativeDistributions {
@@ -114,10 +119,10 @@ tasks.named("processResources") {
 
 tasks.register("packageWindows") {
     group = "compose desktop"
-    dependsOn("clean", "packageAppImage")
+    dependsOn("clean", "packageReleaseAppImage")
     doLast {
         val packageDir = project.buildDir.resolve("packages")
-        val dir = project.buildDir.resolve("packages/main/app")
+        val dir = project.buildDir.resolve("packages/main-release/app")
         val appDir = checkNotNull(dir.listFiles()).first()
         val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-Windows.zip")
         zipTo(packageFile, appDir)
@@ -127,10 +132,10 @@ tasks.register("packageWindows") {
 
 tasks.register("packageMac") {
     group = "compose desktop"
-    dependsOn("clean", "packageDmg")
+    dependsOn("clean", "packageReleaseDmg")
     doLast {
         val packageDir = project.buildDir.resolve("packages")
-        val dir = project.buildDir.resolve("packages/main/dmg")
+        val dir = project.buildDir.resolve("packages/main-release/dmg")
         val dmgFile = checkNotNull(dir.listFiles()).first()
         val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-Mac.dmg")
         dmgFile.copyTo(packageFile, true)

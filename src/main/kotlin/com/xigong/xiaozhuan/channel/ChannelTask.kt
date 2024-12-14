@@ -48,6 +48,7 @@ abstract class ChannelTask {
         try {
             val apkInfo = getApkInfo(apkFile)
             AppLogger.info(channelName, "准备提交Apk信息:$apkInfo")
+            AppLogger.info(channelName, "版本参数:$versionParams")
             listener?.onStart()
             listener?.onProcessing("请求中")
             performUpload(apkFile, apkInfo, versionParams, ::notifyProgress)

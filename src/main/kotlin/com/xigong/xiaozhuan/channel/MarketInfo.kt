@@ -8,7 +8,7 @@ data class MarketInfo(
     /** 审核状态 */
     val reviewState: ReviewState,
     /** 是否允许提交新版本 */
-    val enableSubmit: Boolean = reviewState == ReviewState.Online || reviewState == ReviewState.Rejected,
+    val enableSubmit: Boolean = reviewState != ReviewState.UnderReview,
     /**
      * 最新版本号
      */

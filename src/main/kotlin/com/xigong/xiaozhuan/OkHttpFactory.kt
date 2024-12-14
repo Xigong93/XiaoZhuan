@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 // 有几个平台的接口响应非常慢，所以这个时间要设置的大一些
-private val timeout = 30.seconds.toJavaDuration()
+private val timeout = 60.seconds.toJavaDuration()
 
 private const val DEBUG_NETWORK = false
 

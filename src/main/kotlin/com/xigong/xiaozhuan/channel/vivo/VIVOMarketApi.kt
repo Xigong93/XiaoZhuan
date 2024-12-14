@@ -7,6 +7,7 @@ import com.xigong.xiaozhuan.util.ProgressBody
 import com.xigong.xiaozhuan.util.ProgressChange
 import com.xigong.xiaozhuan.util.getJsonResult
 import com.google.gson.JsonObject
+import com.xigong.xiaozhuan.channel.VersionParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -15,6 +16,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class VIVOMarketApi(
     private val accessKey: String,
@@ -67,16 +70,25 @@ class VIVOMarketApi(
     /**
      * 提交更新
      */
-    suspend fun submit(apkResult: VIVOApkResult, updateDesc: String, appInfo: VIVOAppInfo) =
+    suspend fun submit(apkResult: VIVOApkResult, versionParams: VersionParams, appInfo: VIVOAppInfo) =
         withContext(Dispatchers.IO) {
-            val params = mapOf(
+            val onlineTime = versionParams.onlineTime
+            // 立即上架:1,定时上架:2
+            val onlineType = if (onlineTime > 0) "2" else "1"
+            val params = mutableMapOf(
                 "packageName" to apkResult.packageName,
                 "versionCode" to apkResult.versionCode.toString(),
                 "apk" to apkResult.serialnumber,
                 "fileMd5" to apkResult.fileMd5,
-                "onlineType" to appInfo.onlineType.toString(),
-                "updateDesc" to updateDesc,
+                "onlineType" to onlineType,
+                "updateDesc" to versionParams.updateDesc,
             )
+            if (onlineTime > 0) {
+                // 上架时间，若onlineType   = 2，上架时间必填。格式：yyyy-MM-dd   HH:mm:ss
+                val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                val time = format.format(Date(onlineTime))
+                params["scheOnlineTime"] = time
+            }
             val requestUrl = getRequestUrl("app.sync.update.app", params)
             val request = Request.Builder()
                 .url(requestUrl)

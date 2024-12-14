@@ -70,6 +70,7 @@ class MiMarketApi(
         apkFile: File,
         appInfo: MiAppInfoResp.MiAppInfo,
         updateDesc: String,
+        onlineTime: Long,
         progressChange: ProgressChange
     ) = withContext(Dispatchers.IO) {
         val requestData = JSONObject().apply {
@@ -79,6 +80,9 @@ class MiMarketApi(
                 put("appName", appInfo.appName)
                 put("packageName", appInfo.packageName)
                 put("updateDesc", updateDesc)
+                if (onlineTime > 0) {
+                    put("onlineTime", onlineTime)// 上线时间，毫秒时间戳
+                }
             })
         }
 

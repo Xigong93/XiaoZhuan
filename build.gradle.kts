@@ -44,6 +44,8 @@ dependencies {
     // Enables FileKit with Composable utilities
     implementation("io.github.vinceglb:filekit-compose:0.6.2")
 
+    implementation("net.dongliu:apk-parser:2.6.10")
+
 }
 
 // 小米应用市场

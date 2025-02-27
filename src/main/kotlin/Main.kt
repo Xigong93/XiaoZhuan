@@ -27,11 +27,11 @@ fun main() {
         Window(
             title = BuildConfig.appName,
             icon = painterResource(BuildConfig.ICON),
-            resizable = false,
+            resizable = true,
             transparent = true,
             undecorated = true,
             state = rememberWindowState(
-                width = 1280.dp, height = 960.dp,
+                width = 1080.dp, height = 760.dp,
                 position = WindowPosition(Alignment.Center)
             ),
             onCloseRequest = {

@@ -29,6 +29,7 @@ class ApkPageState(val apkConfig: ApkConfig) {
 
     val updateDesc = mutableStateOf(apkConfig.extension.updateDesc ?: "")
 
+    val ignoreVersionCheck = mutableStateOf(apkConfig.extension.ignoreVersion)
 
     val channels: List<ChannelTask> = ChannelRegistry.channels.filter { apkConfig.channelEnable(it.channelName) }
 
@@ -164,6 +165,29 @@ class ApkPageState(val apkConfig: ApkConfig) {
     }
 
     /**
+     * 是否忽略版本号
+     */
+    fun isIgnoreVersion() : Boolean {
+        return ignoreVersionCheck.value
+    }
+
+    /**
+     * 设置忽略版本号
+     */
+    fun updateIgnoreVersion(checked: Boolean) {
+        ignoreVersionCheck.value = checked
+        val newExtension = apkConfig.extension.copy(ignoreVersion = checked)
+        scope.launch {
+            val configDao = ApkConfigDao()
+            try {
+                configDao.saveConfig(apkConfig.copy(extension = newExtension))
+            } catch (e: Exception) {
+                AppLogger.error(LOG_TAG, "更新Apk配置失败", e)
+            }
+        }
+    }
+
+    /**
      * 检查当前渠道是否支持提交
      */
     private fun checkChannelEnableSubmit(channelName: String, message: AtomicReference<String>? = null): Boolean {
@@ -174,9 +198,11 @@ class ApkPageState(val apkConfig: ApkConfig) {
             message?.set("应用市场审核中，或状态异常，无法上传新版本")
             return false
         }
-        if (apkInfo != null && marketInfo != null && apkInfo.versionCode <= marketInfo.lastVersionCode) {
-            message?.set("要提交的Apk版本号需大于线上最新版本号")
-            return false
+        if (!isIgnoreVersion()) {
+            if (apkInfo != null && marketInfo != null && apkInfo.versionCode <= marketInfo.lastVersionCode) {
+                message?.set("要提交的Apk版本号需大于线上最新版本号")
+                return false
+            }
         }
         return true
     }

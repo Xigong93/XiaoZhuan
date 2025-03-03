@@ -37,15 +37,13 @@ dependencies {
     implementation("org.json:json:20210307")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0")
-    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha02")
+//    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha02")
+    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
     // Enables FileKit without Compose dependencies
     implementation("io.github.vinceglb:filekit-core:0.6.2")
 
     // Enables FileKit with Composable utilities
     implementation("io.github.vinceglb:filekit-compose:0.6.2")
-
-    implementation("net.java.dev.jna:jna-jpms:5.14.0")
-    implementation("net.java.dev.jna:jna-platform-jpms:5.14.0")
 
 }
 

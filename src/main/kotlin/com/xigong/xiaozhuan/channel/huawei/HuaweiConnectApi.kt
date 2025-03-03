@@ -12,7 +12,7 @@ import okhttp3.Request
 import retrofit2.http.*
 import java.io.File
 
-fun HuaweiConnectApi(): HuaweiConnectApi {
+internal fun HuaweiConnectApi(): HuaweiConnectApi {
     return RetrofitFactory.create("https://connect-api.cloud.huawei.com/")
 }
 
@@ -20,7 +20,7 @@ fun HuaweiConnectApi(): HuaweiConnectApi {
  * 华为提供的Api
  * https://developer.huawei.com/consumer/cn/doc/AppGallery-connect-Guides/agcapi-getstarted-0000001111845114
  */
-interface HuaweiConnectApi {
+internal interface HuaweiConnectApi {
 
 
     /**
@@ -83,7 +83,7 @@ interface HuaweiConnectApi {
         @Header("client_id") clientId: String,
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
-        @Query("pkgIds") pkgIds: String ,
+        @Query("pkgIds") pkgIds: String,
     ): HWApkState
 
 
@@ -107,15 +107,21 @@ interface HuaweiConnectApi {
     suspend fun submit(
         @Header("client_id") clientId: String,
         @Header("Authorization") token: String,
-        @Query("appId") appId: String
+        @Query("appId") appId: String,
+        /**
+         *
+         * 指定发布的UTC时间，格式为：yyyy-MM-dd'T'HH:mm:ssZZ，例如“2015-01-01T01:01:01+0800”。
+         */
+        @Query("releaseTime") releaseTime: String?,
     ): HWResp
+
 
 }
 
 /**
  * 上传文件
  */
-suspend fun HuaweiConnectApi.uploadFile(
+internal suspend fun HuaweiConnectApi.uploadFile(
     file: File,
     url: HWUploadUrlResp.UploadUrl,
     progressChange: ProgressChange

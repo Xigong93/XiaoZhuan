@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.xigong.xiaozhuan.channel.ChannelRegistry
 import com.xigong.xiaozhuan.channel.SubmitState
 import com.xigong.xiaozhuan.channel.TaskLauncher
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.config.ApkConfig
 import com.xigong.xiaozhuan.config.ApkConfigDao
 import com.xigong.xiaozhuan.log.AppLogger
@@ -61,7 +62,9 @@ class UploadVM(
             it.prepare()
         }
         val updateDesc = uploadParam.updateDesc.trim()
-        forEach { it.startSubmit(updateDesc) }
+        val onlineTime = uploadParam.onlineTime
+        val versionParams = VersionParams(updateDesc, onlineTime)
+        forEach { it.startSubmit(versionParams) }
     }
 
 

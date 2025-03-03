@@ -2,6 +2,7 @@ package com.xigong.xiaozhuan.channel.mi
 
 import com.xigong.xiaozhuan.channel.ChannelTask
 import com.xigong.xiaozhuan.channel.MarketInfo
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.util.ApkInfo
 import java.io.File
 
@@ -22,8 +23,8 @@ class MiChannelTask : ChannelTask() {
         marketClient = MiMarketClient(account, publicKey, privateKey)
     }
 
-    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
-        requireNotNull(marketClient).submit(file, apkInfo, updateDesc, progress)
+    override suspend fun performUpload(file: File, apkInfo: ApkInfo, versionParams: VersionParams, progress: (Int) -> Unit) {
+        requireNotNull(marketClient).submit(file, apkInfo, versionParams, progress)
     }
 
     override suspend fun getMarketState(applicationId: String): MarketInfo {

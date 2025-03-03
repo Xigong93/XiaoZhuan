@@ -1,11 +1,14 @@
 package com.xigong.xiaozhuan.channel.honor
 
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.log.AppLogger
 import com.xigong.xiaozhuan.log.action
 import com.xigong.xiaozhuan.util.ApkInfo
 import com.xigong.xiaozhuan.util.FileUtil
 import com.xigong.xiaozhuan.util.ProgressChange
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HonorConnectClient {
 
@@ -24,7 +27,7 @@ class HonorConnectClient {
         apkInfo: ApkInfo,
         clientId: String,
         clientSecret: String,
-        updateDesc: String,
+        versionParams: VersionParams,
         progressChange: ProgressChange
     ): Unit = AppLogger.action(LOG_TAG, "提交新版本") {
         val rawToken = getToken(clientId, clientSecret)
@@ -34,8 +37,8 @@ class HonorConnectClient {
         val uploadUrl = getUploadUrl(token, appId, file)
         uploadFile(file, token, uploadUrl, progressChange)
         bindUploadedApk(token, appId, uploadUrl)
-        modifyUpdateDesc(token, appId, updateDesc, languageInfo)
-        submit(token, appId)
+        modifyUpdateDesc(token, appId, versionParams.updateDesc, languageInfo)
+        submit(token, appId, versionParams.onlineTime)
     }
 
     /**
@@ -155,8 +158,17 @@ class HonorConnectClient {
     private suspend fun submit(
         token: String,
         appId: String,
+        onlineTime: Long,
     ): Unit = AppLogger.action(LOG_TAG, "提交审核") {
-        val result = connectApi.submit(token, appId)
+        val params = if (onlineTime > 0) {
+            val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ")
+            val time = format.format(Date(onlineTime))
+            HonorSubmitParam(releaseType = 2, releaseTime = time)
+        } else {
+            HonorSubmitParam(releaseType = 1, releaseTime = null)
+
+        }
+        val result = connectApi.submit(token, appId, params)
         result.throwOnFail("提交审核")
     }
 

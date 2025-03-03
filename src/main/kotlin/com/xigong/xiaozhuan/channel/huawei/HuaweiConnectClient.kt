@@ -1,11 +1,14 @@
 package com.xigong.xiaozhuan.channel.huawei
 
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.log.AppLogger
 import com.xigong.xiaozhuan.log.action
 import com.xigong.xiaozhuan.util.ApkInfo
 import com.xigong.xiaozhuan.util.ProgressChange
 import kotlinx.coroutines.delay
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration.Companion.seconds
@@ -27,7 +30,7 @@ class HuaweiConnectClient {
         apkInfo: ApkInfo,
         clientId: String,
         clientSecret: String,
-        updateDesc: String,
+        versionParams: VersionParams,
         progressChange: ProgressChange
     ): Unit = AppLogger.action(LOG_TAG, "提交新版本") {
         val rawToken = getToken(clientId, clientSecret)
@@ -37,8 +40,9 @@ class HuaweiConnectClient {
         uploadFile(file, uploadUrl, progressChange)
         val bindResult = bindApk(clientId, token, appId, file, uploadUrl)
         waitApkReady(clientId, token, appId, bindResult)
-        modifyUpdateDesc(clientId, token, appId, updateDesc)
-        submit(clientId, token, appId)
+        modifyUpdateDesc(clientId, token, appId, versionParams.updateDesc)
+        submit(clientId, token, appId, versionParams.onlineTime)
+
     }
 
     /**
@@ -169,8 +173,15 @@ class HuaweiConnectClient {
         clientId: String,
         token: String,
         appId: String,
+        onlineTime: Long,
     ): Unit = AppLogger.action(LOG_TAG, "提交审核") {
-        val result = connectApi.submit(clientId, token, appId)
+        val time = if (onlineTime > 0) {
+            val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ")
+            format.format(Date(onlineTime))
+        } else {
+            null
+        }
+        val result = connectApi.submit(clientId, token, appId, time)
         result.result.throwOnFail("提交审核")
     }
 

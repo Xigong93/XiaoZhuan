@@ -36,11 +36,11 @@ class TaskLauncher(private val task: ChannelTask) {
         updateState(SubmitState.Waiting)
     }
 
-    suspend fun startSubmit(updateDesc: String) {
+    suspend fun startSubmit(versionParams: VersionParams) {
         val apkFile = requireNotNull(apkFileState.value)
         initParams()
         task.setSubmitStateListener(stateListener)
-        task.startUpload(apkFile, updateDesc)
+        task.startUpload(apkFile, versionParams)
     }
 
     suspend fun loadMarketState(applicationId: String) {

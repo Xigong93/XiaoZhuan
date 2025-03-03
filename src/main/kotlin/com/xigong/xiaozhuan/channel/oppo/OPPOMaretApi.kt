@@ -8,6 +8,7 @@ import com.xigong.xiaozhuan.util.ProgressChange
 import com.xigong.xiaozhuan.util.getJsonResult
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.xigong.xiaozhuan.channel.VersionParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -17,6 +18,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class OPPOMaretApi(
     private val clientId: String,
@@ -105,7 +108,7 @@ class OPPOMaretApi(
         token: String,
         apkInfo: ApkInfo,
         appInfo: OPPOAppInfo,
-        updateDesc: String,
+        versionParams: VersionParams,
         apkResult: OPPOApkResult
     ) = withContext(Dispatchers.IO) {
         val apkUrl = JsonArray().apply {
@@ -115,12 +118,15 @@ class OPPOMaretApi(
                 addProperty("cpu_code", 0) //多包平台，64 位 CPU 包为 64，32 位 CPU 包为 32，非多包应用为 0
             })
         }
-        val params = mapOf(
+        val onlineTime = versionParams.onlineTime
+        val onlineType = if (onlineTime > 0) "2" else "1"
+
+        val params = mutableMapOf(
             "pkg_name" to apkInfo.applicationId,
             "version_code" to apkInfo.versionCode.toString(),
             "apk_url" to apkUrl.toString(),
-            "update_desc" to updateDesc,
-            "online_type" to "1", // 1. 审核后立即发布 2. 定时发布
+            "update_desc" to versionParams.updateDesc,
+            "online_type" to onlineType, // 1. 审核后立即发布 2. 定时发布
             "second_category_id" to appInfo.secondCategory,
             "third_category_id" to appInfo.thirdCategory,
             "summary" to appInfo.summary,
@@ -139,6 +145,14 @@ class OPPOMaretApi(
             // 电子版软著
             "electronic_cert_url" to appInfo.electronicCertUrl,
         )
+
+        if (onlineTime > 0) {
+            // 	定时发布时间，online_type=2 时必填，不能早于当前时间
+            //格式参考2006-01-02 15:04:05
+            val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            val time = format.format(Date(onlineTime))
+            params["sche_online_time"] = time
+        }
         val body = FormBody.Builder()
             .apply {
                 params.forEach { add(it.key, it.value) }

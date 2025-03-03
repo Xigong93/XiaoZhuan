@@ -1,5 +1,6 @@
 package com.xigong.xiaozhuan.channel.mi
 
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.log.AppLogger
 import com.xigong.xiaozhuan.log.action
 import com.xigong.xiaozhuan.util.ApkInfo
@@ -27,10 +28,10 @@ class MiMarketClient(
      * 提交新版本
      */
     suspend fun submit(
-        file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit
+        file: File, apkInfo: ApkInfo, versionParams: VersionParams, progress: (Int) -> Unit
     ): Unit = AppLogger.action(LOG_TAG, "提交新版本") {
         val appInfo = getAppInfo(apkInfo.applicationId)
-        uploadApk(file, appInfo, updateDesc, progress)
+        uploadApk(file, appInfo, versionParams, progress)
     }
 
     /**
@@ -39,10 +40,10 @@ class MiMarketClient(
     private suspend fun uploadApk(
         file: File,
         appInfo: MiAppInfoResp,
-        updateDesc: String,
+        versionParams: VersionParams,
         progress: (Int) -> Unit
     ): Unit = AppLogger.action(LOG_TAG, "上传Apk文件，并提交审核") {
-        marketApi.uploadApk(file, appInfo.packageInfo, updateDesc) {
+        marketApi.uploadApk(file, appInfo.packageInfo, versionParams.updateDesc, versionParams.onlineTime) {
             progress((it * 100).roundToInt())
         }
     }

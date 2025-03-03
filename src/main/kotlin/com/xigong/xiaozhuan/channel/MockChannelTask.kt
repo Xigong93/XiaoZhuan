@@ -19,7 +19,12 @@ class MockChannelTask(
 
     }
 
-    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
+    override suspend fun performUpload(
+        file: File,
+        apkInfo: ApkInfo,
+        versionParams: VersionParams,
+        progress: (Int) -> Unit
+    ) {
         AppLogger.info(LOG_TAG, "Mock ${channelName},开始上传")
         repeat(100) {
             delay(30)

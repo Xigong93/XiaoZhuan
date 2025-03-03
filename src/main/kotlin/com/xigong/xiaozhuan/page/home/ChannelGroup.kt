@@ -23,6 +23,7 @@ import com.xigong.xiaozhuan.style.AppShapes
 import com.xigong.xiaozhuan.widget.ConfirmDialog
 import com.xigong.xiaozhuan.widget.ErrorPopup
 import com.xigong.xiaozhuan.widget.Toast
+import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -94,6 +95,37 @@ fun ChannelGroup(viewModel: ApkPageState, startUpload: (UploadParam) -> Unit) {
                     modifier = Modifier.padding(start = 10.dp)
                 )
             }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+//                .padding(14.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(AppShapes.roundButton)
+                    .clickable {
+                        viewModel.enableScheduledRelease = !viewModel.enableScheduledRelease
+                    }
+                    .padding(end = 12.dp)) {
+                Checkbox(
+                    viewModel.enableScheduledRelease,
+                    onCheckedChange = { all ->
+                        viewModel.enableScheduledRelease = !viewModel.enableScheduledRelease
+                    },
+                    colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
+                )
+                Text("定时发布")
+            }
+
+            Spacer(Modifier.width(40.dp))
+
+            if (viewModel.enableScheduledRelease) {
+                DateInput(viewModel.releaseTime) {
+                    viewModel.releaseTime = it
+                }
+            }
+
         }
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -170,6 +202,14 @@ private fun showConfirmDialog(viewModel: ApkPageState, onConfirm: () -> Unit, on
         append("版本:  ${apkInfo.versionName}(${apkInfo.versionCode})")
         append("\n")
         append("渠道:  ${selectedChannels.joinToString(",")}")
+        append("\n")
+        if (viewModel.enableScheduledRelease) {
+            val date = viewModel.releaseTime.getData()
+            val dateStr = SimpleDateFormat("yyyy年MM月dd日 HH时").format(date)
+            append("发布方式:  于 $dateStr 定时发布")
+        } else {
+            append("发布方式:  审核通过后立即发布")
+        }
     }
 
 

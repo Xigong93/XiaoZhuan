@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val appVersion = AppVersion(1, 1, 1)
+val appVersion = AppVersion(1, 2, 0)
 
 @Suppress("SpellCheckingInspection")
 val packageId = "com.xigong.xiaozhuan"
@@ -43,6 +43,8 @@ dependencies {
 
     // Enables FileKit with Composable utilities
     implementation("io.github.vinceglb:filekit-compose:0.6.2")
+
+    implementation("net.dongliu:apk-parser:2.6.10")
 
 }
 

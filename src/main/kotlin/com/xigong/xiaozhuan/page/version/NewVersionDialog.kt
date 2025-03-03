@@ -44,7 +44,7 @@ private fun NewVersionDialogPreview() {
 @Composable
 private fun Content(version: AppVersion, onDismiss: () -> Unit) {
 
-    Dialog(onDismiss, properties = remember { DialogProperties() }) {
+    Dialog({ }, properties = remember { DialogProperties() }) {
 
         Column(
             modifier = Modifier
@@ -71,6 +71,7 @@ private fun Content(version: AppVersion, onDismiss: () -> Unit) {
                 Spacer(Modifier.width(12.dp))
                 PositiveButton("下载更新", onClick = {
                     browser("${Api.GITHUB_URL}/releases")
+                    onDismiss()
                 })
             }
 

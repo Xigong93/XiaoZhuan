@@ -132,7 +132,12 @@ class OPPOMaretApi(
             "business_username" to appInfo.businessUsername,
             "business_email" to appInfo.businessEmail,
             "business_mobile" to appInfo.businessMobile,
-            "copyright_url" to appInfo.copyrightUrl,
+            // 纸质软著
+            "copyright_url" to appInfo.copyrightUrl.ifEmpty {
+                appInfo.electronicCertUrl
+            },
+            // 电子版软著
+            "electronic_cert_url" to appInfo.electronicCertUrl,
         )
         val body = FormBody.Builder()
             .apply {

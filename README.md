@@ -45,8 +45,6 @@ Mac 版本未签名，需要配置以后才可以打开
 4. 在弹出的确认弹窗中，点击"打开"按钮即可
    <img src="./img/macOpenError.png"  style="border:2px solid #f4f4f4;border-radius:10px"/>
 
-<a href="https://gitee.com/xigong93/XiaoZhuan/releases">从Gitee下载(推荐)</a>
-
 <a href="https://github.com/xigong93/XiaoZhuan/releases">从Github下载</a>
 
 ## 功能限制

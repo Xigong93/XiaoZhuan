@@ -69,13 +69,7 @@ private fun Content(version: AppVersion, onDismiss: () -> Unit) {
                     onDismiss()
                 })
                 Spacer(Modifier.width(12.dp))
-
-                @Suppress("SpellCheckingInspection")
-                PositiveButton("Gitee下载更新", onClick = {
-                    browser("${Api.GITEE_URL}/releases")
-                })
-                Spacer(Modifier.width(12.dp))
-                PositiveButton("Github下载更新", onClick = {
+                PositiveButton("下载更新", onClick = {
                     browser("${Api.GITHUB_URL}/releases")
                 })
             }

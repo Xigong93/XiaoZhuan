@@ -23,8 +23,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowState
 import com.xigong.xiaozhuan.BuildConfig
 import com.xigong.xiaozhuan.page.splash.SplashPage
 import com.xigong.xiaozhuan.page.version.NewVersionDialog
@@ -33,7 +31,6 @@ import com.xigong.xiaozhuan.style.AppShapes
 
 @Composable
 fun FrameWindowScope.RootWindow(
-    state: WindowState,
     closeClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -54,7 +51,7 @@ fun FrameWindowScope.RootWindow(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                TopBar(state, closeClick)
+                TopBar(closeClick)
                 content()
             }
             SplashPage()
@@ -66,7 +63,7 @@ fun FrameWindowScope.RootWindow(
 }
 
 @Composable
-private fun FrameWindowScope.TopBar(state: WindowState, closeClick: () -> Unit) {
+private fun FrameWindowScope.TopBar(closeClick: () -> Unit) {
     WindowDraggableArea {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -86,13 +83,6 @@ private fun FrameWindowScope.TopBar(state: WindowState, closeClick: () -> Unit) 
             Spacer(modifier = Modifier.weight(1f))
             ImageButton("window_mini.png", 20.dp) {
                 window.isMinimized = true
-            }
-            ImageButton("window_max.png", 20.dp) {
-                if (state.placement == WindowPlacement.Floating) {
-                    state.placement = WindowPlacement.Maximized
-                } else {
-                    state.placement = WindowPlacement.Floating
-                }
             }
             ImageButton("window_close.png", 14.dp, closeClick)
         }

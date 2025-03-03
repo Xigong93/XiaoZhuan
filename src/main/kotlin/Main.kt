@@ -24,22 +24,21 @@ fun main() {
     BuildConfig.print()
     application {
         var exitDialog by remember { mutableStateOf(false) }
-        val state = rememberWindowState(
-            width = 1080.dp, height = 760.dp,
-            position = WindowPosition(Alignment.Center)
-        )
         Window(
             title = BuildConfig.appName,
             icon = painterResource(BuildConfig.ICON),
             resizable = true,
             transparent = true,
             undecorated = true,
-            state = state,
+            state = rememberWindowState(
+                width = 1080.dp, height = 760.dp,
+                position = WindowPosition(Alignment.Center)
+            ),
             onCloseRequest = {
                 exitDialog = true
             }
         ) {
-            RootWindow(state = state, closeClick = { exitDialog = true }) {
+            RootWindow(closeClick = { exitDialog = true }) {
                 AppNavigation()
                 if (exitDialog) {
                     ConfirmDialog("确定退出软件吗？",

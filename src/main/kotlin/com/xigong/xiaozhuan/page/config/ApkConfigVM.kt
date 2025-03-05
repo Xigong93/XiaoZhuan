@@ -14,7 +14,7 @@ import com.xigong.xiaozhuan.widget.Toast
 import kotlinx.coroutines.launch
 
 class ApkConfigVM(
-    private val appId: String?
+    private val appId: String?,
 ) : ViewModel() {
 
     private val configDao = ApkConfigDao()
@@ -90,6 +90,7 @@ class ApkConfigVM(
             applicationId = oldApk?.applicationId ?: "",
             createTime = oldApk?.createTime ?: System.currentTimeMillis(),
             channels = channelConfigs,
+            enableChannel = oldApk?.enableChannel ?: false,
             extension = oldApk?.extension ?: ApkConfig.Extension()
         )
     }

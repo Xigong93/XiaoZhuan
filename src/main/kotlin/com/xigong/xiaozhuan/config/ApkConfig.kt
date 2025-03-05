@@ -23,9 +23,9 @@ data class ApkConfig(
     val channels: List<Channel>,
     /** 是否支持多渠道包 */
     @Json(name = "enableChannel")
-    val enableChannel: Boolean = true,
+    val enableChannel: Boolean,
     @Json(name = "extension")
-    val extension: Extension
+    val extension: Extension,
 ) {
 
     fun getChannel(name: String): Channel? {
@@ -52,7 +52,7 @@ data class ApkConfig(
         val enable: Boolean,
         /** 参数 */
         @Json(name = "params")
-        val params: List<Param>
+        val params: List<Param>,
     ) {
         fun getParam(name: String): Param? {
             return params.firstOrNull { it.name == name }
@@ -64,7 +64,7 @@ data class ApkConfig(
         @Json(name = "name")
         val name: String,
         @Json(name = "value")
-        val value: String
+        val value: String,
     )
 
     @JsonClass(generateAdapter = true)
@@ -74,7 +74,7 @@ data class ApkConfig(
         val updateDesc: String? = null,
         /** 上次选择的Apk目录 */
         @Json(name = "apkDir")
-        val apkDir: String? = null
+        val apkDir: String? = null,
     )
 
     companion object {

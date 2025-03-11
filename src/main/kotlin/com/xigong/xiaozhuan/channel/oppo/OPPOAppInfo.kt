@@ -62,6 +62,10 @@ data class OPPOAppInfo(val obj: JsonObject) {
      */
     val copyrightUrl: String = obj.get("copyright_url")?.asString ?: ""
 
+    /**
+     * 软件的电子版权证明
+     */
+    val electronicCertUrl: String = obj.get("electronic_cert_url")?.asString ?: ""
 
     fun toMarketState(): MarketInfo {
         val state = if (reviewStatus == 111) ReviewState.Online else ReviewState.UnderReview

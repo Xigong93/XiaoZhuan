@@ -122,7 +122,7 @@ class MiMarketApi(
          * 自动发布接口域名
          */
 
-        const val DOMAIN: String = "http://api.developer.xiaomi.com/devupload"
+        const val DOMAIN: String = "https://api.developer.xiaomi.com/devupload"
 
         /**
          * 推送普通apk Url前缀

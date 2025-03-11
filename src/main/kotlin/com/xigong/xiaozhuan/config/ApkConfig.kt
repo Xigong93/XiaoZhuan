@@ -74,7 +74,10 @@ data class ApkConfig(
         val updateDesc: String? = null,
         /** 上次选择的Apk目录 */
         @Json(name = "apkDir")
-        val apkDir: String? = null
+        val apkDir: String? = null,
+        /** 是否忽略版本号 */
+        @Json(name = "ignoreVersion")
+        val ignoreVersion: Boolean = false,
     )
 
     companion object {

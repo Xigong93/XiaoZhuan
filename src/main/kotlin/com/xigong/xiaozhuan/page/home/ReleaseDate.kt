@@ -6,22 +6,42 @@ import java.util.*
  * 发布时间
  */
 data class ReleaseDate(
-    val year: String,
-    val month: String,
-    val day: String,
-    val hour: String
+    /**
+     * 取值范围[2025,...]
+     */
+    val year: Int,
+    /**
+     * 取值范围
+     * [1,12]
+     */
+    val month: Int,
+    /**
+     * 取值范围
+     * [1,31]
+     */
+    val day: Int,
+    /**
+     * 取值范围[0,23]
+     */
+    val hour: Int
 ) {
     companion object {
-        fun new(): ReleaseDate {
+        fun default(): ReleaseDate {
+            // 默认设置的3天后的上午10点钟
             val calendar = Calendar.getInstance()
-            // 默认设置的3天后的上午10点钟表
             calendar.set(Calendar.HOUR_OF_DAY, 10)
             calendar.add(Calendar.DAY_OF_YEAR, 3)
+            return fromDate(calendar.time)
+        }
+
+        fun fromDate(date: Date): ReleaseDate {
+            val calendar = Calendar.getInstance()
+            calendar.time = date
             return ReleaseDate(
-                year = calendar.get(Calendar.YEAR).toString(),
-                month = (calendar.get(Calendar.MONTH) + 1).toString(),
-                day = calendar.get(Calendar.DAY_OF_MONTH).toString(),
-                hour = calendar.get(Calendar.HOUR_OF_DAY).toString(),
+                year = calendar.get(Calendar.YEAR),
+                month = (calendar.get(Calendar.MONTH) + 1),
+                day = calendar.get(Calendar.DAY_OF_MONTH),
+                hour = calendar.get(Calendar.HOUR_OF_DAY),
             )
         }
     }
@@ -30,11 +50,7 @@ data class ReleaseDate(
     /**
      * 转成日期
      */
-    fun getData(): Date {
-        val year = year.toIntOrNull() ?: 0
-        val month = month.toIntOrNull() ?: 0
-        val day = day.toIntOrNull() ?: 0
-        val hour = hour.toIntOrNull() ?: 0
+    fun toDate(): Date {
         return Calendar.getInstance().apply {
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month - 1)

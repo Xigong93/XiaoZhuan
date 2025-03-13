@@ -51,7 +51,7 @@ class ApkPageState(val apkConfig: ApkConfig) {
     /**
      * 定时发布的时间
      */
-    var releaseTime by mutableStateOf(ReleaseDate.new())
+    var releaseTime by mutableStateOf(ReleaseDate.default())
 
     val taskLaunchers: List<TaskLauncher> = channels.map(::TaskLauncher)
 
@@ -249,7 +249,7 @@ class ApkPageState(val apkConfig: ApkConfig) {
 
 
     private fun getReleaseTime(): Long {
-        val time = releaseTime.getData().time
+        val time = releaseTime.toDate().time
         val endTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)
         if (time < System.currentTimeMillis()) {
             Toast.show("不能早于当前时间")

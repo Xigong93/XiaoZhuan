@@ -63,10 +63,10 @@ compose.desktop {
         buildTypes {
             release {
                 proguard {
-                    isEnabled.set(true)
+                    isEnabled.set(false)
                     optimize.set(true)
                     obfuscate.set(false)
-                    configurationFiles.from("./proguard/app.pro", "./proguard/jna.pro")
+                    configurationFiles.from("./proguard/app.pro")
                 }
             }
         }

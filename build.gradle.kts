@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val appVersion = AppVersion(1, 1, 1)
+val appVersion = AppVersion(1, 2, 0)
 
 @Suppress("SpellCheckingInspection")
 val packageId = "com.xigong.xiaozhuan"
@@ -37,12 +37,14 @@ dependencies {
     implementation("org.json:json:20210307")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0")
-    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha02")
+    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
     // Enables FileKit without Compose dependencies
     implementation("io.github.vinceglb:filekit-core:0.6.2")
 
     // Enables FileKit with Composable utilities
     implementation("io.github.vinceglb:filekit-compose:0.6.2")
+
+    implementation("net.dongliu:apk-parser:2.6.10")
 
 }
 
@@ -60,7 +62,12 @@ compose.desktop {
         mainClass = "Main"
         buildTypes {
             release {
-                proguard.isEnabled = false
+                proguard {
+                    isEnabled.set(false)
+                    optimize.set(true)
+                    obfuscate.set(false)
+                    configurationFiles.from("./proguard/app.pro")
+                }
             }
         }
         nativeDistributions {
@@ -111,10 +118,10 @@ tasks.named("processResources") {
 
 tasks.register("packageWindows") {
     group = "compose desktop"
-    dependsOn("clean", "packageAppImage")
+    dependsOn("clean", "packageReleaseAppImage")
     doLast {
         val packageDir = project.buildDir.resolve("packages")
-        val dir = project.buildDir.resolve("packages/main/app")
+        val dir = project.buildDir.resolve("packages/main-release/app")
         val appDir = checkNotNull(dir.listFiles()).first()
         val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-Windows.zip")
         zipTo(packageFile, appDir)
@@ -124,10 +131,10 @@ tasks.register("packageWindows") {
 
 tasks.register("packageMac") {
     group = "compose desktop"
-    dependsOn("clean", "packageDmg")
+    dependsOn("clean", "packageReleaseDmg")
     doLast {
         val packageDir = project.buildDir.resolve("packages")
-        val dir = project.buildDir.resolve("packages/main/dmg")
+        val dir = project.buildDir.resolve("packages/main-release/dmg")
         val dmgFile = checkNotNull(dir.listFiles()).first()
         val packageFile = File(packageDir, "${appNameEn}-v${appVersion.versionName}-Mac.dmg")
         dmgFile.copyTo(packageFile, true)

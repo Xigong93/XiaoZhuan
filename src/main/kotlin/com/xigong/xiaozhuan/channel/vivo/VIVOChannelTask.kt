@@ -2,6 +2,7 @@ package com.xigong.xiaozhuan.channel.vivo
 
 import com.xigong.xiaozhuan.channel.ChannelTask
 import com.xigong.xiaozhuan.channel.MarketInfo
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.util.ApkInfo
 import java.io.File
 
@@ -21,8 +22,13 @@ class VIVOChannelTask : ChannelTask() {
         marketClient = VIVOMarketClient(accessKey, accessSecret)
     }
 
-    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
-        requireNotNull(marketClient).submit(file, apkInfo, updateDesc, progress)
+    override suspend fun performUpload(
+        file: File,
+        apkInfo: ApkInfo,
+        versionParams: VersionParams,
+        progress: (Int) -> Unit
+    ) {
+        requireNotNull(marketClient).submit(file, apkInfo, versionParams, progress)
 
     }
 

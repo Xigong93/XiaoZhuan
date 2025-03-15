@@ -42,15 +42,16 @@ abstract class ChannelTask {
     }
 
     @kotlin.jvm.Throws
-    suspend fun startUpload(apkFile: File, updateDesc: String) {
+    suspend fun startUpload(apkFile: File, versionParams: VersionParams) {
         AppLogger.info(channelName, "开始提交新版本")
         val listener = submitStateListener
         try {
             val apkInfo = getApkInfo(apkFile)
             AppLogger.info(channelName, "准备提交Apk信息:$apkInfo")
+            AppLogger.info(channelName, "版本参数:$versionParams")
             listener?.onStart()
             listener?.onProcessing("请求中")
-            performUpload(apkFile, apkInfo, updateDesc, ::notifyProgress)
+            performUpload(apkFile, apkInfo, versionParams, ::notifyProgress)
             listener?.onSuccess()
             AppLogger.info(channelName, "提交新版本成功,$apkInfo")
         } catch (e: Throwable) {
@@ -73,7 +74,7 @@ abstract class ChannelTask {
      * 执行结束，表示上传成功，抛出异常代表出错
      */
     @Throws
-    abstract suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit)
+    abstract suspend fun performUpload(file: File, apkInfo: ApkInfo, versionParams: VersionParams, progress: (Int) -> Unit)
 
 
     /**

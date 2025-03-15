@@ -1,16 +1,10 @@
 @file:JvmName("Main")
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.*
 import com.xigong.xiaozhuan.BuildConfig
 import com.xigong.xiaozhuan.log.AppLogger
 import com.xigong.xiaozhuan.log.CrashHandler
@@ -23,34 +17,41 @@ fun main() {
     AppLogger.info("main", "App启动")
     BuildConfig.print()
     application {
-        var exitDialog by remember { mutableStateOf(false) }
+        var showExitDialog by remember { mutableStateOf(false) }
         Window(
             title = BuildConfig.appName,
             icon = painterResource(BuildConfig.ICON),
-            resizable = false,
-            transparent = true,
-            undecorated = true,
             state = rememberWindowState(
                 width = 1280.dp, height = 960.dp,
                 position = WindowPosition(Alignment.Center)
             ),
             onCloseRequest = {
-                exitDialog = true
+                showExitDialog = true
             }
         ) {
-            RootWindow(closeClick = { exitDialog = true }) {
+            RootWindow(closeClick = { showExitDialog = true }) {
                 AppNavigation()
-                if (exitDialog) {
-                    ConfirmDialog("确定退出软件吗？",
-                        onConfirm = {
-                            exitDialog = false
-                            AppLogger.info("main", "App关闭")
-                            exitApplication()
-                        }, onDismiss = {
-                            exitDialog = false
-                        })
+            }
+            if (showExitDialog) {
+                exitDialog {
+                    showExitDialog = false
                 }
             }
         }
+
     }
 }
+
+@Composable
+private fun ApplicationScope.exitDialog(requestDismiss: () -> Unit) {
+    ConfirmDialog(
+        "确定退出软件吗？",
+        onDismiss = requestDismiss,
+        onConfirm = {
+            requestDismiss()
+            AppLogger.info("main", "App关闭")
+            exitApplication()
+        },
+    )
+}
+

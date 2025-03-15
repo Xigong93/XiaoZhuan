@@ -1,5 +1,6 @@
 package com.xigong.xiaozhuan.channel.oppo
 
+import com.xigong.xiaozhuan.channel.VersionParams
 import com.xigong.xiaozhuan.log.AppLogger
 import com.xigong.xiaozhuan.log.action
 import com.xigong.xiaozhuan.util.ApkInfo
@@ -13,13 +14,13 @@ class OPPOMarketClient(
     private val marketApi = OPPOMaretApi(clientId, clientSecret)
 
     suspend fun submit(
-        file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit
+        file: File, apkInfo: ApkInfo, versionParams: VersionParams, progress: (Int) -> Unit
     ): Unit = AppLogger.action(LOG_TAG, "提交新版本") {
         val token = getToken()
         val appInfo = getAppInfo(token, apkInfo.applicationId)
         val uploadUrl = getUploadUrl(token)
         val apkResult = uploadApk(uploadUrl, token, file, progress)
-        performSubmit(token, apkInfo, appInfo, updateDesc, apkResult)
+        performSubmit(token, apkInfo, appInfo, versionParams, apkResult)
     }
 
     suspend fun getAppInfo(
@@ -58,10 +59,10 @@ class OPPOMarketClient(
         token: String,
         apkInfo: ApkInfo,
         appInfo: OPPOAppInfo,
-        updateDesc: String,
+        versionParams: VersionParams,
         apkResult: OPPOApkResult
     ): Unit = AppLogger.action(LOG_TAG, "提交审核") {
-        marketApi.submit(token, apkInfo, appInfo, updateDesc, apkResult)
+        marketApi.submit(token, apkInfo, appInfo, versionParams, apkResult)
     }
 
     companion object {

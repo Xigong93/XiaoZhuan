@@ -52,8 +52,7 @@ data class HWAppInfoResp(
             }
             return MarketInfo(
                 reviewState = reviewState,
-                lastVersionName = versionNumber,
-                lastVersionCode = versionCode
+                lastVersion = MarketInfo.Version(versionCode, versionNumber)
             )
         }
     }

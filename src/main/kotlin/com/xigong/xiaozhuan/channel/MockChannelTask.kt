@@ -19,7 +19,12 @@ class MockChannelTask(
 
     }
 
-    override suspend fun performUpload(file: File, apkInfo: ApkInfo, updateDesc: String, progress: (Int) -> Unit) {
+    override suspend fun performUpload(
+        file: File,
+        apkInfo: ApkInfo,
+        versionParams: VersionParams,
+        progress: (Int) -> Unit
+    ) {
         AppLogger.info(LOG_TAG, "Mock ${channelName},开始上传")
         repeat(100) {
             delay(30)
@@ -32,7 +37,7 @@ class MockChannelTask(
     override suspend fun getMarketState(applicationId: String): MarketInfo {
         delay(1000)
         throw ApiException(400, "获取token", "请检测api key")
-        return MarketInfo(ReviewState.Online, lastVersionCode = 100, lastVersionName = "1.1.0")
+        return MarketInfo(ReviewState.Online, lastVersion = MarketInfo.Version(100, "1.0.0"))
     }
 
     companion object {

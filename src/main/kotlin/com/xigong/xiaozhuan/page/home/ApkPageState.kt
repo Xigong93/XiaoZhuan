@@ -18,6 +18,7 @@ import com.xigong.xiaozhuan.util.getApkInfo
 import com.xigong.xiaozhuan.widget.Toast
 import kotlinx.coroutines.*
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class ApkPageState(val apkConfig: ApkConfig) {
 
@@ -41,6 +42,16 @@ class ApkPageState(val apkConfig: ApkConfig) {
      * 应用市场信息加载状态
      */
     var loadingMarkState by mutableStateOf(false)
+
+    /**
+     * 是否开启定时发布
+     */
+    var enableScheduledRelease by mutableStateOf(false)
+
+    /**
+     * 定时发布的时间
+     */
+    var releaseTime by mutableStateOf(ReleaseDate.default())
 
     val taskLaunchers: List<TaskLauncher> = channels.map(::TaskLauncher)
 
@@ -174,7 +185,8 @@ class ApkPageState(val apkConfig: ApkConfig) {
             message?.set("应用市场审核中，或状态异常，无法上传新版本")
             return false
         }
-        if (apkInfo != null && marketInfo != null && apkInfo.versionCode <= marketInfo.lastVersionCode) {
+        val lastVersion = marketInfo?.lastVersion
+        if (apkInfo != null && lastVersion != null && apkInfo.versionCode <= lastVersion.code) {
             message?.set("要提交的Apk版本号需大于线上最新版本号")
             return false
         }
@@ -212,20 +224,41 @@ class ApkPageState(val apkConfig: ApkConfig) {
         if (updateDesc.length > 300) {
             Toast.show("更新描述不可超过300字")
             return null
-
         }
         val channels = selectedChannels
         if (channels.isEmpty()) {
             Toast.show("请选择渠道")
             return null
         }
+
+        val releaseDate = if (enableScheduledRelease) {
+            getReleaseTime()
+        } else {
+            0
+        }
+
         updateApkConfig()
         return UploadParam(
             appId = apkConfig.applicationId,
             updateDesc = updateDesc,
             channels = channels,
-            apkFile = file.absolutePath
+            apkFile = file.absolutePath,
+            onlineTime = releaseDate
         )
+    }
+
+
+    private fun getReleaseTime(): Long {
+        val time = releaseTime.toDate().time
+        val endTime = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30)
+        if (time < System.currentTimeMillis()) {
+            Toast.show("不能早于当前时间")
+            return 0
+        } else if (time > endTime) {
+            Toast.show("不能设置到1个月以后")
+            return 0
+        }
+        return time
     }
 
     fun getFileSize(): String {

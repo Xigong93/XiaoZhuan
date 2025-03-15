@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.xigong.xiaozhuan.Api.GITEE_URL
 import com.xigong.xiaozhuan.Api.GITHUB_URL
 import com.xigong.xiaozhuan.BuildConfig
 import com.xigong.xiaozhuan.style.AppColors
@@ -101,10 +100,6 @@ private fun Content() {
         fontSize = 14.sp
     )
 
-    Spacer(Modifier.height(dividerHeight))
-
-    @Suppress("SpellCheckingInspection")
-    ClickText("Gitee 地址：", GITEE_URL)
     Spacer(Modifier.height(dividerHeight))
     ClickText("Github 地址：", GITHUB_URL)
     Spacer(Modifier.height(dividerHeight))

@@ -70,6 +70,7 @@ class MiMarketApi(
         apkFile: File,
         appInfo: MiAppInfoResp.MiAppInfo,
         updateDesc: String,
+        onlineTime: Long,
         progressChange: ProgressChange
     ) = withContext(Dispatchers.IO) {
         val requestData = JSONObject().apply {
@@ -79,6 +80,9 @@ class MiMarketApi(
                 put("appName", appInfo.appName)
                 put("packageName", appInfo.packageName)
                 put("updateDesc", updateDesc)
+                if (onlineTime > 0) {
+                    put("onlineTime", onlineTime)// 上线时间，毫秒时间戳
+                }
             })
         }
 
@@ -122,7 +126,7 @@ class MiMarketApi(
          * 自动发布接口域名
          */
 
-        const val DOMAIN: String = "http://api.developer.xiaomi.com/devupload"
+        const val DOMAIN: String = "https://api.developer.xiaomi.com/devupload"
 
         /**
          * 推送普通apk Url前缀

@@ -107,7 +107,7 @@ interface HonorConnectApi {
     suspend fun submit(
         @Header("Authorization") token: String,
         @Query("appId") appId: String,
-        @Body param: HonorSubmitParam = HonorSubmitParam()
+        @Body param: HonorSubmitParam
     ): HonorResult<Any?>
 
 }

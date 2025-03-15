@@ -5,11 +5,6 @@ import com.xigong.xiaozhuan.channel.ReviewState
 import com.google.gson.JsonObject
 
 data class VIVOAppInfo(val obj: JsonObject) {
-    /**
-     * 应用分类（appClassify
-     * https://dev.vivo.com.cn/documentCenter/doc/344
-     */
-    val onlineType: Int = obj.get("onlineType").asInt
 
     /**
      * 1 草稿
@@ -22,7 +17,7 @@ data class VIVOAppInfo(val obj: JsonObject) {
     val versionName: String = obj.get("versionName").asString
 
     override fun toString(): String {
-        return "VIVOAppInfo(onlineType=$onlineType)"
+        return "VIVOAppInfo(obj=$obj)"
     }
 
     fun toMarketState(): MarketInfo {
@@ -32,7 +27,10 @@ data class VIVOAppInfo(val obj: JsonObject) {
             4 -> ReviewState.Rejected
             else -> ReviewState.Unknown
         }
-        return MarketInfo(reviewState = state, lastVersionCode = versionCode, lastVersionName = versionName)
+        return MarketInfo(
+            reviewState = state,
+            lastVersion = MarketInfo.Version(versionCode, versionName)
+        )
     }
 
 }

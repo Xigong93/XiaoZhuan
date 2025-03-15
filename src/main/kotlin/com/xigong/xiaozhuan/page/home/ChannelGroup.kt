@@ -23,6 +23,7 @@ import com.xigong.xiaozhuan.style.AppShapes
 import com.xigong.xiaozhuan.widget.ConfirmDialog
 import com.xigong.xiaozhuan.widget.ErrorPopup
 import com.xigong.xiaozhuan.widget.Toast
+import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,37 +37,7 @@ fun ChannelGroup(viewModel: ApkPageState, startUpload: (UploadParam) -> Unit) {
             .padding(20.dp)
     ) {
         Column(modifier = Modifier.weight(1f).fillMaxWidth()) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    "渠道",
-                    color = Color.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.weight(1f))
-
-                Box(modifier = Modifier.size(40.dp)) {
-                    if (viewModel.loadingMarkState) {
-                        CircularProgressIndicator(
-                            color = AppColors.primary,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    } else {
-                        Image(
-                            painterResource("refresh.png"),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(AppColors.primary),
-                            modifier = Modifier.size(36.dp)
-                                .clip(CircleShape)
-                                .clickable {
-                                    tryReloadMarketState(viewModel)
-                                }
-                                .padding(2.dp)
-                        )
-                    }
-                }
-                Spacer(Modifier.width(10.dp))
-            }
+            Header(viewModel)
             Spacer(Modifier.height(12.dp))
 
             val scrollState = rememberScrollState()
@@ -95,53 +66,133 @@ fun ChannelGroup(viewModel: ApkPageState, startUpload: (UploadParam) -> Unit) {
                 )
             }
         }
-        Box(
-            modifier = Modifier.fillMaxWidth()
-                .padding(vertical = 14.dp)
-        ) {
-            val allSelected = viewModel.allChannelSelected()
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+        ScheduleTime(viewModel)
+        Footer(viewModel, startUpload)
+    }
+}
+
+@Composable
+private fun Header(viewModel: ApkPageState) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            "渠道",
+            color = Color.Black,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.weight(1f))
+
+        Box(modifier = Modifier.size(40.dp)) {
+            if (viewModel.loadingMarkState) {
+                CircularProgressIndicator(
+                    color = AppColors.primary,
+                    modifier = Modifier.size(30.dp)
+                )
+            } else {
+                Image(
+                    painterResource("refresh.png"),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(AppColors.primary),
+                    modifier = Modifier.size(36.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            tryReloadMarketState(viewModel)
+                        }
+                        .padding(2.dp)
+                )
+            }
+        }
+        Spacer(Modifier.width(10.dp))
+    }
+}
+
+/**
+ * 定时发布
+ */
+@Composable
+private fun ScheduleTime(viewModel: ApkPageState) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
                 .clip(AppShapes.roundButton)
+                .align(Alignment.CenterStart)
                 .clickable {
-                    viewModel.selectAll(allSelected.not())
+                    viewModel.enableScheduledRelease = !viewModel.enableScheduledRelease
                 }
                 .padding(end = 12.dp)) {
-                Checkbox(
-                    allSelected,
-                    onCheckedChange = { all ->
-                        viewModel.selectAll(all)
-                    },
-                    colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
-                )
-                Text("全选")
-            }
+            Checkbox(
+                viewModel.enableScheduledRelease,
+                onCheckedChange = { all ->
+                    viewModel.enableScheduledRelease = !viewModel.enableScheduledRelease
+                },
+                colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
+            )
+            Text("定时发布")
+        }
 
-            val uploadState = remember { mutableStateOf<UploadParam?>(null) }
-            val uploadParam = uploadState.value
-            if (uploadParam != null) {
-                showConfirmDialog(viewModel,
-                    onConfirm = {
-                        startUpload(uploadParam)
-                        uploadState.value = null
-                    }, onDismiss = {
-                        uploadState.value = null
-                    }
-                )
+
+        if (viewModel.enableScheduledRelease) {
+            DateInput(viewModel.releaseTime) {
+                viewModel.releaseTime = it
             }
-            Button(
-                colors = ButtonDefaults.buttonColors(AppColors.primary),
-                modifier = Modifier.align(Alignment.Center),
-                onClick = {
-                    uploadState.value = viewModel.startDispatch()
+        }
+
+    }
+}
+
+@Composable
+private fun Footer(
+    viewModel: ApkPageState,
+    startUpload: (UploadParam) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 14.dp)
+    ) {
+        val allSelected = viewModel.allChannelSelected()
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+            .clip(AppShapes.roundButton)
+            .clickable {
+                viewModel.selectAll(allSelected.not())
+            }
+            .padding(end = 12.dp)) {
+            Checkbox(
+                allSelected,
+                onCheckedChange = { all ->
+                    viewModel.selectAll(all)
+                },
+                colors = CheckboxDefaults.colors(checkedColor = AppColors.primary)
+            )
+            Text("全选")
+        }
+
+        val uploadState = remember { mutableStateOf<UploadParam?>(null) }
+        val uploadParam = uploadState.value
+        if (uploadParam != null) {
+            showConfirmDialog(viewModel,
+                onConfirm = {
+                    startUpload(uploadParam)
+                    uploadState.value = null
+                }, onDismiss = {
+                    uploadState.value = null
                 }
-            ) {
-
-                Text(
-                    "发布更新",
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 40.dp)
-                )
+            )
+        }
+        Button(
+            colors = ButtonDefaults.buttonColors(AppColors.primary),
+            modifier = Modifier.align(Alignment.Center),
+            onClick = {
+                uploadState.value = viewModel.startDispatch()
             }
+        ) {
+
+            Text(
+                "发布更新",
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 40.dp)
+            )
         }
     }
 }
@@ -170,6 +221,14 @@ private fun showConfirmDialog(viewModel: ApkPageState, onConfirm: () -> Unit, on
         append("版本:  ${apkInfo.versionName}(${apkInfo.versionCode})")
         append("\n")
         append("渠道:  ${selectedChannels.joinToString(",")}")
+        append("\n")
+        if (viewModel.enableScheduledRelease) {
+            val date = viewModel.releaseTime.toDate()
+            val dateStr = SimpleDateFormat("yyyy年MM月dd日 HH时").format(date)
+            append("发布方式:  于 $dateStr 定时发布")
+        } else {
+            append("发布方式:  审核通过后立即发布")
+        }
     }
 
 
@@ -239,7 +298,8 @@ private fun ChannelView(
             is MarketState.Loading -> "加载中"
             is MarketState.Success -> {
                 val info = marketState.info
-                "v${info.lastVersionName} ${info.reviewState.desc}"
+                val version = info.lastVersion?.name?.let { "v$it" } ?: "未知版本"
+                "$version ${info.reviewState.desc}"
             }
 
             is MarketState.Error -> {

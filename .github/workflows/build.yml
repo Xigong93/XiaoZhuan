@@ -22,11 +22,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup encoding for Windows
+        shell: pwsh
+        run: |
+          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+          chcp 65001
+          $env:JAVA_TOOL_OPTES = "-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+          echo "JAVA_TOOL_OPTES=$env:JAVA_TOOL_OPTES" | Out-File -FilePath $env:GITHUB_ENV -Append
+          
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build Windows package
-        run: ./gradlew packageWindows
+        run: ./gradlew  -Dfile.encoding=UTF-8  packageWindows
         shell: pwsh
 
       - name: Upload Windows artifacts
